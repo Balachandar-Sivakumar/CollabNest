@@ -10,12 +10,11 @@
 
   <!-- AOS animation CSS -->
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
-      body {
-    font-family: 'Inter', sans-serif;
-  }
+    body {
+      font-family: 'Inter', sans-serif;
+    }
   </style>
 </head>
 <body class="bg-white text-gray-900 flex flex-col">
@@ -34,8 +33,8 @@
       </h1>
     </div>
     <div class="space-x-6 text-sm font-semibold">
-      <a href="{{ route('home') }}" class="text-blue-600 transition cursor-pointer">Home</a>
-      <a href="{{ route('how-it-works') }}" class="hover:text-blue-600 transition cursor-pointer">How it works</a>
+      <a href="{{ route('home') }}" class="hover:text-blue-600 transition cursor-pointer">Home</a>
+      <a href="{{ route('how-it-works') }}" class="text-blue-600 transition cursor-pointer">How it works</a>
       <a href="{{ route('explore-projects') }}" class="hover:text-blue-600 transition cursor-pointer">Explore Projects</a>
       <a href="{{ route('find-talent') }}" class="hover:text-blue-600 transition cursor-pointer">Find Talent</a>
       <a href="{{ route('help') }}" class="hover:text-blue-600 transition cursor-pointer">Help</a>
@@ -47,38 +46,36 @@
     </div>
   </nav>
 
-  <!-- Hero Section -->
-  <section class="flex flex-col-reverse lg:flex-row items-center max-w-7xl mx-auto px-6 gap-12" style="padding:30px 0px">
-    <div class="flex-1 max-w-lg" data-aos="fade-right">
-      <h2 class="text-4xl font-extrabold leading-tight mb-6">
-        Welcome to <span class="text-blue-600">CollabNest</span><br />
-        Your Ultimate Collaborative Work Platform
-      </h2>
-      <p class="text-gray-700 mb-8 text-lg leading-relaxed" data-aos="fade-up" data-aos-delay="200">
-        Bridging the gap between skilled individuals and meaningful collaboration.
-        Whether you're a developer, designer, freelancer, or entrepreneur, find
-        teammates and projects perfectly aligned with your skills, interests, and availability.
+
+  <section class="bg-white py-16 px-6">
+    <div class="max-w-6xl mx-auto text-center">
+      <h2 class="text-4xl font-bold text-blue-600 mb-6" data-aos="fade-up">How CollabNest Works</h2>
+      <p class="text-gray-600 text-lg mb-12" data-aos="fade-up" data-aos-delay="100">
+        Discover how easy it is to find collaborators, manage tasks, and build amazing projects together.
       </p>
-      <div class="flex space-x-4" data-aos="fade-up" data-aos-delay="400">
-        <a href="/register" class="bg-blue-600 text-white px-6 py-3 rounded-md font-semibold hover:bg-blue-700 transition">
-          Get Started
-        </a>
-        <a href="#how-it-works" class="text-blue-600 font-semibold flex items-center hover:underline">
-          Learn How It Works
-          <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path>
-          </svg>
-        </a>
+
+      <div class="grid md:grid-cols-3 gap-10">
+        <!-- Step 1 -->
+        <div class="p-6 rounded-lg border shadow bg-white" data-aos="zoom-in">
+          <img src="https://cdn-icons-png.flaticon.com/512/1055/1055687.png" class="w-20 h-20 mx-auto mb-4" alt="Sign up icon" />
+          <h3 class="text-xl font-semibold mb-2">Step 1: Create Profile</h3>
+          <p class="text-gray-600">Sign up and build your profile highlighting your skills, interests, and availability.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="p-6 rounded-lg border shadow bg-white" data-aos="zoom-in" data-aos-delay="200">
+          <img src="https://cdn-icons-png.freepik.com/256/8656/8656810.png?uid=R156815013&ga=GA1.1.1574424695.1745626358&semt=ais_incoming" class="w-20 h-20 mx-auto mb-4" alt="Find projects icon" />
+          <h3 class="text-xl font-semibold mb-2">Step 2: Discover Projects</h3>
+          <p class="text-gray-600">Explore open-source projects, startups, or hackathons that need your skills.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="p-6 rounded-lg border shadow bg-white" data-aos="zoom-in" data-aos-delay="400">
+          <img src="https://cdn-icons-png.freepik.com/256/17017/17017929.png?uid=R156815013&ga=GA1.1.1574424695.1745626358&semt=ais_incoming" class="w-20 h-20 mx-auto mb-4" alt="Collaborate icon" />
+          <h3 class="text-xl font-semibold mb-2">Step 3: Start Collaborating</h3>
+          <p class="text-gray-600">Join a team, assign tasks, and communicate directly on the platform with real-time tools.</p>
+        </div>
       </div>
-    </div>
-    <div class="flex-1 max-w-xl" data-aos="fade-left" data-aos-delay="600">
-      <img
-        src="https://img.freepik.com/free-photo/technology-communication-icons-symbols-concept_53876-124058.jpg?uid=R156815013&ga=GA1.1.1574424695.1745626358&semt=ais_hybrid&w=740"
-        alt="Professionals collaborating on projects illustration"
-        class="w-full rounded-lg shadow-lg"
-        style="height: 460px;"
-        width="600"
-      />
     </div>
   </section>
 
