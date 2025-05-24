@@ -10,12 +10,12 @@ use Illuminate\Http\Request;
 
 class Authentication extends Controller
 {
-    public function welcome()
+  public function welcome()
     {
-        if (Auth::check()) {
-            return redirect('/dashboard');
-        }
-        return view('welcome');
+        
+        $users = User::all();
+
+        return view('welcome', compact('users'));
     }
 
     public function register()
