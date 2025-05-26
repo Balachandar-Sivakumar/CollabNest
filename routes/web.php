@@ -10,7 +10,7 @@ use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\WelcomepageController;
-;
+use App\Http\Controllers\UsersController;
 
 // Home page
 Route::get('/', [Authentication::class, 'welcome']);
@@ -71,3 +71,5 @@ Route::get('/explore-projects', [WelcomepageController::class, 'exploreProjects'
 Route::get('/find-talent', [WelcomepageController::class, 'findTalent'])->name('find-talent');
 
 Route::get('/help', [WelcomepageController::class, 'help'])->name('help');
+
+Route::get('/users',[UsersController::class, 'NavUsers']);

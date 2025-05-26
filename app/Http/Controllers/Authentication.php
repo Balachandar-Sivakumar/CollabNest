@@ -12,7 +12,10 @@ class Authentication extends Controller
 {
   public function welcome()
     {
-        
+
+        if (Auth::check()) {
+            return redirect('/dashboard');
+        }
         $users = User::all();
 
         return view('welcome', compact('users'));
@@ -28,6 +31,7 @@ class Authentication extends Controller
 
     public function navLogin()
     {
+      
         if (Auth::check()) {
             return redirect('/dashboard');
         }
