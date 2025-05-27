@@ -9,22 +9,24 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up()
-    {
-        Schema::create('skills', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->json('skills');
-            $table->json('interests');
-            $table->string('availability');
-            $table->timestamps();
+  public function up()
+{
+    Schema::create('skills', function (Blueprint $table) {
+        $table->id();
+        $table->unsignedBigInteger('user_id');
+        $table->string('profession')->nullable();
+        $table->json('skills');
+        $table->json('interests');
+        $table->string('availability');
+        $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-        });
-    }
+        $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+    });
+}
+
 
     public function down()
     {
-        Schema::dropIfExists('skills_tbl');
+        Schema::dropIfExists('skills');
     }
 };
