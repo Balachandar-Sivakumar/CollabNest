@@ -22,9 +22,9 @@
   <!-- Navbar -->
   <nav class="flex items-center justify-between px-6 py-4 border-b border-gray-200 shadow-sm" data-aos="fade-down">
     <div class="flex items-center space-x-3">
-      <div class="w-10 h-10 rounded overflow-hidden">
+      <div class="w-20 h-20 rounded overflow-hidden">
         <img
-          src="https://sdmntprnorthcentralus.oaiusercontent.com/files/00000000-e454-622f-8e2d-e85930ca57ca/raw?se=2025-05-23T23%3A07%3A44Z&sp=r&sv=2024-08-04&sr=b&scid=0347ee2b-e592-56de-8757-bb7ae920edac&skoid=add8ee7d-5fc7-451e-b06e-a82b2276cf62&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-05-23T13%3A08%3A22Z&ske=2025-05-24T13%3A08%3A22Z&sks=b&skv=2024-08-04&sig=ZNSHIzBDzN2Lx2KqIjOpe73Xih6u5VMqAhbofCEpL/I%3D"
+          src="assets/logo.png"
           alt="CollabNest Logo"
           class="w-full h-full object-contain"
         />

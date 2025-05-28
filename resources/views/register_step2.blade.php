@@ -12,13 +12,7 @@
       body {
     font-family: 'Inter', sans-serif;
   }
-    /* @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .animate-fadeIn {
-      animation: fadeIn 0.6s ease-out forwards;
-    } */
+   
   </style>
 </head>
 <body class="bg-gray-100 relative">
@@ -50,33 +44,41 @@
 
         <form method="POST" action="/step_two">
           @csrf 
+       <!-- Profession Dropdown -->
+              <div x-data="{ professionInput: '', selectedProfessions: [] }" 
+         x-init="$watch('professionInput', value => selectedProfessions = value.split(',').map(p => p.trim()).filter(p => p))">
+    
+      <label class="block font-semibold text-gray-700 mb-2 text-lg">Profession(s)</label>
+      
+      <div class="relative">
+        <input type="text"
+               placeholder="Enter professions separated by commas (e.g. Developer, Designer, Project Manager)"
+               x-model="professionInput"
+               class="w-full border border-gray-300 rounded px-3 py-2 mb-2 text-sm text-black text-left focus:outline-none focus:ring-1 focus:ring-cyan-400" />
+    
+        <!-- Hidden inputs to submit as array -->
+        <template x-for="(profession, index) in selectedProfessions" :key="index">
+          <input type="hidden" name="profession[]" :value="profession">
+        </template>
+      </div>
+    </div>
+
 
           <!-- Skills Dropdown -->
-          <div x-data="{ open: false, selectedSkills: [] }">
-            <label class="block font-semibold text-gray-700 mb-2 text-lg">Skills</label>
-            <div class="relative">
-              <button type="button"
-                      class="w-full border border-gray-300 rounded px-3 py-2 mb-2 text-sm text-black text-left focus:outline-none focus:ring-1 focus:ring-cyan-400"
-                      @click="open = !open">
-                <span x-text="selectedSkills.length > 0 ? selectedSkills.join(', ') : 'Select Skills'"></span>
-                <svg class="w-5 h-5 inline float-right" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
+            <div x-data="{ skillsInput: '', selectedSkills: [] }" x-init="$watch('skillsInput', value => selectedSkills = value.split(',').map(s => s.trim()).filter(s => s))">
+          <label class="block font-semibold text-gray-700 mb-2 text-lg">Technical Skills</label>
+          <div class="relative">
+            <input type="text"
+                   placeholder="Enter skills separated by commas (e.g. PHP, Laravel, VueJS)"
+                   x-model="skillsInput"
+                   class="w-full border border-gray-300 rounded px-3 py-2 mb-2 text-sm text-black text-left focus:outline-none focus:ring-1 focus:ring-cyan-400" />
 
-              <div x-show="open"
-                   @click.outside="open = false"
-                   class="absolute z-10 mt-2 w-full max-h-64 overflow-y-auto border border-gray-300 bg-white rounded-lg shadow-lg p-4 space-y-2">
-                <template x-for="skill in ['PHP', 'Laravel', 'VueJS', 'React', 'Node.js', 'Python', 'Django', 'MySQL', 'PostgreSQL', 'Docker']" :key="skill">
-                  <label class="flex items-center space-x-3 text-gray-800">
-                    <input type="checkbox" :value="skill" name="skills[]" x-model="selectedSkills"
-                           class="border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                    <span x-text="skill"></span>
-                  </label>
-                </template>
-              </div>
-            </div>
+            <!-- Hidden inputs to submit as array -->
+            <template x-for="(skill, index) in selectedSkills" :key="index">
+              <input type="hidden" name="skills[]" :value="skill">
+            </template>
           </div>
+        </div>
 
           <!-- Interests Dropdown -->
           <div x-data="{ open: false, selectedInterests: [] }" class="mt-6">
