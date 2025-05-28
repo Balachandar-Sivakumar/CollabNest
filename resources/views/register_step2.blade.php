@@ -12,13 +12,7 @@
       body {
     font-family: 'Inter', sans-serif;
   }
-    /* @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .animate-fadeIn {
-      animation: fadeIn 0.6s ease-out forwards;
-    } */
+   
   </style>
 </head>
 <body class="bg-gray-100 relative">
@@ -50,6 +44,32 @@
 
         <form method="POST" action="/step_two">
           @csrf 
+       <!-- Profession Dropdown -->
+<div x-data="{ open: false, selectedProfession: '' }" class="mb-6">
+  <label class="block font-semibold text-gray-700 mb-2 text-lg">Profession</label>
+  <div class="relative">
+    <button type="button"
+            @click="open = !open"
+            class="w-full border border-gray-300 rounded px-3 py-2 mb-2 text-sm text-black text-left focus:outline-none focus:ring-1 focus:ring-cyan-400">
+      <span x-text="selectedProfession ? selectedProfession : 'Select Profession'"></span>
+      <svg class="w-5 h-5 inline float-right" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+
+    <div x-show="open" @click.outside="open = false"
+         class="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg p-2 max-h-60 overflow-y-auto">
+      <template x-for="option in ['Developer', 'Designer', 'Product Manager', 'Data Scientist', 'DevOps Engineer']" :key="option">
+        <div @click="selectedProfession = option; open = false"
+             class="cursor-pointer px-4 py-2 hover:bg-cyan-100 rounded text-gray-800"
+             :class="{ 'bg-cyan-200 font-semibold': selectedProfession === option }">
+          <span x-text="option"></span>
+        </div>
+      </template>
+    </div>
+  </div>
+  <input type="hidden" name="profession" :value="selectedProfession">
+</div>
 
           <!-- Skills Dropdown -->
           <div x-data="{ open: false, selectedSkills: [] }">

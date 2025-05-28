@@ -9,8 +9,8 @@ class UsersController extends Controller
 {
     public function NavUsers(){
         $users = User::get();
-        return view('user_profile',compact('users'));
+        $skills = Skills::all();
+        return view('user_profile',compact('skills','users'));
     }
-
-   
+ 
 }

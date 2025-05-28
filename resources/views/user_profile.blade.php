@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,28 +26,33 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-h-screen overflow-y-auto scrollbar-hide">
  
     <!-- User Card -->
-      @foreach($users as $user)
-    <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-      <img class="w-full h-40 object-cover" src="https://randomuser.me/api/portraits/men/32.jpg" alt="User Photo" />
-      <div class="p-4">
-        <h2 class="text-xl font-semibold text-gray-800">{{$user->name}}</h2>
-       
-        <p class="text-gray-500 text-sm mt-1">FrontEnd</p>
-      
-        <div class="flex flex-wrap mt-3 gap-2">
-          <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">HTML</span>
-          <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">CSS</span>
-          <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">JS</span>
-        </div>
-        <p class="text-gray-600 text-sm mt-3">Passionate about building responsive UIs and creating seamless user experiences.</p>
+   <!-- User Card -->
+@foreach($users as $user)
+  <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+    <img class="w-full h-40 object-cover" src="https://randomuser.me/api/portraits/men/32.jpg" alt="User Photo" />
+    <div class="p-4">
+      <h2 class="text-xl font-semibold text-gray-800">{{ $user->name }}</h2>
+
+      @php
+        $userSkill = $skills->where('user_id', $user->id)->first();
+      @endphp
+
+      <p class="text-gray-500 text-sm mt-1">{{ $userSkill->profession ?? 'N/A' }}</p>
+
+      <div class="flex flex-wrap mt-3 gap-2">
+        @if($userSkill)
+          @foreach(json_decode($userSkill->skills, true) as $n)
+            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">{{ $n }}</span>
+          @endforeach
+        @endif
       </div>
     </div>
- @endforeach
-    <!-- Repeat the User Card block for each user -->
+  </div>
+@endforeach
+
   </div>
  
 </div>
 
-  
 </body>
 </html>
