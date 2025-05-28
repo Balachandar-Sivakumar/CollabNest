@@ -46,7 +46,9 @@ Route::get('/projects', [ProjectController::class, 'index'])->name('projects');
 Route::get('/tasks', [TaskController::class, 'index'])->name('tasks');
 
 // Messages page
-Route::get('/messages', [MessageController::class, 'index'])->name('messages');
+// Route::get('/messages', [MessageController::class, 'index'])->name('messages');
+// Route::get('/messages', [MessageController::class, 'index'])->name('messages');
+
 
 // Meetings page
 Route::get('/meetings', [MeetingController::class, 'index'])->name('meetings');
@@ -73,3 +75,13 @@ Route::get('/find-talent', [WelcomepageController::class, 'findTalent'])->name('
 Route::get('/help', [WelcomepageController::class, 'help'])->name('help');
 
 Route::get('/users',[UsersController::class, 'NavUsers']);
+
+
+// Route::get('/test-pusher-env', function() {
+//     return [
+//         'key' => env('3bea8e9c2a7be99ce8b3'),
+//         'secret' => env('fa9cff59b9da7c173b75'),
+//         'app_id' => env('1999609'),
+//         'cluster' => env('mt1'),
+//     ];
+// });

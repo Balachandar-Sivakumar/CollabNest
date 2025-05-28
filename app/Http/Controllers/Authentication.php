@@ -116,7 +116,7 @@ class Authentication extends Controller
             return redirect('/dashboard');
          } 
         else {
-            dd('console');
+            // dd('console');
             return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
         }
        

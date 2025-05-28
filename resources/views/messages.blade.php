@@ -17,6 +17,15 @@
 
   <!-- Sidebar -->
   @include('layout.aside')
+
+
+<!-- @section('content')
+    <div class="p-4">
+        <h2 class="text-xl font-bold">Your Messages</h2>
+        <p>Here you can access the Chatify messaging system:</p>
+        <a href="{{ route('chatify') }}" class="text-blue-600 underline">Open Chat</a>
+    </div>
+@endsection -->
   
 </body>
 </html>
