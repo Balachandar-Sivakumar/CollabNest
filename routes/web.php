@@ -58,9 +58,10 @@ Route::get('/files', [FileController::class, 'index'])->name('files');
 Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
 
 // Fallback route - show custom 404 error page
-Route::fallback(function () {
-    return response()->view('404', [], 404);
-});
+// Route::fallback(function () {
+//     return response()->view('404', [], 404);
+// });
+
 
 Route::get('/how-it-works', [WelcomePageController::class, 'howItWorks'])->name('how-it-works');
 
