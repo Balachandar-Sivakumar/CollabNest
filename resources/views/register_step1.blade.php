@@ -20,9 +20,6 @@
     <img alt="People working together" class="absolute inset-0 w-full h-full object-cover opacity-30"
          src="https://storage.googleapis.com/a1aa/image/6a58b975-69ac-4dd7-2152-e73aa1eb888d.jpg"/>
 
-
-  <!-- <div class="absolute inset-0 bg-black opacity-40 z-0"></div> -->
-
     <!-- Two-column layout -->
  <div class="relative z-10 max-w-4xl w-full shadow-lg  bg-white flex flex-col md:flex-row rounded-[30px]">
       
@@ -39,7 +36,7 @@
 
       <!-- Right side: Create account form -->
       <div class="flex-1 p-10 md:p-16 flex flex-col justify-center">
-        <form method="POST" action="/step_one" class="w-full max-w-md mx-auto">
+        <form method="POST" action="/step_one" class="w-full max-w-md mx-auto" id="registrationForm">
           @csrf
           <h2 class="text-center text-black text-lg font-extrabold mb-8">Create Account</h2>
 
@@ -59,17 +56,18 @@
 
           <input name="password"
                  class="w-full border border-gray-300 rounded px-3 py-2 mb-2 text-sm text-black focus:outline-none focus:ring-1 focus:ring-cyan-400"
-                 type="password" placeholder="Password"/>
+                 type="password" placeholder="Password" id="password"/>
           @error('password')
           <p class="text-red-500 text-xs mb-2">{{ $message }}</p>
           @enderror
 
           <input name="password_confirmation"
-                 class="w-full border border-gray-300 rounded px-3 py-2 mb-4 text-sm text-black focus:outline-none focus:ring-1 focus:ring-cyan-400"
-                 type="password" placeholder="Repeat your password"/>
+                 class="w-full border border-gray-300 rounded px-3 py-2 mb-1 text-sm text-black focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                 type="password" placeholder="Repeat your password" id="confirm_password"/>
+          <p id="password_error" class="text-red-500 text-xs mb-2 hidden">Passwords do not match</p>
 
           <label class="flex items-center text-xs text-gray-600 mb-6">
-            <input class="mr-2 w-4 h-4 border border-gray-300 rounded" type="checkbox" required/>
+            <input class="mr-2 w-4 h-4 border border-gray-300 rounded" type="checkbox" required id="termsCheckbox"/>
             <span>I agree to the </span>
             <a class="ml-1 underline text-gray-700 hover:text-cyan-600" href="#">Terms of Service</a>
           </label>
@@ -87,5 +85,20 @@
       </div>
     </div>
   </div>
+
+  <script>
+   
+    document.getElementById('confirm_password').addEventListener('input', function() {
+      const password = document.getElementById('password').value;
+      const confirmPassword = this.value;
+      const passwordError = document.getElementById('password_error');
+      
+      if (confirmPassword && password !== confirmPassword) {
+        passwordError.classList.remove('hidden');
+      } else {
+        passwordError.classList.add('hidden');
+      }
+    });
+  </script>
 </body>
 </html>

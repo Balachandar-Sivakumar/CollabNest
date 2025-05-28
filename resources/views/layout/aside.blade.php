@@ -11,7 +11,8 @@
         <a class="text-indigo-700 font-semibold text-lg" href="#">CollabNest</a>
       </div>
       <div class="px-6 mb-6">
-        <div class="flex items-center space-x-4 bg-gray-100 rounded-lg py-3 px-4">
+        <a href="/profile">
+          <div class="flex items-center space-x-4 bg-gray-100 rounded-lg py-3 px-4">
           <img alt="Profile" class="rounded-full w-10 h-10 object-cover" src="https://cdn-icons-png.freepik.com/256/12483/12483554.png?uid=R156815013&ga=GA1.1.1574424695.1745626358&semt=ais_incoming" />
           <div>
            
@@ -19,6 +20,7 @@
             <p class="text-gray-500 text-xs leading-tight">{{ Auth::user()->email }}</p>
           </div>
         </div>
+        </a>
       </div>
     <nav class="flex flex-col space-y-2 px-6 text-sm font-semibold">
   <a href="{{ route('dashboard') }}"

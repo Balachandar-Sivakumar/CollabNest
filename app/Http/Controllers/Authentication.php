@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Skills;
+use App\Models\user_profile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
@@ -63,11 +63,13 @@ class Authentication extends Controller
 
    public function step_two_register(Request $request)
     {
+
+       
         if (Auth::check()) {
             return redirect('/dashboard');
         }
         $request->validate([
-            'profession'   => 'required|string',
+            'profession'   => 'required|array|min:1',
             'skills'       => 'required|array|min:1',
             'interests'    => 'required|array|min:1',
             'availability' => 'required|string'
@@ -85,13 +87,14 @@ class Authentication extends Controller
             'password' => bcrypt($step1['password']),
         ]);
 
-        Skills::create([
-            'user_id'      => $user->id,
-            'profession'   => $request->profession,
-            'skills'       => json_encode($request->skills),
-            'interests'    => json_encode($request->interests),
-            'availability' => $request->availability,
+       user_profile::create([
+        'user_id'         => $user->id,
+        'profession'      => json_encode($request->profession),
+        'technical_skills'=> json_encode($request->skills),
+        'interests'       => json_encode($request->interests),
+        'availability'    => $request->availability,
         ]);
+
 
         session()->forget('step_1');
         Auth::login($user);
@@ -116,7 +119,7 @@ class Authentication extends Controller
             return redirect('/dashboard');
          } 
         else {
-            dd('console');
+            dd('error');
             return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
         }
        

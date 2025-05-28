@@ -20,14 +20,13 @@
   <!-- Sidebar -->
   @include('layout.aside')
   
-<div class="p-6 bg-gray-100 min-h-screen">
+<div class="p-6 bg-gray-100 min-h-screen w-full h-full [scrollbar-width:'none']">
   <h1 class="text-3xl font-bold mb-6">Our Skilled Users</h1>
  
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-h-screen overflow-y-auto scrollbar-hide">
  
-    <!-- User Card -->
-   <!-- User Card -->
-@foreach($users as $user)
+ @forelse($users as $user)
+  @if($user !== null)
   <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
     <img class="w-full h-40 object-cover" src="https://randomuser.me/api/portraits/men/32.jpg" alt="User Photo" />
     <div class="p-4">
@@ -40,7 +39,7 @@
       <p class="text-gray-500 text-sm mt-1">{{ $userSkill->profession ?? 'N/A' }}</p>
 
       <div class="flex flex-wrap mt-3 gap-2">
-        @if($userSkill)
+        @if($userSkill && $userSkill->skills)
           @foreach(json_decode($userSkill->skills, true) as $n)
             <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">{{ $n }}</span>
           @endforeach
@@ -48,7 +47,13 @@
       </div>
     </div>
   </div>
-@endforeach
+  @endif
+@empty
+  <div class="text-center text-gray-500 col-span-full text-lg py-10">
+    No users here.
+  </div>
+@endforelse
+
 
   </div>
  
