@@ -18,7 +18,7 @@ class Authentication extends Controller
         }
         $users = User::all();
 
-        return view('welcome', compact('users'));
+        return view('welcome');
     }
 
     public function register()
