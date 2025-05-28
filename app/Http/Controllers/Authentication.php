@@ -54,7 +54,7 @@ class Authentication extends Controller
             'step_1' => [
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
+                'password' => $request->password,
             ]
         ]);
 
@@ -111,14 +111,15 @@ class Authentication extends Controller
             'email' => 'required|email',
             'password' => 'required'
         ]);
-
-        // if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-        //     return redirect('/dashboard');
-        //  } 
-        // else {
-        //     return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
-        // }
-        return redirect('/dashboard');
+        // dd($request);
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            return redirect('/dashboard');
+         } 
+        else {
+            dd('console');
+            return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
+        }
+       
     }
 
 
