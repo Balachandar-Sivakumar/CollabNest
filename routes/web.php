@@ -57,12 +57,6 @@ Route::get('/files', [FileController::class, 'index'])->name('files');
 // Settings page
 Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
 
-// Fallback route - show custom 404 error page
-// Route::fallback(function () {
-//     return response()->view('404', [], 404);
-// });
-
-
 Route::get('/how-it-works', [WelcomePageController::class, 'howItWorks'])->name('how-it-works');
 
 Route::get('/Home', [WelcomepageController::class, 'home'])->name('home');
@@ -73,4 +67,8 @@ Route::get('/find-talent', [WelcomepageController::class, 'findTalent'])->name('
 
 Route::get('/help', [WelcomepageController::class, 'help'])->name('help');
 
-Route::get('/users',[UsersController::class, 'NavUsers']);
+Route::get('/profile',[UsersController::class, 'NavUsers']);
+
+Route::get('/profile/edit',[UsersController::class, 'navedit']);
+
+Route::post('/profile/update',[UsersController::class, 'profileUpdate']);

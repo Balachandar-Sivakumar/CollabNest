@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\user_profile;
+
+use App\Models\Users;
+use App\Models\UserProfile;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 
 class Authentication extends Controller
@@ -16,7 +16,6 @@ class Authentication extends Controller
         if (Auth::check()) {
             return redirect('/dashboard');
         }
-        $users = User::all();
 
         return view('welcome');
     }
@@ -61,13 +60,12 @@ class Authentication extends Controller
         return view('register_step2');
     }
 
-   public function step_two_register(Request $request)
+    public function step_two_register(Request $request)
     {
-
-       
         if (Auth::check()) {
             return redirect('/dashboard');
         }
+
         $request->validate([
             'profession'   => 'required|array|min:1',
             'skills'       => 'required|array|min:1',
@@ -81,26 +79,31 @@ class Authentication extends Controller
             return redirect('/register')->withErrors(['message' => 'Session expired. Please register again.']);
         }
 
-        $user = User::create([
+        $user = Users::create([
             'name'     => $step1['name'],
             'email'    => $step1['email'],
             'password' => bcrypt($step1['password']),
         ]);
 
-       user_profile::create([
-        'user_id'         => $user->id,
-        'profession'      => json_encode($request->profession),
-        'technical_skills'=> json_encode($request->skills),
-        'interests'       => json_encode($request->interests),
-        'availability'    => $request->availability,
+        $settings = [
+            'profession'       => $request->profession,
+            'technical_skills' => $request->skills,
+            'interests'        => $request->interests,
+            'availability'     => $request->availability,
+        ];
+
+        UserProfile::create([
+            'user_id'          => $user->id,
+            'profile_settings' => json_encode($settings)
         ]);
 
-
         session()->forget('step_1');
+        
         Auth::login($user);
 
         return redirect('/dashboard');
     }
+
 
 
     public function loginUser(Request $request)
@@ -114,7 +117,7 @@ class Authentication extends Controller
             'email' => 'required|email',
             'password' => 'required'
         ]);
-        // dd($request);
+     
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             return redirect('/dashboard');
          } 
