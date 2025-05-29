@@ -11,6 +11,8 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\WelcomepageController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\MailSendController;
+use App\Http\Controllers\VerifyController;
 
 // Home page
 Route::get('/', [Authentication::class, 'welcome']);
@@ -74,3 +76,8 @@ Route::get('/find-talent', [WelcomepageController::class, 'findTalent'])->name('
 Route::get('/help', [WelcomepageController::class, 'help'])->name('help');
 
 Route::get('/users',[UsersController::class, 'NavUsers']);
+
+Route::get('/register', [MailSendController::class, 'showForm'])->name('register.form');
+
+Route::post('/register', [MailSendController::class, 'registerUser'])->name('register.user');
+// Route::get('/verify', [VerifyController::class, 'verify']);

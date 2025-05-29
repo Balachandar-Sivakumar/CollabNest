@@ -58,7 +58,7 @@ class Authentication extends Controller
             ]
         ]);
 
-        return view('register_step2');
+        return redirect('/mailregister');
     }
 
    public function step_two_register(Request $request)
