@@ -122,7 +122,7 @@ class Authentication extends Controller
             return redirect('/dashboard');
          } 
         else {
-            dd('error');
+
             return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
         }
        

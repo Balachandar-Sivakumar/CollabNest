@@ -47,6 +47,8 @@ Route::get('/tasks', [TaskController::class, 'index'])->name('tasks');
 
 // Messages page
 Route::get('/messages', [MessageController::class, 'index'])->name('messages');
+// Route::get('/messages', [MessageController::class, 'index'])->name('messages');
+
 
 // Meetings page
 Route::get('/meetings', [MeetingController::class, 'index'])->name('meetings');
