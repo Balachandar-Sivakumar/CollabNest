@@ -104,9 +104,12 @@ class Authentication extends Controller
         Mail::to($step1['email'])->send(new WelcomeMail($step1['email'], $verificationToken, $hash));
 
         session()->forget('step_1');
-
-        return redirect('/email-sent');
-    }   
+        
+        Auth::login($user);
+        $profile = UserProfile::where('user_id',Auth::user()->id)->first();
+       
+        return redirect('/dashboard')->with('success','Rejistred successflly');
+    }
 
 
 
@@ -123,11 +126,11 @@ class Authentication extends Controller
         ]);
      
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            return redirect('/dashboard');
+            return redirect('/dashboard')->with('success','login successfull');
          } 
         else {
 
-            return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
+            return back()->with('error' , 'Invalid credentials')->withInput();
         }
        
     }
