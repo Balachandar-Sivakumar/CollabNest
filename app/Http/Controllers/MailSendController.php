@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\MailSend;
+use App\Models\Users;
+use App\Models\UserProfile;
+use Illuminate\Support\Facades\Auth;
+
 
 class MailSendController extends Controller
 {
@@ -12,23 +15,35 @@ class MailSendController extends Controller
         $emailHash = $request->query('email_hash');
         $token = $request->query('token');
 
-        $user = MailSend::where('verification_token', $token)->first();
+        $pending = session('pending_registration');
 
-        if (!$user) {
-            return view('verification-failed', ['message' => 'Invalid token!']);
+        if (!$pending || $pending['token'] !== $token) {
+            return view('verification-failed', ['message' => 'Invalid or expired token']);
         }
 
-        if (hash('sha256', $user->email) !== $emailHash) {
-            return view('verification-failed', ['message' => 'Email hash mismatch!']);
+        if (hash('sha256', $pending['email']) !== $emailHash) {
+            return view('verification-failed', ['message' => 'Email hash mismatch']);
         }
 
-        $user->update([
+        // Now store the user
+        $user = Users::create([
+            'name'     => $pending['name'],
+            'email'    => $pending['email'],
+            'password' => bcrypt($pending['password']),
             'verified_at' => now(),
-            'verification_token' => null
         ]);
 
-        return view('verification-success');
+        UserProfile::create([
+            'user_id' => $user->id,
+            'profile_settings' => json_encode($pending['profile']),
+        ]);
+
+        session()->forget('pending_registration');
+        Auth::login($user);
+
+        return redirect('/dashboard');
     }
+
 }
 
 

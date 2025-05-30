@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\user_profile;
+use App\Models\Users;
+use App\Models\UserProfile;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeMail;
 
 class Authentication extends Controller
 {
@@ -16,7 +18,6 @@ class Authentication extends Controller
         if (Auth::check()) {
             return redirect('/dashboard');
         }
-        $users = User::all();
 
         return view('welcome');
     }
@@ -58,16 +59,15 @@ class Authentication extends Controller
             ]
         ]);
 
-        return redirect('/mailregister');
+        return view('register_step2');
     }
 
-   public function step_two_register(Request $request)
+    public function step_two_register(Request $request)
     {
-
-       
         if (Auth::check()) {
             return redirect('/dashboard');
         }
+
         $request->validate([
             'profession'   => 'required|array|min:1',
             'skills'       => 'required|array|min:1',
@@ -81,26 +81,33 @@ class Authentication extends Controller
             return redirect('/register')->withErrors(['message' => 'Session expired. Please register again.']);
         }
 
-        $user = User::create([
-            'name'     => $step1['name'],
-            'email'    => $step1['email'],
-            'password' => bcrypt($step1['password']),
+        $verificationToken = Str::random(64);
+        $hash = hash('sha256', $step1['email']);
+
+        // Store all info in session
+        session([
+            'pending_registration' => [
+                'name' => $step1['name'],
+                'email' => $step1['email'],
+                'password' => $step1['password'],
+                'profile' => [
+                    'profession'   => $request->profession,
+                    'skills'       => $request->skills,
+                    'interests'    => $request->interests,
+                    'availability' => $request->availability,
+                ],
+                'token' => $verificationToken
+            ]
         ]);
 
-       user_profile::create([
-        'user_id'         => $user->id,
-        'profession'      => json_encode($request->profession),
-        'technical_skills'=> json_encode($request->skills),
-        'interests'       => json_encode($request->interests),
-        'availability'    => $request->availability,
-        ]);
-
+        // Send email
+        Mail::to($step1['email'])->send(new WelcomeMail($step1['email'], $verificationToken, $hash));
 
         session()->forget('step_1');
-        Auth::login($user);
 
-        return redirect('/dashboard');
-    }
+        return redirect('/email-sent');
+    }   
+
 
 
     public function loginUser(Request $request)
@@ -114,12 +121,12 @@ class Authentication extends Controller
             'email' => 'required|email',
             'password' => 'required'
         ]);
-        // dd($request);
+     
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             return redirect('/dashboard');
          } 
         else {
-            dd('error');
+
             return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
         }
        
@@ -136,9 +143,15 @@ class Authentication extends Controller
 
     public function dashboard()
     {
-        if (Auth::check()) {
-            return view('dashboard');
+        if (!Auth::check()) {
+            return redirect('/login');
         }
-        return redirect('/login');
+
+        if (is_null(!Auth::user()->verified_at)) {
+            return redirect('/not-verified');
+        }
+
+        return view('dashboard');
     }
+
 }

@@ -4,23 +4,24 @@ namespace App\Mail;
 
 
 use Illuminate\Mail\Mailable;
-use App\Models\MailSend;
+use App\Models\Users;
+use PHPUnit\Metadata\Uses;
 
 class WelcomeMail extends Mailable
 {
-    public $user, $emailHash, $token;
-
-    public function __construct(MailSend $user, $emailHash, $token)
+    public function __construct($email, $token, $hash)
     {
-        $this->user = $user;
-        $this->emailHash = $emailHash;
+        $this->email = $email;
         $this->token = $token;
+        $this->hash = $hash;
     }
 
     public function build()
     {
+        $url = url("/verify?token={$this->token}&email_hash={$this->hash}");
         return $this->subject('Verify Your Email')
-                    ->view('emails.verify');
+                    ->view('emails.verify')
+                    ->with(['url' => $url]);
     }
 }
 

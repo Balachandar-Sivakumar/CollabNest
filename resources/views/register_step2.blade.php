@@ -45,94 +45,57 @@
         <form method="POST" action="/step_two">
           @csrf 
        <!-- Profession Dropdown -->
-              <div x-data="{ professionInput: '', selectedProfessions: [] }" 
-         x-init="$watch('professionInput', value => selectedProfessions = value.split(',').map(p => p.trim()).filter(p => p))">
-    
-      <label class="block font-semibold text-gray-700 mb-2 text-lg">Profession(s)</label>
-      
-      <div class="relative">
-        <input type="text"
-               placeholder="Enter professions separated by commas (e.g. Developer, Designer, Project Manager)"
-               x-model="professionInput"
-               class="w-full border border-gray-300 rounded px-3 py-2 mb-2 text-sm text-black text-left focus:outline-none focus:ring-1 focus:ring-cyan-400" />
-    
-        <!-- Hidden inputs to submit as array -->
-        <template x-for="(profession, index) in selectedProfessions" :key="index">
-          <input type="hidden" name="profession[]" :value="profession">
-        </template>
-      </div>
-    </div>
+      <div x-data="{ professionInput: '', selectedProfessions: [] }" 
+     x-init="$watch('professionInput', v => selectedProfessions = v.split(',').map(p => p.trim()).filter(Boolean))">
+  <label class="block font-semibold text-gray-700 mb-2 text-lg">Profession(s)</label>
+  <input type="text" x-model="professionInput" placeholder="e.g. Developer, Designer"
+         class="w-full px-3 py-2 border border-gray-300 rounded text-sm text-black focus:ring-1 focus:ring-cyan-400" />
+  <template x-for="(p, i) in selectedProfessions" :key="i">
+    <input type="hidden" name="profession[]" :value="p">
+  </template>
+</div>
 
 
           <!-- Skills Dropdown -->
-            <div x-data="{ skillsInput: '', selectedSkills: [] }" x-init="$watch('skillsInput', value => selectedSkills = value.split(',').map(s => s.trim()).filter(s => s))">
-          <label class="block font-semibold text-gray-700 mb-2 text-lg">Technical Skills</label>
-          <div class="relative">
-            <input type="text"
-                   placeholder="Enter skills separated by commas (e.g. PHP, Laravel, VueJS)"
-                   x-model="skillsInput"
-                   class="w-full border border-gray-300 rounded px-3 py-2 mb-2 text-sm text-black text-left focus:outline-none focus:ring-1 focus:ring-cyan-400" />
+           <div x-data="{ skillsInput: '', selectedSkills: [] }" 
+     x-init="$watch('skillsInput', v => selectedSkills = v.split(',').map(s => s.trim()).filter(Boolean))">
+  <label class="block font-semibold text-gray-700 mb-2 text-lg">Technical Skills</label>
+  <input type="text" x-model="skillsInput" placeholder="e.g. PHP, Laravel, VueJS"
+         class="w-full px-3 py-2 border border-gray-300 rounded text-sm text-black focus:ring-1 focus:ring-cyan-400" />
+  <template x-for="(s, i) in selectedSkills" :key="i">
+    <input type="hidden" name="skills[]" :value="s">
+  </template>
+</div>
 
-            <!-- Hidden inputs to submit as array -->
-            <template x-for="(skill, index) in selectedSkills" :key="index">
-              <input type="hidden" name="skills[]" :value="skill">
-            </template>
-          </div>
-        </div>
 
           <!-- Interests Dropdown -->
-          <div x-data="{ open: false, selectedInterests: [] }" class="mt-6">
-            <label class="block font-semibold text-gray-700 mb-2 text-lg">Interests</label>
-            <div class="relative">
-              <button type="button"
-                      class="w-full border border-gray-300 rounded px-3 py-2 mb-2 text-sm text-black text-left focus:outline-none focus:ring-1 focus:ring-cyan-400"
-                      @click="open = !open">
-                <span x-text="selectedInterests.length > 0 ? selectedInterests.join(', ') : 'Select Interests'"></span>
-                <svg class="w-5 h-5 inline float-right" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
+        <div x-data="{ input: '', interests: [] }" 
+     x-init="$watch('input', v => interests = v.split(',').map(i => i.trim()).filter(Boolean))">
+  <label class="block font-semibold text-gray-700 mb-2 text-lg">Interests</label>
+  <input type="text" x-model="input" placeholder="e.g. AI, Web3, HealthTech"
+         class="w-full px-3 py-2 border border-gray-300 rounded text-sm text-black focus:ring-1 focus:ring-cyan-400" />
+  <template x-for="(i, idx) in interests" :key="idx">
+    <input type="hidden" name="interests[]" :value="i">
+  </template>
+</div>
 
-              <div x-show="open"
-                   @click.outside="open = false"
-                   class="absolute z-10 mt-2 w-full max-h-64 overflow-y-auto border border-gray-300 bg-white rounded-lg shadow-lg p-4 space-y-2">
-                <template x-for="interest in ['AI', 'Web3', 'HealthTech', 'EdTech', 'FinTech', 'SaaS', 'Cybersecurity', 'Game Dev', 'Climate Tech']" :key="interest">
-                  <label class="flex items-center space-x-3 text-gray-800">
-                    <input type="checkbox" :value="interest" name="interests[]" x-model="selectedInterests"
-                           class="border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                    <span x-text="interest"></span>
-                  </label>
-                </template>
-              </div>
-            </div>
-          </div>
 
         <!-- Availability Dropdown -->
-<div x-data="{ open: false, selectedAvailability: '' }" class="mt-6">
+<div class="mt-6">
   <label class="block font-semibold text-gray-700 mb-2 text-lg">Availability</label>
-  <div class="relative">
-    <button type="button"
-            @click="open = !open"
-            class="w-full border border-gray-300 rounded px-3 py-2 mb-2 text-sm text-black text-left focus:outline-none focus:ring-1 focus:ring-cyan-400">
-      <span x-text="selectedAvailability ? selectedAvailability : 'Select Availability'"></span>
-      <svg class="w-5 h-5 inline float-right" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-      </svg>
-    </button>
-
-    <div x-show="open"
-         @click.outside="open = false"
-         class="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg p-2 max-h-60 overflow-y-auto">
-      <template x-for="option in ['Weekdays', 'Weekends', 'Full-time', 'Part-time', 'Freelance', 'Night shifts', 'Remote Only', 'Onsite Only']" :key="option">
-        <div @click="selectedAvailability = option; open = false"
-             class="cursor-pointer px-4 py-2 hover:bg-cyan-100 rounded text-gray-800"
-             :class="{ 'bg-cyan-200 font-semibold': selectedAvailability === option }">
-          <input type="radio" :value="option" name="availability" x-model="selectedAvailability" class="hidden">
-          <span x-text="option"></span>
-        </div>
-      </template>
-    </div>
-  </div>
+  <select name="availability"
+          class="w-full border border-gray-300 rounded px-3 py-2 mb-2 text-sm text-black focus:outline-none focus:ring-1 focus:ring-cyan-400">
+    <option value="" disabled selected>Select Availability</option>
+    <option value="Weekdays">Weekdays</option>
+    <option value="Weekends">Weekends</option>
+    <option value="Full-time">Full-time</option>
+    <option value="Part-time">Part-time</option>
+    <option value="Freelance">Freelance</option>
+    <option value="Night shifts">Night shifts</option>
+    <option value="Remote Only">Remote Only</option>
+    <option value="Onsite Only">Onsite Only</option>
+    <option value="Flexible">Flexible</option> <!-- new option -->
+  </select>
 </div>
 
 

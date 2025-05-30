@@ -49,6 +49,8 @@ Route::get('/tasks', [TaskController::class, 'index'])->name('tasks');
 
 // Messages page
 Route::get('/messages', [MessageController::class, 'index'])->name('messages');
+// Route::get('/messages', [MessageController::class, 'index'])->name('messages');
+
 
 // Meetings page
 Route::get('/meetings', [MeetingController::class, 'index'])->name('meetings');
@@ -58,12 +60,6 @@ Route::get('/files', [FileController::class, 'index'])->name('files');
 
 // Settings page
 Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
-
-// Fallback route - show custom 404 error page
-// Route::fallback(function () {
-//     return response()->view('404', [], 404);
-// });
-
 
 Route::get('/how-it-works', [WelcomePageController::class, 'howItWorks'])->name('how-it-works');
 
@@ -77,7 +73,12 @@ Route::get('/help', [WelcomepageController::class, 'help'])->name('help');
 
 Route::get('/users',[UsersController::class, 'NavUsers']);
 
-Route::get('/register', [MailSendController::class, 'showForm'])->name('register.form');
+Route::get('/verify', [MailSendController::class, 'verify']);
 
-Route::post('/register', [MailSendController::class, 'registerUser'])->name('register.user');
-// Route::get('/verify', [VerifyController::class, 'verify']);
+// Route::post('/register', [MailSendController::class, 'registerUser'])->name('register.user');
+
+Route::get('/profile',[UsersController::class, 'NavUsers']);
+
+Route::get('/profile/edit',[UsersController::class, 'navedit']);
+
+Route::post('/profile/update',[UsersController::class, 'profileUpdate']);
