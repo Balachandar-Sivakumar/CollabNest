@@ -53,17 +53,17 @@
       <section class="grid md:grid-cols-2 gap-6">
         <div>
           <label for="github" class="block text-sm font-medium mb-1">GitHub</label>
-          <input type="url" id="github" name="github" placeholder="https://github.com/yourusername"
+          <input type="url" id="github" name="github" value="{{json_decode($skills->profile_settings,true)['github'] ?? ''}}" placeholder="https://github.com/yourusername"
                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
         </div>
         <div>
           <label for="leetcode" class="block text-sm font-medium mb-1">LeetCode</label>
-          <input type="url" id="leetcode" name="leetcode" placeholder="https://leetcode.com/yourusername"
+          <input type="url" id="leetcode" name="leetcode" value="{{json_decode($skills->profile_settings,true)['leetcode'] ?? ''}}" placeholder="https://leetcode.com/yourusername"
                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
         </div>
         <div>
           <label for="linkedin" class="block text-sm font-medium mb-1">LinkedIn</label>
-          <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/yourprofile"
+          <input type="url" id="linkedin" name="linkedin" value="{{json_decode($skills->profile_settings,true)['linkedin'] ?? ''}}" placeholder="https://linkedin.com/in/yourprofile"
                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
         </div>
         <div>
@@ -87,12 +87,12 @@
           </div>
           <div>
             <label class="block text-sm font-medium mb-1">Soft Skills</label>
-            <input type="text" name="soft_skills" placeholder="e.g. Leadership, Communication"
+            <input type="text" name="soft_skills" value="{{ implode(', ',json_decode($skills->profile_settings, true)['soft_skills'] ?? [])}}" placeholder="e.g. Leadership, Communication"
                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
           </div>
           <div>
             <label class="block text-sm font-medium mb-1">Skill Level</label>
-            <select name="skill_level"
+            <select name="skill_level" 
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
               <option value="Beginner">Beginner</option>
               <option value="Intermediate" selected>Intermediate</option>
@@ -101,7 +101,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium mb-1">Years of Experience</label>
-            <input type="number" min="0" name="years_of_experience" value="3"
+            <input type="number" min="0" name="years_of_experience" value="{{json_decode($skills->profile_settings,true)['years_of_experience'] ?? ''}}"
                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
           </div>
         </div>
@@ -121,7 +121,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium mb-1">Availability</label>
-            <input type="text" name="availability" placeholder="e.g. Weekends, Evenings"
+            <input type="text" name="availability" value="{{json_decode($skills->profile_settings,true)['availability'] ?? ''}}" placeholder="e.g. Weekends, Evenings"
                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
           </div>
         </div>

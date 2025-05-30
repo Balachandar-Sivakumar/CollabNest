@@ -34,6 +34,7 @@ class UsersController extends Controller
             'github'                => 'nullable',
             'leetcode'              => 'nullable',
             'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:3072',
+            'resume' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
         $data = UserProfile::where('user_id',Auth::user()->id)->first();

@@ -100,8 +100,9 @@ class Authentication extends Controller
         session()->forget('step_1');
         
         Auth::login($user);
-
-        return redirect('/dashboard');
+        $profile = UserProfile::where('user_id',Auth::user()->id)->first();
+       
+        return redirect('/dashboard')->with('success','Rejistred successflly');
     }
 
 
@@ -119,11 +120,11 @@ class Authentication extends Controller
         ]);
      
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            return redirect('/dashboard');
+            return redirect('/dashboard')->with('success','login successfull');
          } 
         else {
 
-            return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
+            return back()->with('error' , 'Invalid credentials')->withInput();
         }
        
     }
