@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 
-use App\Models\Users;
+use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -62,16 +62,16 @@ class Authentication extends Controller
 
     public function step_two_register(Request $request)
     {
+        dd($request);
         if (Auth::check()) {
             return redirect('/dashboard');
         }
-
-        $request->validate([
-            'profession'   => 'required|array|min:1',
-            'skills'       => 'required|array|min:1',
-            'interests'    => 'required|array|min:1',
-            'availability' => 'required|string'
-        ]);
+            $request->validate([
+                'profession'   => 'required|array|min:1',
+                'skills'       => 'required|array|min:1',
+                'interests'    => 'required|array|min:1',
+                'availability' => 'required|string',
+            ]);
 
         $step1 = session('step_1');
 
@@ -79,7 +79,7 @@ class Authentication extends Controller
             return redirect('/register')->withErrors(['message' => 'Session expired. Please register again.']);
         }
 
-        $user = Users::create([
+        $user = User::create([
             'name'     => $step1['name'],
             'email'    => $step1['email'],
             'password' => bcrypt($step1['password']),
