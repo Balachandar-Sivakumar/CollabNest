@@ -43,7 +43,7 @@
 
     <div class="space-x-4">
       <a href="/navlogin" class="text-blue-600 font-semibold hover:underline">Log In</a>
-      <a href="/register" class="bg-blue-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-blue-700 transition">Sign Up</a>
+      <a href="/navregister" class="bg-blue-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-blue-700 transition">Sign Up</a>
     </div>
   </nav>
 

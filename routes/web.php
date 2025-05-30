@@ -17,7 +17,7 @@ use App\Http\Controllers\MailSendController;
 Route::get('/', [Authentication::class, 'welcome']);
 
 // Register page navigation
-Route::get('/register', [Authentication::class, 'register']);
+Route::get('/navregister', [Authentication::class, 'navregister']);
 
 // User login
 Route::post('/login', [Authentication::class, 'loginUser']);
@@ -26,7 +26,7 @@ Route::post('/login', [Authentication::class, 'loginUser']);
 Route::get('/navlogin', [Authentication::class, 'navLogin']);
 
 // Registration step 1 (personal details)
-Route::post('/step_one', [Authentication::class, 'step_one_register']);
+Route::post('/register', [Authentication::class, 'register']);
 
 // Registration step 2
 Route::post('/step_two', [Authentication::class, 'step_two_register']);
