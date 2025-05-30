@@ -6,9 +6,6 @@ use App\Models\Users;
 use App\Models\UserProfile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\WelcomeMail;
 
 class Authentication extends Controller
 {
@@ -81,34 +78,29 @@ class Authentication extends Controller
             return redirect('/register')->withErrors(['message' => 'Session expired. Please register again.']);
         }
 
-        $verificationToken = Str::random(64);
-        $hash = hash('sha256', $step1['email']);
-
-        // Store all info in session
-        session([
-            'pending_registration' => [
-                'name' => $step1['name'],
-                'email' => $step1['email'],
-                'password' => $step1['password'],
-                'profile' => [
-                    'profession'   => $request->profession,
-                    'skills'       => $request->skills,
-                    'interests'    => $request->interests,
-                    'availability' => $request->availability,
-                ],
-                'token' => $verificationToken
-            ]
+        $user = Users::create([
+            'name'     => $step1['name'],
+            'email'    => $step1['email'],
+            'password' => bcrypt($step1['password']),
         ]);
 
-        // Send email
-        Mail::to($step1['email'])->send(new WelcomeMail($step1['email'], $verificationToken, $hash));
+        $settings = [
+            'profession'       => $request->profession,
+            'technical_skills' => $request->skills,
+            'interests'        => $request->interests,
+            'availability'     => $request->availability,
+        ];
+
+        UserProfile::create([
+            'user_id'          => $user->id,
+            'profile_settings' => json_encode($settings)
+        ]);
 
         session()->forget('step_1');
         
         Auth::login($user);
-        $profile = UserProfile::where('user_id',Auth::user()->id)->first();
-       
-        return redirect('/dashboard')->with('success','Rejistred successflly');
+
+        return redirect('/dashboard');
     }
 
 
@@ -126,11 +118,11 @@ class Authentication extends Controller
         ]);
      
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            return redirect('/dashboard')->with('success','login successfull');
+            return redirect('/dashboard');
          } 
         else {
 
-            return back()->with('error' , 'Invalid credentials')->withInput();
+            return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
         }
        
     }

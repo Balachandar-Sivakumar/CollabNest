@@ -12,7 +12,6 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\WelcomepageController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\MailSendController;
-use App\Http\Controllers\VerifyController;
 
 // Home page
 Route::get('/', [Authentication::class, 'welcome']);
@@ -75,7 +74,7 @@ Route::get('/users',[UsersController::class, 'NavUsers']);
 
 Route::get('/verify', [MailSendController::class, 'verify']);
 
-// Route::post('/register', [MailSendController::class, 'registerUser'])->name('register.user');
+Route::post('/register', [MailSendController::class, 'registerUser'])->name('register.user');
 
 Route::get('/profile',[UsersController::class, 'NavUsers']);
 

@@ -16,7 +16,7 @@
             </p>
 
             <div class="text-center my-6">
-                <a href="{{ url('/verify?email_hash=' . $emailHash . '&token=' . $token) }}"
+                <a href="{{ $url }}"
                    class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-6 py-3 rounded-full shadow transition duration-300">
                     ✅ Verify My Email
                 </a>
