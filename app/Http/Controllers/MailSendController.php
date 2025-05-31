@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Users;
+use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,7 +26,7 @@ class MailSendController extends Controller
         }
 
         // Now store the user
-        $user = Users::create([
+        $user = User::create([
             'name'     => $pending['name'],
             'email'    => $pending['email'],
             'password' => bcrypt($pending['password']),
