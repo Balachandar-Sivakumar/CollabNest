@@ -72,9 +72,9 @@ Route::get('/help', [WelcomepageController::class, 'help'])->name('help');
 
 Route::get('/users',[UsersController::class, 'NavUsers']);
 
-Route::get('/verify', [MailSendController::class, 'verify']);
+Route::get('/verify', [MailSendController::class, 'verify'])->name('verifymail');
 
-Route::post('/register', [MailSendController::class, 'registerUser'])->name('register.user');
+Route::get('/mailverify', [Authentication::class, 'registerUser']);
 
 Route::get('/profile',[UsersController::class, 'NavUsers']);
 

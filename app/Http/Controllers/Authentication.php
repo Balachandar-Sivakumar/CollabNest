@@ -6,6 +6,9 @@ use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeMail;
 
 class Authentication extends Controller
 {
@@ -73,6 +76,11 @@ class Authentication extends Controller
         ]);
 
         Auth::login($user);
+
+        $token = Str::random(40);
+        $hash = hash('sha256', Auth::user()->email);
+
+        Mail::to(Auth::user()->email)->send(new WelcomeMail(Auth::user()->email, $token, $hash, $user));
 
         return redirect('/dashboard')->with('success', 'Registered successfully');
     }
