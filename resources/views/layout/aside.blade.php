@@ -19,8 +19,8 @@
             
                 $image = json_decode($profile->profile_settings,true)['image'] ?? null;
             @endphp
-            
-          <img alt="Profile" class="rounded-full w-10 h-10 object-cover" src="{{$image ? asset('storage/'. $image) : '#'}}" />
+ 
+          <img alt="Profile" class="rounded-full w-10 h-10 object-cover" src="{{asset('storage/'. $image) ?? '' }}" />
           <div>
            
             <p class="font-semibold text-gray-900 text-sm leading-tight">{{ Auth::user()->name }}</p>

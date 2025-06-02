@@ -11,24 +11,30 @@ class WelcomeMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $email;
+    
     public $token;
     public $hash;
     public $user;
 
-    public function __construct(string $email, string $token, string $hash,User $user)
+    public function __construct($token, User $user)
     {
-        $this->user = $user;
-        $this->email = $email;
+        
         $this->token = $token;
-        $this->hash = $hash;
+        $this->user = $user; 
+        $this->hash = hash('sha256', $user->email); 
+        
     }
-
     public function build()
     {
-        $url = url("/verify?token={$this->token}&email_hash={$this->hash}");
+        // $link = url("/verify?token={$this->token}&email_hash={$this->hash}");
+
         return $this->subject('Verify Your Email')
                     ->view('verifymail')
-                    ->with(['url' => $url,'user'=> $this->user]);
+                    ->with([
+                        'token' => $this->token,
+                        'user' => $this->user,
+                        'hash' => $this->hash,
+                    ]);
     }
+
 }

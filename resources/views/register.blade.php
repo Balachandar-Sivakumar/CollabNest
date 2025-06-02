@@ -188,18 +188,9 @@
       step1.classList.add('hidden');
       step2.classList.remove('hidden');
 
-      localStorage.setItem('flag',JSON.stringify(true));
+      
     });
 
-    addEventListener('DOMContentLoaded',()=>{
-        let flag = JSON.parse(localStorage.getItem('flag')) || [];
-
-        if(flag){
-           errorBox1.classList.add('hidden');
-            step1.classList.add('hidden');
-            step2.classList.remove('hidden');
-        }
-    })
 
     // STEP 2 Validation
     form.addEventListener('submit', e => {

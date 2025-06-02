@@ -44,7 +44,7 @@ class Authentication extends Controller
         if (Auth::check()) {
             return redirect('/dashboard');
         }
-
+                // dd($request);
         $request->validate([
             'name'         => 'required',
             'email'        => 'required|email|unique:users,email',
@@ -55,11 +55,15 @@ class Authentication extends Controller
             'availability' => 'required|string',
         ]);
 
+        $token = Str::random(40);
+
         // Create user
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => bcrypt($request->password),
+            'verification_token' => $token,
+            'verified_at' => now(),
         ]);
 
         // Save profile settings
@@ -74,17 +78,35 @@ class Authentication extends Controller
             'user_id'          => $user->id,
             'profile_settings' => json_encode($settings),
         ]);
+     
+        Auth::login($user);
+        Mail::to($user->email)->send(new WelcomeMail($token,$user));
+        
+        return view('verification-success')->with('user', $user);
+
+        
+    }
+
+        public function verify(Request $request)
+    {
+        $emailHash = $request->query('email_hash');
+        $token = $request->query('token');
+
+        $user = User::where('verification_token', $token)->first();
+
+        if (!$user || hash('sha256', $user->email) !== $emailHash) {
+            return view('verification-failed', ['message' => 'Invalid or expired token']);
+        }
+
+        $user->update([
+            'verified_at' => now(),
+            'verification_token' => null,
+        ]);
 
         Auth::login($user);
 
-        $token = Str::random(40);
-        $hash = hash('sha256', Auth::user()->email);
-
-        Mail::to(Auth::user()->email)->send(new WelcomeMail(Auth::user()->email, $token, $hash, $user));
-
-        return redirect('/dashboard')->with('success', 'Registered successfully');
+        return redirect('/dashboard')->with('success', 'Register successful');
     }
-
     public function loginUser(Request $request)
     {
         if (Auth::check()) {

@@ -1,35 +1,49 @@
 <?php
 
-namespace App\Http\Controllers;
+// namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+// use Illuminate\Http\Request;
+// use App\Models\Users;
+// use App\Models\UserProfile;
+// use Illuminate\Support\Facades\Auth;
 
 
-class MailSendController extends Controller
-{
-   public function verify(Request $request)
-{
-    $emailHash = $request->query('email_hash');
-    $token = $request->query('token');
+// class MailSendController extends Controller
+// {
+//     public function verify(Request $request)
+//     {
+//         $emailHash = $request->query('email_hash');
+//         $token = $request->query('token');
 
-    $user = User::where('verification_token', $token)->first();
+//         $pending = session('pending_registration');
 
-    if (!$user || hash('sha256', $user->email) !== $emailHash) {
-        return view('verification-failed', ['message' => 'Invalid or expired token']);
-    }
+//         if (!$pending || $pending['token'] !== $token) {
+//             return view('verification-failed', ['message' => 'Invalid or expired token']);
+//         }
 
-    $user->update([
-        'verified_at' => now(),
-        'verification_token' => null,
-    ]);
+//         if (hash('sha256', $pending['email']) !== $emailHash) {
+//             return view('verification-failed', ['message' => 'Email hash mismatch']);
+//         }
 
-    Auth::login($user);
+//         // Now store the user
+//         $user = Users::create([
+//             'name'     => $pending['name'],
+//             'email'    => $pending['email'],
+//             'password' => bcrypt($pending['password']),
+//             'verified_at' => now(),
+//         ]);
 
-    return redirect('/dashboard');
-}
+//         UserProfile::create([
+//             'user_id' => $user->id,
+//             'profile_settings' => json_encode($pending['profile']),
+//         ]);
 
-}
+//         session()->forget('pending_registration');
+//         Auth::login($user);
+
+//         return redirect('/dashboard');
+//     }
+
+// }
 
 
