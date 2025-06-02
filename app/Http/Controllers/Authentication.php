@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Projects;
 
 class Authentication extends Controller
 {
@@ -30,6 +31,8 @@ class Authentication extends Controller
      */
     public function navLogin()
     {
+        $team = Projects::all();
+        dd($team);
         return Auth::check() ? redirect('/dashboard') : view('login');
     }
 
