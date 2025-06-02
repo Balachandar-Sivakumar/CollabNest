@@ -13,7 +13,14 @@
       <div class="px-6 mb-6">
         <a href="/profile">
           <div class="flex items-center space-x-4 bg-gray-100 rounded-lg py-3 px-4">
-          <img alt="Profile" class="rounded-full w-10 h-10 object-cover" src="https://cdn-icons-png.freepik.com/256/12483/12483554.png?uid=R156815013&ga=GA1.1.1574424695.1745626358&semt=ais_incoming" />
+            
+            @php
+             $profile = App\Models\UserProfile::where('user_id',Auth::user()->id)->first();
+            
+                $image = json_decode($profile->profile_settings,true)['image'] ?? null;
+            @endphp
+ 
+          <img alt="Profile" class="rounded-full w-10 h-10 object-cover" src="{{asset('storage/'. $image) ?? '' }}" />
           <div>
            
             <p class="font-semibold text-gray-900 text-sm leading-tight">{{ Auth::user()->name }}</p>

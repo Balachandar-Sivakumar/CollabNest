@@ -1,63 +1,166 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>TeamCollab Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="https://unpkg.com/alpinejs" defer></script>
   <style>
     body {
       font-family: 'Inter', sans-serif;
     }
+    .profile-shadow {
+      box-shadow: 0 4px 6px -1px rgba(6, 182, 212, 0.1), 0 2px 4px -1px rgba(6, 182, 212, 0.06);
+    }
   </style>
 </head>
-<body class="bg-[#f8fafc] text-gray-900 min-h-screen flex">
+<body class="bg-gray-50 text-gray-800 min-h-screen flex">
 
-  <!-- Sidebar -->
   @include('layout.aside')
-  
-<div class="p-6 bg-gray-100 min-h-screen w-full h-full [scrollbar-width:'none']">
-  <h1 class="text-3xl font-bold mb-6">Our Skilled Users</h1>
- 
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-h-screen overflow-y-auto scrollbar-hide">
- 
- @forelse($users as $user)
-  @if($user !== null)
-  <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-    <img class="w-full h-40 object-cover" src="https://randomuser.me/api/portraits/men/32.jpg" alt="User Photo" />
-    <div class="p-4">
-      <h2 class="text-xl font-semibold text-gray-800">{{ $user->name }}</h2>
 
-      @php
-        $userSkill = $skills->where('user_id', $user->id)->first();
-      @endphp
+  <div class="flex-1 p-6">
+    @if(session('success'))
+        <div
+            x-data = "{show:true}"
+            x-init = "setTimeout(()=>show=false,3000)"
+            x-show="show"
+            x-transition
+            class="bg-emerald-50 text-emerald-700 text-sm absolute top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg border border-emerald-100 flex items-center gap-2">
+            <i class="fas fa-check-circle"></i>
+            {{ session('success') }}
+        </div>
+    @endif
+    <div class="max-w-6xl mx-auto bg-white rounded-2xl overflow-hidden p-8 profile-shadow">
+      <div class="flex flex-col md:flex-row gap-10 items-start">
+        <!-- Left: Profile Image & Resume -->
+        <div class="flex flex-col items-center gap-6 w-full md:w-1/3">
+          @php
+            $settings = json_decode($skills->profile_settings, true);
+            $imagePath = $settings['image'] ?? null;
+            $pdf = $settings['resume'] ?? null;
+          @endphp
 
-      <p class="text-gray-500 text-sm mt-1">{{ $userSkill->profession ?? 'N/A' }}</p>
+          <!-- Profile Image -->
+          <div class="relative group">
+            <img class="w-36 h-36 rounded-full object-cover border-4 border-cyan-100 shadow-md transition-all duration-300 group-hover:border-cyan-300"
+                 src="{{ $imagePath ? asset('storage/' . $imagePath) : asset('images/default-profile.png') }}" alt="Profile Picture">
+            <div class="absolute inset-0 bg-cyan-50 bg-opacity-30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+              <span class="text-xs font-medium text-cyan-800 bg-white px-2 py-1 rounded-full">Profile</span>
+            </div>
+          </div>
 
-      <div class="flex flex-wrap mt-3 gap-2">
-        @if($userSkill && $userSkill->skills)
-          @foreach(json_decode($userSkill->skills, true) as $n)
-            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">{{ $n }}</span>
-          @endforeach
-        @endif
+          <!-- Resume PDF Preview -->
+          @if($pdf)
+          <div class="w-full">
+            <div class="h-[440px] rounded-lg overflow-hidden shadow-sm border border-gray-100 bg-gray-50">
+              <iframe src="{{ asset('storage/' . $pdf) }}#toolbar=0" class="w-full h-full" frameborder="0"></iframe>
+            </div>
+            <div class="mt-3 text-center">
+              <a href="{{ asset('storage/' . $pdf) }}" target="_blank" download class="inline-flex items-center text-sm text-cyan-600 hover:text-cyan-800 font-medium transition-colors">
+                <i class="fas fa-file-pdf mr-2"></i>
+                Download Resume
+              </a>
+            </div>
+          </div>
+          @endif
+        </div>
+
+        <!-- Right: Profile Details -->
+        <div class="flex-1 space-y-6">
+          <!-- Name & Professions -->
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">{{ Auth::user()->name }}</h1>
+            <div class="mt-3 flex flex-wrap gap-2">
+              @foreach($settings['profession'] ?? [] as $n)
+                <span class="bg-cyan-50 text-cyan-700 text-xs font-medium px-3 py-1.5 rounded-full border border-cyan-100">{{ $n }}</span>
+              @endforeach
+            </div>
+          </div>
+
+          <!-- Key Info Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-gray-500 text-xs font-medium mb-1">User ID</p>
+              <p class="font-semibold text-gray-700">{{ Auth::user()->id }}</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-gray-500 text-xs font-medium mb-1">Technical Skills</p>
+              <p class="font-semibold text-cyan-600">
+                {{ implode(', ', $settings['technical_skills'] ?? []) ?: 'Not specified' }}
+              </p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-gray-500 text-xs font-medium mb-1">Soft Skills</p>
+              <p class="font-semibold text-gray-700">{{ implode(', ', $settings['soft_skills'] ?? []) ?: 'Not specified' }}</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-gray-500 text-xs font-medium mb-1">Skill Level</p>
+              <p class="font-semibold text-gray-700">{{ $settings['skill_level'] ?? 'Not specified' }}</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-gray-500 text-xs font-medium mb-1">Interests</p>
+              <p class="font-semibold text-gray-700">{{ implode(', ', $settings['interests'] ?? []) ?: 'Not specified' }}</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-gray-500 text-xs font-medium mb-1">Availability</p>
+              <p class="font-semibold text-gray-700">{{ $settings['availability'] ?? 'Not specified' }}</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-gray-500 text-xs font-medium mb-1">Experience</p>
+              <p class="font-semibold text-gray-700">{{ $settings['years_of_experience'] ?? 'Not specified' }} years</p>
+            </div>
+          </div>
+
+          <!-- Bio -->
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-gray-500 text-xs font-medium mb-2">About Me</p>
+            <p class="text-gray-700 text-sm leading-relaxed">
+              {{ $settings['bio'] ?? 'No bio information available. Update your profile to add a bio.' }}
+            </p>
+          </div>
+
+          <!-- Links -->
+          <div class="space-y-3">
+            <div class="flex items-center">
+              <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
+                <i class="fab fa-github text-gray-600"></i>
+              </div>
+              <a href="{{ $settings['github'] ?? '#' }}" target="_blank" class="text-cyan-600 hover:text-cyan-800 hover:underline font-medium text-sm transition-colors">
+                {{ $settings['github'] ?? 'GitHub not provided' }}
+              </a>
+            </div>
+            <div class="flex items-center">
+              <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
+                <i class="fas fa-code text-gray-600"></i>
+              </div>
+              <a href="{{ $settings['leetcode'] ?? '#' }}" target="_blank" class="text-cyan-600 hover:text-cyan-800 hover:underline font-medium text-sm transition-colors">
+                {{ $settings['leetcode'] ?? 'LeetCode not provided' }}
+              </a>
+            </div>
+            <div class="flex items-center">
+              <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
+                <i class="fab fa-linkedin-in text-gray-600"></i>
+              </div>
+              <a href="{{ $settings['linkedin'] ?? '#' }}" target="_blank" class="text-cyan-600 hover:text-cyan-800 hover:underline font-medium text-sm transition-colors">
+                {{ $settings['linkedin'] ?? 'LinkedIn not provided' }}
+              </a>
+            </div>
+          </div>
+
+          <!-- Button -->
+          <div class="pt-2">
+            <a href="/profile/edit" class="inline-flex items-center bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-medium px-6 py-3 rounded-lg shadow-sm transition-all text-sm">
+              <i class="fas fa-user-edit mr-2"></i>
+              Update Profile
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  @endif
-@empty
-  <div class="text-center text-gray-500 col-span-full text-lg py-10">
-    No users here.
-  </div>
-@endforelse
-
-
-  </div>
- 
-</div>
 
 </body>
 </html>

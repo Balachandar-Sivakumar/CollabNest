@@ -7,6 +7,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+   <script src="https://unpkg.com/alpinejs" defer></script>
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -27,7 +28,16 @@
 
     <!-- Login card container (on top) -->
     <div class="relative flex flex-col md:flex-row bg-white rounded-[30px] max-w-4xl w-full shadow-lg overflow-hidden mx-4">
-      
+      @if(session('error'))
+        <div
+            x-data = "{show:true}"
+            x-init = "setTimeout(()=>show=false,3000)"
+            x-show="show"
+            x-transition
+            class="bg-red-100 text-red-800 text-center absolute p-3 w-full rounded">
+            {{ session('error') }}
+        </div>
+    @endif
       <!-- Left side: Login form -->
       <div class="flex-1 p-10 md:p-16 flex flex-col justify-center">
         <h2 class="text-black text-xl font-semibold mb-8 text-center md:text-left">Login</h2>

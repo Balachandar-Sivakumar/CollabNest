@@ -7,18 +7,31 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/alpinejs" defer></script>
   <style>
     body {
       font-family: 'Inter', sans-serif;
     }
   </style>
 </head>
-<body class="bg-[#f8fafc] text-gray-900 min-h-screen flex">
 
+<body class="bg-[#f8fafc] text-gray-900 min-h-screen flex">
+    
   <!-- Sidebar -->
     @include("layout.aside")
   <!-- Main content -->
   <main class="flex-1 p-8">
+ @if(session('success'))
+        <div
+            x-data = "{show:true}"
+            x-init = "setTimeout(()=>show=false,3000)"
+            x-show="show"
+            x-transition
+            class="bg-green-100 text-green-800 text-center absolute p-3 rounded" style="width: 500px;">
+            {{ session('success') }}
+        </div>
+    @endif
+
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-xl font-semibold text-gray-900">Welcome, {{Auth::user()->name}}</h1>
       <button class="bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md flex items-center space-x-2 hover:bg-indigo-800">
