@@ -3,48 +3,123 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Update Profile</title>
+  <title>Update Profile | TeamCollab</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
   <style>
     body {
       font-family: 'Inter', sans-serif;
     }
+    .tag {
+      transition: all 0.2s ease;
+    }
+    .tag:hover {
+      transform: translateY(-1px);
+    }
+    .tag-remove {
+      transition: all 0.2s ease;
+    }
+    .tag-remove:hover {
+      color: #dc2626;
+      transform: scale(1.1);
+    }
+    .input-tag-container {
+      min-height: 44px;
+    }
   </style>
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 </head>
-<body class="bg-gray-100 text-gray-800 min-h-screen py-10 px-4">
+<body class="bg-gray-50 text-gray-800 min-h-screen py-10 px-4">
 
-  <div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-cyan-600 to-blue-600 px-8 py-6">
-      <h1 class="text-3xl font-bold text-white">Update Your Profile</h1>
-      <p class="text-cyan-100 mt-1">Maintain your up-to-date professional info</p>
+  <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-xl overflow-hidden">
+    <!-- Header with Gradient -->
+    <div class="bg-gradient-to-r from-indigo-600 to-blue-600 px-8 py-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-white">Update Your Profile</h1>
+          <p class="text-blue-100 mt-1">Keep your professional information up-to-date</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white bg-opacity-20 text-white">
+            <i class="fas fa-user-edit mr-1"></i> Edit Mode
+          </span>
+        </div>
+      </div>
     </div>
 
     <!-- Form -->
-    <form action="/profile/update" method="POST" enctype="multipart/form-data" class="p-8 space-y-10">
+    <form action="/profile/update" method="POST" enctype="multipart/form-data" class="p-6 md:p-8 space-y-8">
       @csrf
 
-      <!-- Profile Image + Info -->
-      <section class="grid md:grid-cols-3 gap-8">
-        <div>
-          <label class="block text-sm font-medium mb-2">Profile Image</label>
-          <input type="file" name="profile_image" id="profile_image"
-                 class="w-full text-sm text-gray-700 file:py-2 file:px-4 file:border file:border-gray-300 file:rounded-lg file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+      <!-- Profile Image + Basic Info -->
+      <section class="grid md:grid-cols-3 gap-8 items-start">
+        <!-- Profile Image Upload -->
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Profile Image</label>
+            <div class="flex items-center space-x-4">
+              <div class="relative">
+                <div class="h-24 w-24 rounded-full bg-gray-200 overflow-hidden border-2 border-white shadow">
+                  <img id="profile-preview" src="{{ Auth::user()->profile_image ?? 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->name).'&color=7F9CF5&background=EBF4FF' }}" 
+                       alt="Profile Preview" class="h-full w-full object-cover">
+                </div>
+                <label for="profile_image" class="absolute -bottom-2 -right-2 bg-white p-1.5 rounded-full shadow-md cursor-pointer hover:bg-gray-100">
+                  <i class="fas fa-camera text-blue-600 text-sm"></i>
+                </label>
+              </div>
+              <input type="file" name="profile_image" id="profile_image" accept="image/*" class="hidden">
+            </div>
+          </div>
+          
+          <!-- Resume Upload -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Resume (PDF)</label>
+            <div class="flex items-center">
+              <label for="resume" class="flex-1 cursor-pointer">
+                <div class="flex items-center justify-between px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100">
+                  <span class="text-sm text-gray-600 truncate">
+                    {{ json_decode($skills->profile_settings,true)['resume'] ?? 'Upload resume' }}
+                  </span>
+                  <i class="fas fa-file-pdf text-red-500 ml-2"></i>
+                </div>
+                <input type="file" id="resume" name="resume" accept=".pdf" class="hidden">
+              </label>
+            </div>
+          </div>
         </div>
 
+        <!-- Basic Info -->
         <div class="md:col-span-2 space-y-5">
           <div>
-            <label for="name" class="block text-sm font-medium mb-1">Full Name</label>
-            <input type="text" id="name" name="name" value="{{Auth::user()->name}}"
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
+            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+            <input type="text" id="name" name="name" value="{{ Auth::user()->name }}"
+                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
           </div>
 
+          <!-- Profession Tags -->
           <div>
-            <label class="block text-sm font-medium mb-1">Profession(s)</label>
-            <input type="text" name="profession" value="{{ implode(', ', json_decode($skills->profile_settings, true)['profession']) }}"
-                   placeholder="e.g. Developer, Designer"
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Profession(s)</label>
+            <div class="input-tag-container flex flex-wrap items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
+              <div id="profession-tags" class="flex flex-wrap gap-2">
+                @if(isset(json_decode($skills->profile_settings, true)['profession']))
+                  @foreach(json_decode($skills->profile_settings, true)['profession'] as $profession)
+                    <div class="tag inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {{ $profession }}
+                      <button type="button" class="tag-remove ml-1.5 text-blue-600 hover:text-blue-800">
+                        <i class="fas fa-times text-xs"></i>
+                      </button>
+                    </div>
+                  @endforeach
+                @endif
+              </div>
+              <input type="text" id="profession-input" placeholder="e.g. Developer, Designer" 
+                     class="flex-1 min-w-[100px] border-0 focus:ring-0 px-1 py-1 text-sm">
+              <button type="button" id="add-profession" class="text-blue-600 hover:text-blue-800">
+                <i class="fas fa-plus-circle"></i>
+              </button>
+              <input type="hidden" name="profession" id="profession-values" value="{{implode(', ',json_decode($skills->profile_settings,true)['profession']) ?? []}}">
+            </div>
           </div>
         </div>
       </section>
@@ -52,101 +127,224 @@
       <!-- Social Links -->
       <section class="grid md:grid-cols-2 gap-6">
         <div>
-          <label for="github" class="block text-sm font-medium mb-1">GitHub</label>
-          <input type="url" id="github" name="github" value="{{json_decode($skills->profile_settings,true)['github'] ?? ''}}" placeholder="https://github.com/yourusername"
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
+          <label for="github" class="block text-sm font-medium text-gray-700 mb-1">GitHub</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fab fa-github text-gray-400"></i>
+            </div>
+            <input type="url" id="github" name="github" value="{{ json_decode($skills->profile_settings,true)['github'] ?? '' }}" placeholder="https://github.com/yourusername"
+                   class="pl-10 w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+          </div>
         </div>
         <div>
-          <label for="leetcode" class="block text-sm font-medium mb-1">LeetCode</label>
-          <input type="url" id="leetcode" name="leetcode" value="{{json_decode($skills->profile_settings,true)['leetcode'] ?? ''}}" placeholder="https://leetcode.com/yourusername"
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
+          <label for="leetcode" class="block text-sm font-medium text-gray-700 mb-1">LeetCode</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-code text-gray-400"></i>
+            </div>
+            <input type="url" id="leetcode" name="leetcode" value="{{ json_decode($skills->profile_settings,true)['leetcode'] ?? '' }}" placeholder="https://leetcode.com/yourusername"
+                   class="pl-10 w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+          </div>
         </div>
         <div>
-          <label for="linkedin" class="block text-sm font-medium mb-1">LinkedIn</label>
-          <input type="url" id="linkedin" name="linkedin" value="{{json_decode($skills->profile_settings,true)['linkedin'] ?? ''}}" placeholder="https://linkedin.com/in/yourprofile"
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
+          <label for="linkedin" class="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fab fa-linkedin text-gray-400"></i>
+            </div>
+            <input type="url" id="linkedin" name="linkedin" value="{{ json_decode($skills->profile_settings,true)['linkedin'] ?? '' }}" placeholder="https://linkedin.com/in/yourprofile"
+                   class="pl-10 w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+          </div>
         </div>
         <div>
-          <label for="resume" class="block text-sm font-medium mb-1">Resume (PDF)</label>
-          <input type="file" id="resume" name="resume" accept=".pdf"
-                 class="w-full text-sm file:py-2 file:px-4 file:border file:border-gray-300 file:rounded-lg file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+          <label for="portfolio" class="block text-sm font-medium text-gray-700 mb-1">Portfolio</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-globe text-gray-400"></i>
+            </div>
+            <input type="url" id="portfolio" name="portfolio" value="{{ json_decode($skills->profile_settings,true)['portfolio'] ?? '' }}" placeholder="https://yourportfolio.com"
+                   class="pl-10 w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+          </div>
         </div>
       </section>
 
       <!-- Skills & Experience -->
       <section class="space-y-5">
-        <h2 class="text-xl font-semibold text-gray-700 border-b pb-2">Skills & Expertise</h2>
+        <h2 class="text-xl font-semibold text-gray-800 border-b pb-2 flex items-center">
+          <i class="fas fa-tools text-blue-500 mr-2"></i> Skills & Expertise
+        </h2>
 
         <div class="grid md:grid-cols-2 gap-6">
+          <!-- Technical Skills Tags -->
           <div>
-            <label class="block text-sm font-medium mb-1">Technical Skills</label>
-            <input type="text" name="technical_skills"
-                   value="{{ implode(', ',json_decode($skills->profile_settings, true)['technical_skills']) }}"
-                   placeholder="e.g. JavaScript, Python"
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Technical Skills</label>
+            <div class="input-tag-container flex flex-wrap items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
+              <div id="technical-skills-tags" class="flex flex-wrap gap-2">
+                @if(isset(json_decode($skills->profile_settings, true)['technical_skills']))
+                  @foreach(json_decode($skills->profile_settings, true)['technical_skills'] as $skill)
+                    <div class="tag inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                      {{ $skill }}
+                      <button type="button" class="tag-remove ml-1.5 text-indigo-600 hover:text-indigo-800">
+                        <i class="fas fa-times text-xs"></i>
+                      </button>
+                    </div>
+                  @endforeach
+                @endif
+              </div>
+              <input type="text" id="technical-skills-input" placeholder="e.g. JavaScript, Python" 
+                     class="flex-1 min-w-[100px] border-0 focus:ring-0 px-1 py-1 text-sm">
+              <button type="button" id="add-technical-skill" class="text-indigo-600 hover:text-indigo-800">
+                <i class="fas fa-plus-circle"></i>
+              </button>
+              <input type="hidden" name="technical_skills" id="technical-skills-values" 
+                     value="{{ implode(',', json_decode($skills->profile_settings, true)['technical_skills'] ?? []) }}">
+            </div>
           </div>
+
+          <!-- Soft Skills Tags -->
           <div>
-            <label class="block text-sm font-medium mb-1">Soft Skills</label>
-            <input type="text" name="soft_skills" value="{{ implode(', ',json_decode($skills->profile_settings, true)['soft_skills'] ?? [])}}" placeholder="e.g. Leadership, Communication"
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Soft Skills</label>
+            <div class="input-tag-container flex flex-wrap items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
+              <div id="soft-skills-tags" class="flex flex-wrap gap-2">
+                @if(isset(json_decode($skills->profile_settings, true)['soft_skills']))
+                  @foreach(json_decode($skills->profile_settings, true)['soft_skills'] as $skill)
+                    <div class="tag inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      {{ $skill }}
+                      <button type="button" class="tag-remove ml-1.5 text-green-600 hover:text-green-800">
+                        <i class="fas fa-times text-xs"></i>
+                      </button>
+                    </div>
+                  @endforeach
+                @endif
+              </div>
+              <input type="text" id="soft-skills-input" placeholder="e.g. Leadership, Communication" 
+                     class="flex-1 min-w-[100px] border-0 focus:ring-0 px-1 py-1 text-sm">
+              <button type="button" id="add-soft-skill" class="text-green-600 hover:text-green-800">
+                <i class="fas fa-plus-circle"></i>
+              </button>
+              <input type="hidden" name="soft_skills" id="soft-skills-values" 
+                     value="{{ implode(',', json_decode($skills->profile_settings, true)['soft_skills'] ?? []) }}">
+            </div>
           </div>
+
+          <!-- Skill Level -->
           <div>
-            <label class="block text-sm font-medium mb-1">Skill Level</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Skill Level</label>
             <select name="skill_level" 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
-              <option value="Beginner">Beginner</option>
-              <option value="Intermediate" selected>Intermediate</option>
-              <option value="Expert">Expert</option>
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+              <option value="Beginner" {{ (json_decode($skills->profile_settings,true)['skill_level'] ?? '') == 'Beginner' ? 'selected' : '' }}>Beginner</option>
+              <option value="Intermediate" {{ (json_decode($skills->profile_settings,true)['skill_level'] ?? 'Intermediate') == 'Intermediate' ? 'selected' : '' }}>Intermediate</option>
+              <option value="Expert" {{ (json_decode($skills->profile_settings,true)['skill_level'] ?? '') == 'Expert' ? 'selected' : '' }}>Expert</option>
             </select>
           </div>
+
+          <!-- Years of Experience -->
           <div>
-            <label class="block text-sm font-medium mb-1">Years of Experience</label>
-            <input type="number" min="0" name="years_of_experience" value="{{json_decode($skills->profile_settings,true)['years_of_experience'] ?? ''}}"
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
+            <div class="relative">
+              <input type="number" min="0" name="years_of_experience" value="{{ json_decode($skills->profile_settings,true)['years_of_experience'] ?? '' }}"
+                     class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <span class="text-gray-500">years</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       <!-- Preferences -->
       <section class="space-y-5">
-        <h2 class="text-xl font-semibold text-gray-700 border-b pb-2">Preferences</h2>
+        <h2 class="text-xl font-semibold text-gray-800 border-b pb-2 flex items-center">
+          <i class="fas fa-sliders-h text-blue-500 mr-2"></i> Preferences
+        </h2>
 
         <div class="grid md:grid-cols-2 gap-6">
+          <!-- Interests Tags -->
           <div>
-            <label class="block text-sm font-medium mb-1">Interests</label>
-            <input type="text" name="interests"
-                   value="{{ implode(', ', json_decode($skills->profile_settings, true)['interests'] ?? '[]') ?: 'Update' }}"
-                   placeholder="e.g. Open Source, AI"
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Interests</label>
+            <div class="input-tag-container flex flex-wrap items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
+              <div id="interests-tags" class="flex flex-wrap gap-2">
+                @if(isset(json_decode($skills->profile_settings, true)['interests']))
+                  @foreach(json_decode($skills->profile_settings, true)['interests'] as $interest)
+                    <div class="tag inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                      {{ $interest }}
+                      <button type="button" class="tag-remove ml-1.5 text-purple-600 hover:text-purple-800">
+                        <i class="fas fa-times text-xs"></i>
+                      </button>
+                    </div>
+                  @endforeach
+                @endif
+              </div>
+              <input type="text" id="interests-input" placeholder="e.g. Open Source, AI" 
+                     class="flex-1 min-w-[100px] border-0 focus:ring-0 px-1 py-1 text-sm">
+              <button type="button" id="add-interest" class="text-purple-600 hover:text-purple-800">
+                <i class="fas fa-plus-circle"></i>
+              </button>
+              <input type="hidden" name="interests" id="interests-values" 
+                     value="{{ implode(',', json_decode($skills->profile_settings, true)['interests'] ?? []) }}">
+            </div>
           </div>
+
+          <!-- Availability -->
           <div>
-            <label class="block text-sm font-medium mb-1">Availability</label>
-            <input type="text" name="availability" value="{{json_decode($skills->profile_settings,true)['availability'] ?? ''}}" placeholder="e.g. Weekends, Evenings"
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Availability</label>
+            <input type="text" name="availability" value="{{ json_decode($skills->profile_settings,true)['availability'] ?? '' }}" placeholder="e.g. Weekends, Evenings"
+                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
           </div>
         </div>
       </section>
 
       <!-- Bio -->
       <div>
-        <label for="bio" class="block text-sm font-medium mb-1">About You</label>
-        <textarea id="bio" name="bio" rows="4" placeholder="Tell us about yourself"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"></textarea>
+        <label for="bio" class="block text-sm font-medium text-gray-700 mb-1">About You</label>
+        <textarea id="bio" name="bio" rows="4" placeholder="Tell us about yourself, your experience, and what you're passionate about"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">{{ json_decode($skills->profile_settings,true)['bio'] ?? '' }}</textarea>
       </div>
 
-      <!-- Buttons -->
-      <div class="flex justify-between items-center pt-4">
+      <!-- Form Buttons -->
+      <div class="flex justify-between items-center pt-6 border-t border-gray-200">
         <a href="{{ url()->previous() }}"
-           class="text-gray-600 border border-gray-300 px-5 py-2 rounded-lg hover:bg-gray-100 transition">
-          Cancel
+           class="flex items-center px-5 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+          <i class="fas fa-arrow-left mr-2"></i> Cancel
         </a>
         <button type="submit"
-                class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition">
-          Save Changes
+                class="flex items-center px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition">
+          <i class="fas fa-save mr-2"></i> Save Changes
         </button>
       </div>
     </form>
   </div>
 
+  <script>
+   
+
+
+
+let profession_value = $('#profession-values').val().split(',');
+
+$('#add-profession').on('click', () => {
+    let val = $('#profession-input').val().trim();
+    if (!val) return;
+
+    profession_value.push(val);
+    $('#profession-tags').append(`
+        <div class="tag inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            ${val}
+            <button type="button" class="tag-remove ml-1.5 text-blue-600 hover:text-blue-800">
+                <i class="fas fa-times text-xs"></i>
+            </button>
+        </div>
+    `);
+
+    $('#profession-values').val(profession_value.join(','));
+    $('#profession-input').val('');
+});
+  
+
+
+
+   
+
+  </script>
 </body>
 </html>

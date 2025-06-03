@@ -34,10 +34,7 @@
 
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-xl font-semibold text-gray-900">Welcome, {{Auth::user()->name}}</h1>
-      <button class="bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md flex items-center space-x-2 hover:bg-indigo-800">
-        <i class="fas fa-plus"></i>
-        <span>New Project</span>
-      </button>
+    
     </div>
 
     <!-- Stats cards -->

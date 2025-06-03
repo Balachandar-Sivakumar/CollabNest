@@ -6,7 +6,9 @@ use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Projects;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeMail;
 
 class Authentication extends Controller
 {
@@ -31,8 +33,6 @@ class Authentication extends Controller
      */
     public function navLogin()
     {
-        $team = Projects::all();
-        dd($team);
         return Auth::check() ? redirect('/dashboard') : view('login');
     }
 
@@ -44,7 +44,7 @@ class Authentication extends Controller
         if (Auth::check()) {
             return redirect('/dashboard');
         }
-
+                // dd($request);
         $request->validate([
             'name'         => 'required',
             'email'        => 'required|email|unique:users,email',
@@ -55,11 +55,15 @@ class Authentication extends Controller
             'availability' => 'required|string',
         ]);
 
+        $token = Str::random(40);
+
         // Create user
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => bcrypt($request->password),
+            'verification_token' => $token,
+            'verified_at' => now(),
         ]);
 
         // Save profile settings
@@ -74,12 +78,35 @@ class Authentication extends Controller
             'user_id'          => $user->id,
             'profile_settings' => json_encode($settings),
         ]);
+     
+    
+        Mail::to($user->email)->send(new WelcomeMail($token,$user));
+        
+        return view('verification-success')->with('user', $user);
+
+        
+    }
+
+        public function verify(Request $request)
+    {
+        $emailHash = $request->query('email_hash');
+        $token = $request->query('token');
+
+        $user = User::where('verification_token', $token)->first();
+
+        if (!$user || hash('sha256', $user->email) !== $emailHash) {
+            return view('verification-failed', ['message' => 'Invalid or expired token']);
+        }
+
+        $user->update([
+            'verified_at' => now(),
+            'verification_token' => null,
+        ]);
 
         Auth::login($user);
 
-        return redirect('/dashboard')->with('success', 'Registered successfully');
+        return redirect('/dashboard')->with('success', 'Register successful');
     }
-
     public function loginUser(Request $request)
     {
         if (Auth::check()) {
@@ -111,4 +138,5 @@ class Authentication extends Controller
     {
         return Auth::check() ? view('dashboard') : redirect('/login');
     }
+
 }

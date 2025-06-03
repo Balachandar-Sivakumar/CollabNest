@@ -1,4 +1,4 @@
-<aside class="w-72 bg-white border-r border-gray-200 flex flex-col justify-between min-w-72">
+<aside class="w-72 bg-white border-r border-gray-200 flex flex-col justify-between min-w-72" style="width: 350px;">
     <div>
       <div class="px-5 pt-5 pb-5" style="display:flex; align-items:center; gap:8px">
         <div class="w-30 h-30 rounded overflow-hidden">
@@ -19,8 +19,8 @@
             
                 $image = json_decode($profile->profile_settings,true)['image'] ?? null;
             @endphp
-            
-          <img alt="Profile" class="rounded-full w-10 h-10 object-cover" src="{{$image ? asset('storage/'. $image) : '#'}}" />
+ 
+          <img alt="Profile" class="rounded-full w-10 h-10 object-cover" src="{{asset('storage/'. $image) ?? '' }}" />
           <div>
            
             <p class="font-semibold text-gray-900 text-sm leading-tight">{{ Auth::user()->name }}</p>
@@ -66,11 +66,7 @@
     <i class="fas fa-video"></i><span>Meetings</span>
   </a>
 
-  <a href="{{ route('files') }}"
-     class="flex items-center space-x-2 py-2 px-3 rounded-md 
-            {{ request()->routeIs('files') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
-    <i class="far fa-file-alt"></i><span>Files</span>
-  </a>
+
 
   <a href="{{ route('settings') }}"
      class="flex items-center space-x-2 py-2 px-3 rounded-md 
