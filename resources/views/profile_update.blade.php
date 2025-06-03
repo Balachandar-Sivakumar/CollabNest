@@ -320,31 +320,72 @@
 
 
 
-let profession_value = $('#profession-values').val().split(',');
+function handleTagging(inputId, addBtnId, tagsContainerId, hiddenInputId, valueArray, color) {
+    valueArray = $(hiddenInputId).val() ? $(hiddenInputId).val().split(',') : [];
 
-$('#add-profession').on('click', () => {
-    let val = $('#profession-input').val().trim();
-    if (!val) return;
+    $(addBtnId).on('click', () => {
+        let val = $(inputId).val().trim();
+        if (!val) return;
 
-    profession_value.push(val);
-    $('#profession-tags').append(`
-        <div class="tag inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            ${val}
-            <button type="button" class="tag-remove ml-1.5 text-blue-600 hover:text-blue-800">
-                <i class="fas fa-times text-xs"></i>
-            </button>
-        </div>
-    `);
+        valueArray.push(val);
+        $(tagsContainerId).append(`
+            <div class="tag inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${color.bg} ${color.text}">
+                ${val}
+                <button type="button" class="tag-remove ml-1.5 ${color.hover}">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+        `);
+        $(hiddenInputId).val(valueArray.join(','));
+        $(inputId).val('');
+    });
 
-    $('#profession-values').val(profession_value.join(','));
-    $('#profession-input').val('');
+    return () => valueArray;
+}
+
+let getProfession = handleTagging('#profession-input', '#add-profession', '#profession-tags', '#profession-values', [], {
+    bg: 'bg-blue-100', text: 'text-blue-800', hover: 'text-blue-600 hover:text-blue-800'
 });
-  
 
+let getTechnical = handleTagging('#technical-skills-input', '#add-technical-skill', '#technical-skills-tags', '#technical-skills-values', [], {
+    bg: 'bg-indigo-100', text: 'text-indigo-800', hover: 'text-indigo-600 hover:text-indigo-800'
+});
 
+let getSoft = handleTagging('#soft-skills-input', '#add-soft-skill', '#soft-skills-tags', '#soft-skills-values', [], {
+    bg: 'bg-green-100', text: 'text-green-800', hover: 'text-green-600 hover:text-green-800'
+});
 
-   
+let getInterests = handleTagging('#interests-input', '#add-interest', '#interests-tags', '#interests-values', [], {
+    bg: 'bg-purple-100', text: 'text-purple-800', hover: 'text-purple-600 hover:text-purple-800'
+});
 
+$(document).on('click', '.tag-remove', function () {
+    const tag = $(this).closest('.tag');
+    const tagText = tag.text().trim();
+    const containerId = tag.parent().attr('id');
+
+    let updateArray;
+
+    if (containerId === 'profession-tags') {
+        updateArray = getProfession();
+        updateArray = updateArray.filter(item => item !== tagText);
+        $('#profession-values').val(updateArray.join(','));
+    } else if (containerId === 'technical-skills-tags') {
+        updateArray = getTechnical();
+        updateArray = updateArray.filter(item => item !== tagText);
+        $('#technical-skills-values').val(updateArray.join(','));
+    } else if (containerId === 'soft-skills-tags') {
+        updateArray = getSoft();
+        updateArray = updateArray.filter(item => item !== tagText);
+        $('#soft-skills-values').val(updateArray.join(','));
+    } else if (containerId === 'interests-tags') {
+        updateArray = getInterests();
+        updateArray = updateArray.filter(item => item !== tagText);
+        $('#interests-values').val(updateArray.join(','));
+    }
+
+    tag.remove();
+});
   </script>
 </body>
 </html>
