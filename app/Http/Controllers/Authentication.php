@@ -79,7 +79,7 @@ class Authentication extends Controller
             'profile_settings' => json_encode($settings),
         ]);
      
-       
+    
         Mail::to($user->email)->send(new WelcomeMail($token,$user));
         
         return view('verification-success')->with('user', $user);

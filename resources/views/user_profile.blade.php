@@ -58,12 +58,16 @@
             <div class="h-[440px] rounded-lg overflow-hidden shadow-sm border border-gray-100 bg-gray-50">
               <iframe src="{{ asset('storage/' . $pdf) }}#toolbar=0" class="w-full h-full" frameborder="0"></iframe>
             </div>
-            <div class="mt-3 text-center">
+            
+          @if($skills->user_id !== Auth::user()->id)
+          <div class="mt-3 text-center">
               <a href="{{ asset('storage/' . $pdf) }}" target="_blank" download class="inline-flex items-center text-sm text-cyan-600 hover:text-cyan-800 font-medium transition-colors">
                 <i class="fas fa-file-pdf mr-2"></i>
                 Download Resume
               </a>
             </div>
+            @endif
+
           </div>
           @endif
         </div>
@@ -151,12 +155,14 @@
           </div>
 
           <!-- Button -->
+          @if($skills->user_id === Auth::user()->id)
           <div class="pt-2">
             <a href="/profile/edit" class="inline-flex items-center bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-medium px-6 py-3 rounded-lg shadow-sm transition-all text-sm">
               <i class="fas fa-user-edit mr-2"></i>
               Update Profile
             </a>
           </div>
+          @endif
         </div>
       </div>
     </div>

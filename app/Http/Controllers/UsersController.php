@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Models\Projects;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use App\Models\UserProfile;
@@ -11,6 +13,7 @@ class UsersController extends Controller
 {
     public function NavUsers(){
         $skills = UserProfile::where('user_id',Auth::user()->id)->first();
+      
         return view('user_profile',compact('skills'));
     }
 
@@ -20,7 +23,9 @@ class UsersController extends Controller
     }
 
         public function profileUpdate(Request $request)
-    {
+                {
+
+        dd($request);
        $request->validate([
             'technical_skills'      => 'required',
             'soft_skills'           => 'required',
@@ -61,7 +66,7 @@ class UsersController extends Controller
         $data->image=$path;
     }
     if($request->hasFile('resume')){
-        $resume_path = $request->file('resume')->store('file','public');
+        $resume_path = $request->file('resume')->store('files','public');
         $data->resume = $resume_path;
     }
 

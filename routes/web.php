@@ -54,9 +54,6 @@ Route::get('/messages', [MessageController::class, 'index'])->name('messages');
 // Meetings page
 Route::get('/meetings', [MeetingController::class, 'index'])->name('meetings');
 
-// Files page
-Route::get('/files', [FileController::class, 'index'])->name('files');
-
 // Settings page
 Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
 
@@ -81,3 +78,9 @@ Route::get('/profile',[UsersController::class, 'NavUsers']);
 Route::get('/profile/edit',[UsersController::class, 'navedit']);
 
 Route::post('/profile/update',[UsersController::class, 'profileUpdate']);
+
+Route::get("/navcreateproject",[ProjectController::class,'navcreateproject']);
+
+Route::post('/CreateProject',[ProjectController::class,'CreateProject']);
+
+Route::get('/view/{id}',[ProjectController::class,'viewProject']);
