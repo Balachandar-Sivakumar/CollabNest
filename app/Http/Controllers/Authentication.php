@@ -63,7 +63,7 @@ class Authentication extends Controller
             'email'    => $request->email,
             'password' => bcrypt($request->password),
             'verification_token' => $token,
-            'verified_at' => now(),
+            
         ]);
 
         // Save profile settings
@@ -79,7 +79,7 @@ class Authentication extends Controller
             'profile_settings' => json_encode($settings),
         ]);
      
-        Auth::login($user);
+       
         Mail::to($user->email)->send(new WelcomeMail($token,$user));
         
         return view('verification-success')->with('user', $user);
