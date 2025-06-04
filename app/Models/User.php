@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable; 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Vinkla\Hashids\Facades\Hashids;
 
 class User extends Authenticatable 
 {
@@ -16,6 +17,13 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+      protected $appends = ['hashid'];
+
+     public function getHashidAttribute()
+    {
+        return Hashids::encode($this->id);
+    }
 
     protected $casts = [
         'email_verified_at' => 'datetime',

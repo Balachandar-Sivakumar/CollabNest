@@ -16,6 +16,7 @@
             
             @php
              $profile = App\Models\UserProfile::where('user_id',Auth::user()->id)->first();
+             $hashid = $profile->user->hashid ?? null;
             
                 $image = json_decode($profile->profile_settings,true)['image'] ?? null;
             @endphp
