@@ -12,6 +12,8 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\WelcomepageController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\MailSendController;
+use App\Http\Controllers\SkillsController;
+use App\Models\Skills;
 
 // Home page
 Route::get('/', [Authentication::class, 'welcome']);
@@ -82,3 +84,5 @@ Route::get("/navcreateproject",[ProjectController::class,'navcreateproject']);
 Route::post('/CreateProject',[ProjectController::class,'CreateProject']);
 
 Route::get('/view/{hashid}',[ProjectController::class,'viewProject']);
+
+Route::get('/profession/search',[SkillsController::class,'getProfession']);

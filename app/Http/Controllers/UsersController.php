@@ -26,7 +26,7 @@ class UsersController extends Controller
         public function profileUpdate(Request $request)
                 {
 
-        dd($request);
+   
        $request->validate([
             'technical_skills'      => 'required',
             'soft_skills'           => 'required',
