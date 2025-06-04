@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeMail;
+use App\Models\Interests;
+use App\Models\Profession;
+use App\Models\Skills;
 
 class Authentication extends Controller
 {
@@ -44,7 +47,9 @@ class Authentication extends Controller
         if (Auth::check()) {
             return redirect('/dashboard');
         }
-                dd($request);
+
+    
+
         $request->validate([
             'name'         => 'required',
             'email'        => 'required|email|unique:users,email',
@@ -66,11 +71,27 @@ class Authentication extends Controller
             'verified_at' => now(),
         ]);
 
+        $professions = [];
+        $tech_skills =[];
+        $interests = [];
+
+        foreach($request->profession as $prof){
+            array_push($professions,Profession::where('profession',$prof)->value('id'));
+        }
+        foreach($request->skills as $skill){
+            array_push($tech_skills,Skills::where('skill',$skill)->value('id'));
+        }
+        foreach($request->interests as $interest){
+            array_push($interests,Interests::where('interest',$interest)->value('id'));
+        }
+
+     
+
         // Save profile settings
         $settings = [
-            'profession'       => $request->profession,
-            'technical_skills' => $request->skills,
-            'interests'        => $request->interests,
+            'profession'       => $professions,
+            'technical_skills' => $tech_skills,
+            'interests'        => $interests,
             'availability'     => $request->availability,
         ];
 

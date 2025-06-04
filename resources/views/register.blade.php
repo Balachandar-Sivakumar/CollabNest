@@ -124,6 +124,10 @@
               <div id="skillsHiddenInputs"></div>
             </div>
 
+              <ul id="skills_suggession"
+                  class="absolute mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-48 overflow-auto ">
+              </ul>
+
             <!-- Interests Input -->
             <div class="mt-4 interests-container">
               <label class="block font-semibold text-gray-700 mb-2 text-lg">Interests</label>
@@ -137,6 +141,10 @@
               <div id="interestsTags" class="flex flex-wrap mt-2"></div>
               <div id="interestsHiddenInputs"></div>
             </div>
+
+             <ul id="interests_suggession"
+                  class="absolute mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-48 overflow-auto ">
+              </ul>
 
             <div class="mt-6">
               <label class="block font-semibold text-gray-700 mb-2 text-lg">Availability</label>
@@ -173,10 +181,9 @@
   </div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
- <!-- Your full HTML stays unchanged above here -->
+ 
+  <script>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
 $(function () {
   const form = $('#detailsForm'), step1 = $('.step_1'), step2 = $('.step_2'),
         nextBtn = $('#nextbtn'), errorBox1 = $('#errorMessage1'), errorBox2 = $('#errorMessage'),
@@ -263,7 +270,7 @@ $(function () {
     return { updateTags };
   }
 
-  // ✅ Store handlers globally so suggestion click can call `prof.updateTags()`
+  
   let prof = setupTagInput('#professionInput', '#addProfession', '#professionTags', '#professionHiddenInputs', professionTags, 'blue', 'profession');
   let skills = setupTagInput('#skillsInput', '#addSkill', '#skillsTags', '#skillsHiddenInputs', skillsTags, 'indigo', 'skills');
   let interests = setupTagInput('#interestsInput', '#addInterest', '#interestsTags', '#interestsHiddenInputs', interestsTags, 'purple', 'interests');
@@ -279,57 +286,72 @@ $(function () {
     box.text(msg).removeClass('hidden');
   }
 
-    /// handles profession suggession
-  $('#professionInput').on('input', () => {
-    const query = $('#professionInput').val().trim();
-    const list = $('#profession_suggession');
-    list.empty();
-    if (query.length === 0) return;
+ function setupTagSuggestion({ inputId, listId, fetchUrl, dataKey, tagArray, updateFunc }) {
+  const $input = $(`#${inputId}`);
+  const $list = $(`#${listId}`);
 
-    fetch(`/profession/search?q=${query}`)
-      .then(res =>  res.json())
+  $input.on('input', () => {
+    const query = $input.val().trim();
+    $list.empty();
+    if (!query) return;
+
+    fetch(`${fetchUrl}${encodeURIComponent(query)}`)
+      .then(res => res.json())
       .then(data => {
-        if (data.length === 0) {list.append('<li class="p-2 text-gray-500">No matches found</li>'); return;}
-        data.forEach(profession => {
-          list.append(`<li class="p-2 hover:bg-gray-100 cursor-pointer" data-profession="${profession}">${profession}</li>`);
+        if (!data.length) return $list.append('<li class="p-2 text-gray-500">No matches found</li>');
+        data.forEach(item => {
+          $list.append(`<li class="p-2 hover:bg-gray-100 cursor-pointer" data-${dataKey}="${item}">${item}</li>`);
         });
       })
       .catch(err => console.error('Fetch error:', err));
   });
-  
-  $(document).on('click', '#profession_suggession li', function () {
-    const selected = $(this).data('profession');
-    if (selected && !professionTags.includes(selected)) {
-      professionTags.push(selected);
-      prof.updateTags();
+
+  $(document).on('click', `#${listId} li`, function () {
+    const selected = $(this).data(dataKey);
+    if (selected && !tagArray.includes(selected)) {
+      tagArray.push(selected);
+      updateFunc();
     }
-    $('#professionInput').val('');
-    $('#profession_suggession').empty();
+    $input.val('');
+    $list.empty();
   });
+}
 
-  ///handle skills suggession
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /////handle intersests suggession
+// Setup suggestions
+setupTagSuggestion({
+  inputId: 'professionInput',
+  listId: 'profession_suggession',
+  fetchUrl: '/profession/search?q=',
+  dataKey: 'profession',
+  tagArray: professionTags,
+  updateFunc: prof.updateTags
 });
-</script>
+
+setupTagSuggestion({
+  inputId: 'skillsInput',
+  listId: 'skills_suggession',
+  fetchUrl: '/skills/search?q=',
+  dataKey: 'skill',
+  tagArray: skillsTags,
+  updateFunc: skills.updateTags
+});
+
+setupTagSuggestion({
+  inputId: 'interestsInput',
+  listId: 'interests_suggession',
+  fetchUrl: '/interests/search?q=',
+  dataKey: 'interest',
+  tagArray: interestsTags,
+  updateFunc: interests.updateTags
+});
+
+      
+
+});
+
+ 
+  
+  </script>
 
 </body>
 </html>
