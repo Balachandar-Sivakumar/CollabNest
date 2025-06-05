@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Projects;
 use Illuminate\Auth\Events\Validated;
-use SebastianBergmann\CodeCoverage\Report\Xml\Project;
+// use SebastianBergmann\CodeCoverage\Report\Xml\Project;
 use Vinkla\Hashids\Facades\Hashids;
 use App\Models\User;
 
@@ -53,19 +53,11 @@ public function CreateProject(Request $request)
     return redirect()->route('projects')->with('success', 'Project created!');
 }
 
-public function viewProject($hashid)
+public function viewProject(Projects $project)
 {
-    $decoded = Hashids::decode($hashid);
+    // $user = User::with('projects')->findOrFail($project);
 
-    if (empty($decoded)) {
-        abort(404, 'Invalid hashid');
-    }
-
-    $id = $decoded[0];
-    dd($id); 
-    $user = User::with('projects')->findOrFail($id);
-
-    return view('viewProject', compact('user'));
+    return view('viewProject', compact('project'));
 }
 
 

@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable; 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-// use Vinkla\Hashids\HashidsServiceProvider;
 use Mtvs\EloquentHashids\HasHashid;
 use Mtvs\EloquentHashids\HashidRouting;
 
@@ -13,6 +12,7 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
     use HasHashid, HashidRouting;
+    use HasFactory;
 
     protected $fillable = ['name', 'email', 'password',  'verification_token','verified_at',];
 

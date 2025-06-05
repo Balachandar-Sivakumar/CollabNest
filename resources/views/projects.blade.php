@@ -43,7 +43,7 @@
            @endforeach
           </div>
         </div>
-        <a href="/view/{{$project->id}}" class="text-blue-600 text-sm hover:underline">View Details</a>
+        <a href="/view/{{$project->hashid}}" class="text-blue-600 text-sm hover:underline">View Details</a>
       </div>
     @endforeach
 

@@ -83,7 +83,7 @@ Route::get("/navcreateproject",[ProjectController::class,'navcreateproject']);
 
 Route::post('/CreateProject',[ProjectController::class,'CreateProject']);
 
-Route::get('/view/{hashid}',[ProjectController::class,'viewProject']);
+Route::get('/view/{project}',[ProjectController::class,'viewProject']);
 
 Route::get('/profession/search',[SkillsController::class,'getProfession']);
 
