@@ -79,7 +79,7 @@
             <h1 class="text-3xl font-bold text-gray-900 tracking-tight">{{ Auth::user()->name }}</h1>
             <div class="mt-3 flex flex-wrap gap-2">
               @foreach($settings['profession'] ?? [] as $n)
-                <span class="bg-cyan-50 text-cyan-700 text-xs font-medium px-3 py-1.5 rounded-full border border-cyan-100">{{ $n }}</span>
+                <span class="bg-cyan-50 text-cyan-700 text-xs font-medium px-3 py-1.5 rounded-full border border-cyan-100">{{ App\Models\Profession::where('id',$n)->value('profession')}}</span>
               @endforeach
             </div>
           </div>
@@ -91,9 +91,19 @@
               <p class="font-semibold text-gray-700">{{ Auth::user()->id }}</p>
             </div>
             <div class="bg-gray-50 p-3 rounded-lg">
+                @php
+                    $tech_skill = [];
+
+                    if ($settings['technical_skills']) {
+                        foreach ($settings['technical_skills'] as $skill_id) {
+                            $tech_skill[] = \App\Models\Skills::where('id', $skill_id)->value('skill');
+                        }
+                    }
+                @endphp
+
               <p class="text-gray-500 text-xs font-medium mb-1">Technical Skills</p>
               <p class="font-semibold text-cyan-600">
-                {{ implode(', ', $settings['technical_skills'] ?? []) ?: 'Not specified' }}
+                {{ implode(', ', $tech_skill) ?: 'Not specified' }}
               </p>
             </div>
             <div class="bg-gray-50 p-3 rounded-lg">
@@ -104,9 +114,17 @@
               <p class="text-gray-500 text-xs font-medium mb-1">Skill Level</p>
               <p class="font-semibold text-gray-700">{{ $settings['skill_level'] ?? 'Not specified' }}</p>
             </div>
+            @php
+                    $interests =[];
+            if($settings['interests']){
+              foreach($settings['interests'] as $interest_id){
+                $interests[]=\App\Models\Interests::where('id',$interest_id)->value('interest');
+              }
+            }
+            @endphp
             <div class="bg-gray-50 p-3 rounded-lg">
               <p class="text-gray-500 text-xs font-medium mb-1">Interests</p>
-              <p class="font-semibold text-gray-700">{{ implode(', ', $settings['interests'] ?? []) ?: 'Not specified' }}</p>
+              <p class="font-semibold text-gray-700">{{ implode(', ', $interests) ?: 'Not specified' }}</p>
             </div>
             <div class="bg-gray-50 p-3 rounded-lg">
               <p class="text-gray-500 text-xs font-medium mb-1">Availability</p>

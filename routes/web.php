@@ -86,3 +86,9 @@ Route::post('/CreateProject',[ProjectController::class,'CreateProject']);
 Route::get('/view/{hashid}',[ProjectController::class,'viewProject']);
 
 Route::get('/profession/search',[SkillsController::class,'getProfession']);
+
+Route::get('/skills/search',[SkillsController::class,'getSkills']);
+
+Route::get('/interests/search',[SkillsController::class,'getInterests']);
+
+Route::get('/softSkill/search',[SkillsController::class,'getSoftskills']);

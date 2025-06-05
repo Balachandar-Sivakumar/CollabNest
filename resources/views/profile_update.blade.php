@@ -27,6 +27,25 @@
     .input-tag-container {
       min-height: 44px;
     }
+    #profession_suggession {
+      display: none;
+      position: absolute;
+      width: 100%;
+      max-height: 200px;
+      overflow-y: auto;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.375rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+    }
+    #profession_suggession li {
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    #profession_suggession li:hover {
+      background-color: #f3f4f6;
+    }
   </style>
   <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 </head>
@@ -98,19 +117,27 @@
           </div>
 
           <!-- Profession Tags -->
-          <div>
+          <div class="relative">
             <label class="block text-sm font-medium text-gray-700 mb-1">Profession(s)</label>
             <div class="input-tag-container flex flex-wrap items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
               <div id="profession-tags" class="flex flex-wrap gap-2">
+
+              @php
+                $professions_id = json_decode($skills->profile_settings, true)['profession'] ?? [];
+                $professions =[];
+                foreach($professions_id as $n){
+                  $professions[]=\App\Models\Profession::where('id',$n)->value('profession');
+                }
+              @endphp
                 @if(isset(json_decode($skills->profile_settings, true)['profession']))
-                  @foreach(json_decode($skills->profile_settings, true)['profession'] as $profession)
+               
                     <div class="tag inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      {{ $profession }}
+                   
                       <button type="button" class="tag-remove ml-1.5 text-blue-600 hover:text-blue-800">
                         <i class="fas fa-times text-xs"></i>
                       </button>
                     </div>
-                  @endforeach
+            
                 @endif
               </div>
               <input type="text" id="profession-input" placeholder="e.g. Developer, Designer" 
@@ -118,11 +145,16 @@
               <button type="button" id="add-profession" class="text-blue-600 hover:text-blue-800">
                 <i class="fas fa-plus-circle"></i>
               </button>
-              <input type="hidden" name="profession" id="profession-values" value="{{implode(', ',json_decode($skills->profile_settings,true)['profession']) ?? []}}">
+              <input type="hidden" name="profession" id="profession-values" value="{{ implode(',', $professions) ?? '' }}">
+                
             </div>
+             <ul id="prof_suggession" class="absolute mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-48 overflow-auto "></ul>
           </div>
         </div>
       </section>
+
+      
+     
 
       <!-- Social Links -->
       <section class="grid md:grid-cols-2 gap-6">
@@ -180,16 +212,22 @@
             <label class="block text-sm font-medium text-gray-700 mb-1">Technical Skills</label>
             <div class="input-tag-container flex flex-wrap items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
               <div id="technical-skills-tags" class="flex flex-wrap gap-2">
-                @if(isset(json_decode($skills->profile_settings, true)['technical_skills']))
-                  @foreach(json_decode($skills->profile_settings, true)['technical_skills'] as $skill)
+
+              @php
+                  $tech_skills_id = json_decode($skills->profile_settings, true)['technical_skills'] ?? [];
+                  $tech_skills = [];
+                  foreach($tech_skills_id as $tech_id){
+                    $tech_skills[]=\App\Models\Skills::where('id', $tech_id)->value('skill');
+                  }
+              @endphp
+               
                     <div class="tag inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                      {{ $skill }}
+                     
                       <button type="button" class="tag-remove ml-1.5 text-indigo-600 hover:text-indigo-800">
                         <i class="fas fa-times text-xs"></i>
                       </button>
                     </div>
-                  @endforeach
-                @endif
+
               </div>
               <input type="text" id="technical-skills-input" placeholder="e.g. JavaScript, Python" 
                      class="flex-1 min-w-[100px] border-0 focus:ring-0 px-1 py-1 text-sm">
@@ -197,8 +235,11 @@
                 <i class="fas fa-plus-circle"></i>
               </button>
               <input type="hidden" name="technical_skills" id="technical-skills-values" 
-                     value="{{ implode(',', json_decode($skills->profile_settings, true)['technical_skills'] ?? []) }}">
+                     value="{{ implode(',', $tech_skills) ?? '' }}">
             </div>
+             <ul id="skills_suggession"
+                  class="absolute mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-48 overflow-auto ">
+              </ul>
           </div>
 
           <!-- Soft Skills Tags -->
@@ -206,15 +247,25 @@
             <label class="block text-sm font-medium text-gray-700 mb-1">Soft Skills</label>
             <div class="input-tag-container flex flex-wrap items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
               <div id="soft-skills-tags" class="flex flex-wrap gap-2">
+
+                @php
+                  $soft_skills_id = json_decode($skills->profile_settings, true)['soft_skills'] ?? [];
+                  $soft_skills=[];
+                  foreach($soft_skills_id as $soft_skill){
+                    $soft_skills[]=\App\Models\SoftSkills::where('id',$soft_skill)->value('soft_skills');
+                  }
+              @endphp
+              
+                
                 @if(isset(json_decode($skills->profile_settings, true)['soft_skills']))
-                  @foreach(json_decode($skills->profile_settings, true)['soft_skills'] as $skill)
+                  
                     <div class="tag inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      {{ $skill }}
+                     
                       <button type="button" class="tag-remove ml-1.5 text-green-600 hover:text-green-800">
                         <i class="fas fa-times text-xs"></i>
                       </button>
                     </div>
-                  @endforeach
+                
                 @endif
               </div>
               <input type="text" id="soft-skills-input" placeholder="e.g. Leadership, Communication" 
@@ -223,8 +274,11 @@
                 <i class="fas fa-plus-circle"></i>
               </button>
               <input type="hidden" name="soft_skills" id="soft-skills-values" 
-                     value="{{ implode(',', json_decode($skills->profile_settings, true)['soft_skills'] ?? []) }}">
+                     value="{{ implode(',', $soft_skills) ?? '' }}">
             </div>
+             <ul id="soft_skill_suggession"
+                  class="absolute mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-48 overflow-auto ">
+              </ul>
           </div>
 
           <!-- Skill Level -->
@@ -233,7 +287,7 @@
             <select name="skill_level" 
                     class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
               <option value="Beginner" {{ (json_decode($skills->profile_settings,true)['skill_level'] ?? '') == 'Beginner' ? 'selected' : '' }}>Beginner</option>
-              <option value="Intermediate" {{ (json_decode($skills->profile_settings,true)['skill_level'] ?? 'Intermediate') == 'Intermediate' ? 'selected' : '' }}>Intermediate</option>
+              <option value="Intermediate" {{ (json_decode($skills->profile_settings,true)['skill_level'] ?? '') == 'Intermediate' ? 'selected' : '' }}>Intermediate</option>
               <option value="Expert" {{ (json_decode($skills->profile_settings,true)['skill_level'] ?? '') == 'Expert' ? 'selected' : '' }}>Expert</option>
             </select>
           </div>
@@ -264,16 +318,20 @@
             <label class="block text-sm font-medium text-gray-700 mb-1">Interests</label>
             <div class="input-tag-container flex flex-wrap items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
               <div id="interests-tags" class="flex flex-wrap gap-2">
-                @if(isset(json_decode($skills->profile_settings, true)['interests']))
-                  @foreach(json_decode($skills->profile_settings, true)['interests'] as $interest)
+              
+                    @php
+                        $interests_id = json_decode($skills->profile_settings, true)['interests'] ?? [];
+                        $interests = [];
+                        foreach ($interests_id as $interest_id) {
+                            $interests[] = \App\Models\Interests::where('id', $interest_id)->value('interest');
+                        }
+                    @endphp
                     <div class="tag inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                      {{ $interest }}
+                     
                       <button type="button" class="tag-remove ml-1.5 text-purple-600 hover:text-purple-800">
                         <i class="fas fa-times text-xs"></i>
                       </button>
-                    </div>
-                  @endforeach
-                @endif
+                    </div> 
               </div>
               <input type="text" id="interests-input" placeholder="e.g. Open Source, AI" 
                      class="flex-1 min-w-[100px] border-0 focus:ring-0 px-1 py-1 text-sm">
@@ -281,8 +339,11 @@
                 <i class="fas fa-plus-circle"></i>
               </button>
               <input type="hidden" name="interests" id="interests-values" 
-                     value="{{ implode(',', json_decode($skills->profile_settings, true)['interests'] ?? []) }}">
+                     value="{{ implode(',', $interests) ?? '' }}">
             </div>
+             <ul id="interests_suggession"
+                  class="absolute mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-48 overflow-auto ">
+              </ul>
           </div>
 
           <!-- Availability -->
@@ -316,75 +377,115 @@
   </div>
 
   <script>
-   
+    $(document).ready(function() {
 
+      // Tag handling functions
+      function setupTagSystem(inputSelector, addButtonSelector, tagsContainerSelector, hiddenInputSelector, colorClasses) {
+        let tags = $(hiddenInputSelector).val() ? $(hiddenInputSelector).val().split(',') : [];
 
-
-function handleTagging(inputId, addBtnId, tagsContainerId, hiddenInputId, valueArray, color) {
-    valueArray = $(hiddenInputId).val() ? $(hiddenInputId).val().split(',') : [];
-
-    $(addBtnId).on('click', () => {
-        let val = $(inputId).val().trim();
-        if (!val) return;
-
-        valueArray.push(val);
-        $(tagsContainerId).append(`
-            <div class="tag inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${color.bg} ${color.text}">
-                ${val}
-                <button type="button" class="tag-remove ml-1.5 ${color.hover}">
+        function updateTags() {
+          $(tagsContainerSelector).empty();
+          tags.forEach(tag => {
+            if (tag.trim()) {
+              $(tagsContainerSelector).append(`
+                <div class="tag inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${colorClasses.bg} ${colorClasses.text}">
+                  ${tag.trim()}
+                  <button type="button" class="tag-remove ml-1.5 ${colorClasses.hover}">
                     <i class="fas fa-times text-xs"></i>
-                </button>
-            </div>
-        `);
-        $(hiddenInputId).val(valueArray.join(','));
-        $(inputId).val('');
-    });
+                  </button>
+                </div>
+              `);
+            }
+          });
+          $(hiddenInputSelector).val(tags.join(','));
+        }
 
-    return () => valueArray;
+        $(addButtonSelector).on('click', function() {
+          const val = $(inputSelector).val().trim();
+          if (val && !tags.includes(val)) {
+            tags.push(val);
+            updateTags();
+            $(inputSelector).val('');
+          }
+        });
+
+        $(inputSelector).on('keypress', function(e) {
+          if (e.which === 13) { // Enter key
+            e.preventDefault();
+            $(addButtonSelector).click();
+          }
+        });
+
+        $(document).on('click', `${tagsContainerSelector} .tag-remove`, function() {
+          const tagText = $(this).parent().text().trim();
+          tags = tags.filter(t => t.trim() !== tagText);
+          updateTags();
+        });
+
+        // Initialize tags on page load
+        updateTags();
+      }
+
+      // Setup all tag systems
+       setupTagSystem('#profession-input', '#add-profession', '#profession-tags', '#profession-values', {
+        bg: 'bg-blue-100',
+        text: 'text-blue-800',
+        hover: 'text-blue-600 hover:text-blue-800'
+      });
+
+      setupTagSystem('#technical-skills-input', '#add-technical-skill', '#technical-skills-tags', '#technical-skills-values', {
+        bg: 'bg-indigo-100',
+        text: 'text-indigo-800',
+        hover: 'text-indigo-600 hover:text-indigo-800'
+      });
+
+      setupTagSystem('#soft-skills-input', '#add-soft-skill', '#soft-skills-tags', '#soft-skills-values', {
+        bg: 'bg-green-100',
+        text: 'text-green-800',
+        hover: 'text-green-600 hover:text-green-800'
+      });
+
+      setupTagSystem('#interests-input', '#add-interest', '#interests-tags', '#interests-values', {
+        bg: 'bg-purple-100',
+        text: 'text-purple-800',
+        hover: 'text-purple-600 hover:text-purple-800'
+      });
+
+    
+  function setupSuggestion(inputId, listId, fetchUrl, clickBtnId, keyName = '') {
+  $(`#${inputId}`).on('input', function () {
+    const query = $(this).val().trim();
+    const list = $(`#${listId}`);
+    list.empty();
+    if (!query) return;
+
+    fetch(`${fetchUrl}${encodeURIComponent(query)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.length) return list.append('<li class="p-2 text-gray-500">No matches found</li>');
+        data.forEach(item => {
+          const text = typeof item === 'object' ? item[keyName] : item;
+          list.append(`<li class="p-2 hover:bg-gray-100 cursor-pointer">${text}</li>`);
+        });
+      })
+      .catch(err => console.error('Fetch error:', err));
+  });
+
+  $(document).on('click', `#${listId} li`, function () {
+    const selected = $(this).text();
+    $(`#${inputId}`).val(selected);
+    $(`#${listId}`).empty();
+    $(`#${clickBtnId}`).click();
+  });
 }
 
-let getProfession = handleTagging('#profession-input', '#add-profession', '#profession-tags', '#profession-values', [], {
-    bg: 'bg-blue-100', text: 'text-blue-800', hover: 'text-blue-600 hover:text-blue-800'
-});
 
-let getTechnical = handleTagging('#technical-skills-input', '#add-technical-skill', '#technical-skills-tags', '#technical-skills-values', [], {
-    bg: 'bg-indigo-100', text: 'text-indigo-800', hover: 'text-indigo-600 hover:text-indigo-800'
-});
+setupSuggestion('profession-input', 'prof_suggession', '/profession/search?q=', 'add-profession');
+setupSuggestion('technical-skills-input', 'skills_suggession', '/skills/search?q=', 'add-technical-skill');
+setupSuggestion('soft-skills-input', 'soft_skill_suggession', '/softSkill/search?query=', 'add-soft-skill');
+setupSuggestion('interests-input','interests_suggession','/interests/search?query=','add-interest');
 
-let getSoft = handleTagging('#soft-skills-input', '#add-soft-skill', '#soft-skills-tags', '#soft-skills-values', [], {
-    bg: 'bg-green-100', text: 'text-green-800', hover: 'text-green-600 hover:text-green-800'
-});
-
-let getInterests = handleTagging('#interests-input', '#add-interest', '#interests-tags', '#interests-values', [], {
-    bg: 'bg-purple-100', text: 'text-purple-800', hover: 'text-purple-600 hover:text-purple-800'
-});
-
-$(document).on('click', '.tag-remove', function () {
-    const tag = $(this).closest('.tag');
-    const tagText = tag.text().trim();
-    const containerId = tag.parent().attr('id');
-
-    let updateArray;
-
-    if (containerId === 'profession-tags') {
-        updateArray = getProfession();
-        updateArray = updateArray.filter(item => item !== tagText);
-        $('#profession-values').val(updateArray.join(','));
-    } else if (containerId === 'technical-skills-tags') {
-        updateArray = getTechnical();
-        updateArray = updateArray.filter(item => item !== tagText);
-        $('#technical-skills-values').val(updateArray.join(','));
-    } else if (containerId === 'soft-skills-tags') {
-        updateArray = getSoft();
-        updateArray = updateArray.filter(item => item !== tagText);
-        $('#soft-skills-values').val(updateArray.join(','));
-    } else if (containerId === 'interests-tags') {
-        updateArray = getInterests();
-        updateArray = updateArray.filter(item => item !== tagText);
-        $('#interests-values').val(updateArray.join(','));
-    }
-
-    tag.remove();
+      
 });
   </script>
 </body>
