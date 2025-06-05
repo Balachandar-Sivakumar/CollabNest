@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\ViewServiceProvider;
 use Vinkla\Hashids\Facades\Hashids;
 
+
 class UsersController extends Controller
 {
     public function NavUsers(){
@@ -80,12 +81,6 @@ class UsersController extends Controller
 
 
         return redirect('/profile')->with('success', 'Profile updated successfully.');
-    }
-    public function show($hashid)
-    {
-        $id = Hashids::decode($hashid)[0] ?? abort(404);
-        $user = User::findOrFail($id);
-        return view('user_profile.show', compact('user'));
     }
 
  

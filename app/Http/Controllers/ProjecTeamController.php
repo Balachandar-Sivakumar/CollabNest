@@ -34,32 +34,32 @@ class ProjecTeamController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ProjecTeam $projecTeam)
-    {
-        //
-    }
+    // public function show(ProjecTeam $projecTeam)
+    // {
+    //     //
+    // }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ProjecTeam $projecTeam)
-    {
-        //
-    }
+    // /**
+    //  * Show the form for editing the specified resource.
+    //  */
+    // public function edit(ProjecTeam $projecTeam)
+    // {
+    //     //
+    // }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, ProjecTeam $projecTeam)
-    {
-        //
-    }
+    // /**
+    //  * Update the specified resource in storage.
+    //  */
+    // public function update(Request $request, ProjecTeam $projecTeam)
+    // {
+    //     //
+    // }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(ProjecTeam $projecTeam)
-    {
-        //
-    }
+    // /**
+    //  * Remove the specified resource from storage.
+    //  */
+    // public function destroy(ProjecTeam $projecTeam)
+    // {
+    //     //
+    // }
 }

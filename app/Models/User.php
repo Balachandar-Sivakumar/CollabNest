@@ -5,11 +5,14 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable; 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Vinkla\Hashids\Facades\Hashids;
+// use Vinkla\Hashids\HashidsServiceProvider;
+use Mtvs\EloquentHashids\HasHashid;
+use Mtvs\EloquentHashids\HashidRouting;
 
 class User extends Authenticatable 
 {
     use HasFactory, Notifiable;
+    use HasHashid, HashidRouting;
 
     protected $fillable = ['name', 'email', 'password',  'verification_token','verified_at',];
 
@@ -22,7 +25,12 @@ class User extends Authenticatable
 
      public function getHashidAttribute()
     {
-        return Hashids::encode($this->id);
+         return $this->hashid();
+    }
+
+    public function resolveRouteBinding($value, $field = null)
+    {
+        return $this->findByHashid($value);
     }
 
     protected $casts = [

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0d7d243c18a6c8f34fc7e1a552216248",
+    "content-hash": "5e29756bd4a7aaf7f0eda76dff894186",
     "packages": [
         {
             "name": "brick/math",
@@ -2247,6 +2247,52 @@
                 }
             ],
             "time": "2025-03-24T10:02:05+00:00"
+        },
+        {
+            "name": "mtvs/eloquent-hashids",
+            "version": "v3.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mtvs/eloquent-hashids.git",
+                "reference": "30bfd493fdd713a238073610421ea045ddfcc580"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mtvs/eloquent-hashids/zipball/30bfd493fdd713a238073610421ea045ddfcc580",
+                "reference": "30bfd493fdd713a238073610421ea045ddfcc580",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "^8.0|^9.0|^10.0|^11.0|^12.0",
+                "vinkla/hashids": "^9.0|^10.0|^11.0|^12.0|^13.0"
+            },
+            "require-dev": {
+                "laravel/legacy-factories": "^1.0",
+                "orchestra/testbench": "^6.0|^7.0|^8.0|^9.0|^10.0",
+                "phpunit/phpunit": "^8.4|^9.0|^10.0|^11.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Mtvs\\EloquentHashids\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mohammad Ali Tavassoli",
+                    "email": "mtvs.dev@gmail.com"
+                }
+            ],
+            "description": "On-the-fly hashids for Laravel Eloquent models.",
+            "support": {
+                "issues": "https://github.com/mtvs/eloquent-hashids/issues",
+                "source": "https://github.com/mtvs/eloquent-hashids/tree/v3.6.0"
+            },
+            "time": "2025-03-30T00:05:05+00:00"
         },
         {
             "name": "munafio/chatify",

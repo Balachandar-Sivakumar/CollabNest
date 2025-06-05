@@ -45,7 +45,7 @@ class Authentication extends Controller
         if (Auth::check()) {
             return redirect('/dashboard');
         }
-                dd($request);
+                // dd($request);
         $request->validate([
             'name'         => 'required',
             'email'        => 'required|email|unique:users,email',
