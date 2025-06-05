@@ -78,7 +78,11 @@
           <div>
             <h1 class="text-3xl font-bold text-gray-900 tracking-tight">{{ Auth::user()->name }}</h1>
             <div class="mt-3 flex flex-wrap gap-2">
-              @foreach($settings['profession'] ?? [] as $n)
+              @php 
+                $professions_id = \App\Models\UserTag::where('user_id',Auth::user()->id)->where('tag_model','profession')->pluck('tag_id');
+              @endphp
+              
+              @foreach($professions_id ?? [] as $n)
                 <span class="bg-cyan-50 text-cyan-700 text-xs font-medium px-3 py-1.5 rounded-full border border-cyan-100">{{ App\Models\Profession::where('id',$n)->value('profession')}}</span>
               @endforeach
             </div>
@@ -93,12 +97,11 @@
             <div class="bg-gray-50 p-3 rounded-lg">
                 @php
                     $tech_skill = [];
+                    $tech_skill_id = \App\Models\UserTag::where('user_id',Auth::user()->id)->where('tag_model','tech_skill')->pluck('tag_id');
 
-                    if ($settings['technical_skills']) {
-                        foreach ($settings['technical_skills'] as $skill_id) {
+                        foreach ($tech_skill_id ?? [] as $skill_id) {
                             $tech_skill[] = \App\Models\Skills::where('id', $skill_id)->value('skill');
                         }
-                    }
                 @endphp
 
               <p class="text-gray-500 text-xs font-medium mb-1">Technical Skills</p>
@@ -106,21 +109,30 @@
                 {{ implode(', ', $tech_skill) ?: 'Not specified' }}
               </p>
             </div>
+
+            @php 
+              $soft_skills_id = \App\Models\UserTag::where('user_id',Auth::user()->id)->where('tag_model','tech_skill')->pluck('tag_id');
+              $soft_skills=[];
+              foreach($soft_skills_id ?? [] as $soft_skill){
+                $soft_skills[]=\App\Models\SoftSkills::where('id',$soft_skill)->value('soft_skills');
+              }
+            @endphp
             <div class="bg-gray-50 p-3 rounded-lg">
               <p class="text-gray-500 text-xs font-medium mb-1">Soft Skills</p>
-              <p class="font-semibold text-gray-700">{{ implode(', ', $settings['soft_skills'] ?? []) ?: 'Not specified' }}</p>
+              <p class="font-semibold text-gray-700">{{ implode(', ', $soft_skills) ??  'Not specified' }}</p>
             </div>
             <div class="bg-gray-50 p-3 rounded-lg">
               <p class="text-gray-500 text-xs font-medium mb-1">Skill Level</p>
               <p class="font-semibold text-gray-700">{{ $settings['skill_level'] ?? 'Not specified' }}</p>
             </div>
             @php
-                    $interests =[];
-            if($settings['interests']){
-              foreach($settings['interests'] as $interest_id){
-                $interests[]=\App\Models\Interests::where('id',$interest_id)->value('interest');
+              $interests =[];
+              $interests_id = \App\Models\UserTag::where('user_id',Auth::user()->id)->where('tag_model','interest')->pluck('tag_id');
+          
+              foreach($interests_id as $int){
+                $interests[]=\App\Models\Interest::where('id',$int)->value('interest');
               }
-            }
+         
             @endphp
             <div class="bg-gray-50 p-3 rounded-lg">
               <p class="text-gray-500 text-xs font-medium mb-1">Interests</p>

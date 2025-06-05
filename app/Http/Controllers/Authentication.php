@@ -9,9 +9,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeMail;
-use App\Models\Interests;
+use App\Models\Interest;
 use App\Models\Profession;
 use App\Models\Skills;
+use App\Models\UserTag;
 
 class Authentication extends Controller
 {
@@ -71,27 +72,34 @@ class Authentication extends Controller
             'verified_at' => now(),
         ]);
 
-        $professions = [];
-        $tech_skills =[];
-        $interests = [];
+        
 
         foreach($request->profession as $prof){
-            array_push($professions,Profession::where('profession',$prof)->value('id'));
+            UserTag::create([
+                'tag_id'=>Profession::where('profession',$prof)->value('id'),
+                'user_id'=>$user->id,
+                'tag_model'=>'profession'
+            ]);
         }
         foreach($request->skills as $skill){
-            array_push($tech_skills,Skills::where('skill',$skill)->value('id'));
+             UserTag::create([
+                'tag_id'=>Skills::where('skill',$skill)->value('id'),
+                'user_id'=>$user->id,
+                'tag_model'=>'tech_skill'
+            ]);
+            
         }
         foreach($request->interests as $interest){
-            array_push($interests,Interests::where('interest',$interest)->value('id'));
+             UserTag::create([
+                'tag_id'=>Interest::where('interest',$interest)->value('id'),
+                'user_id'=>$user->id,
+                'tag_model'=>'interest'
+            ]);
+            
         }
-
-     
 
         // Save profile settings
         $settings = [
-            'profession'       => $professions,
-            'technical_skills' => $tech_skills,
-            'interests'        => $interests,
             'availability'     => $request->availability,
         ];
 

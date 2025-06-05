@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Profession;
 use Illuminate\Http\Request;
 use App\Models\Skills;
-use App\Models\Interests;
+use App\Models\Interest;
 use App\Models\SoftSkills;
 
 class SkillsController extends Controller
@@ -27,7 +27,7 @@ class SkillsController extends Controller
     public function getInterests(Request $request){
         $query = $request->get('q');
 
-        return Interests::where('interest','like','%'.$query.'%')->pluck('interest');
+        return Interest::where('interest','like','%'.$query.'%')->pluck('interest');
     }
 
      public function getSoftskills(Request $request){

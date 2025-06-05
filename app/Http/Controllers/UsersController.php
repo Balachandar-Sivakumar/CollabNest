@@ -8,6 +8,13 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\View\ViewServiceProvider;
+use App\Models\Profession;
+use App\Models\SoftSkills;
+use App\Models\Interest;
+use App\Models\Skills;
+use App\Models\UserTag;
+
+
 
 class UsersController extends Controller
 {
@@ -25,7 +32,6 @@ class UsersController extends Controller
         public function profileUpdate(Request $request)
                 {
 
-                dd($request);
             $request->validate([
             'technical_skills'      => 'required',
             'soft_skills'           => 'required',
@@ -44,14 +50,53 @@ class UsersController extends Controller
 
         $data = UserProfile::where('user_id',Auth::user()->id)->first();
 
-        $data = json_decode($data->profile_settings);
+      
+        UserTag::where('user_id',Auth::user()->id)->where('tag_model','profession')->delete();
+        UserTag::where('user_id',Auth::user()->id)->where('tag_model','interest')->delete();
+        UserTag::where('user_id',Auth::user()->id)->where('tag_model','tech_skill')->delete();
+        UserTag::where('user_id',Auth::user()->id)->where('tag_model','soft_skill')->delete();
 
-        
-            $data->technical_skills     = json_decode(json_encode(array_filter(array_map('trim', explode(',', $request->technical_skills)))));
-            $data->soft_skills          = json_decode(json_encode(array_filter(array_map('trim', explode(',', $request->soft_skills)))));
+        foreach(json_decode(json_encode(array_filter(array_map('trim', explode(',', $request->technical_skills))))) as $skill){
+            UserTag::create([
+                'tag_id'=>Skills::where('skill',$skill)->value('id'),
+                'user_id'=>Auth::user()->id,
+                'tag_model'=>'tech_skill'
+            ]);
+            
+        }
+
+     
+         foreach(json_decode(json_encode(array_filter(array_map('trim', explode(',', $request->soft_skills))))) as $st_skill){
+
+             UserTag::create([
+
+                'tag_id'=>SoftSkills::where('soft_skills',$st_skill)->value('id'),
+                'user_id'=>Auth::user()->id,
+                'tag_model'=>'soft_skill'
+            ]);
+           
+         }
+
+         foreach(json_decode(json_encode(array_filter(array_map('trim', explode(',', $request->profession))))) as $profession){
+            UserTag::create([
+                'tag_id'=>Profession::where('profession',$profession)->value('id'),
+                'user_id'=>Auth::user()->id,
+                'tag_model'=>'profession'
+            ]);
+         }
+
+          foreach(json_decode(json_encode(array_filter(array_map('trim', explode(',', $request->interests))))) as $interest){
+            UserTag::create([
+                'tag_id'=>Interest::where('interest',$interest)->value('id'),
+                'user_id'=>Auth::user()->id,
+                'tag_model'=>'interest'
+            ]);
+         }
+
+    
+        $data = json_decode($data->profile_settings);
+   
             $data->skill_level          = trim($request->skill_level);
-            $data->profession           = json_decode(json_encode(array_filter(array_map('trim', explode(',', $request->profession)))));
-            $data->interests            = json_decode(json_encode(array_filter(array_map('trim', explode(',', $request->interests)))));
             $data->availability         = trim($request->availability);
             $data->years_of_experience  = $request->years_of_experience ?? null;
             $data->bio                  = trim($request->bio ??  $data->bio ?? null);
@@ -60,7 +105,6 @@ class UsersController extends Controller
             $data->leetcode             = trim($request->leetcode ?? $data->leetcode ?? null );
 
   
-
     if($request->hasFile('profile_image')){
         $path = $request->file('profile_image')->store('assets','public');
         $data->image=$path;
