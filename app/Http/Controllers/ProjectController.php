@@ -4,15 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Projects;
+use App\Models\Project;
 use Illuminate\Auth\Events\Validated;
-use SebastianBergmann\CodeCoverage\Report\Xml\Project;
+use Vinkla\Hashids\Facades\Hashids;
+use App\Models\User;
 
 class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Projects::all();
+        $projects = Project::all();
         return view('projects',compact('projects'));
     }
 
@@ -46,17 +47,16 @@ public function CreateProject(Request $request)
 
     
        
-    Projects::create($validated);
+    Project::create($validated);
 
     return redirect()->route('projects')->with('success', 'Project created!');
 }
 
-public function viewProject($id){
+    public function viewProject(Project $project)
+    {
+        // $user = User::with('projects')->findOrFail($project);
 
-    $project = Projects::where('id',$id)->first();
-   
-    return view('viewProject',compact('project'));
-
-}
+        return view('viewProject', compact('project'));
+    }
 
 }

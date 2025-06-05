@@ -156,30 +156,33 @@
             </p>
           </div>
 
-          <!-- Links -->
-          <div class="space-y-3">
-            <div class="flex items-center">
-              <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
-                <i class="fab fa-github text-gray-600"></i>
-              </div>
-              <a href="{{ $settings['github'] ?? '#' }}" target="_blank" class="text-cyan-600 hover:text-cyan-800 hover:underline font-medium text-sm transition-colors">
-                {{ $settings['github'] ?? 'GitHub not provided' }}
+    
+          <!-- Social Links -->
+          <div class="flex flex-wrap gap-4 items-center">
+            <!-- GitHub Link -->
+            <div>
+              <a href="{{$settings['github'] ?? 'https://github.com'}}" target="_blank"
+                 class="inline-flex items-center px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium rounded-md transition-colors duration-200">
+                <i class="fab fa-github mr-2"></i>
+                GitHub
               </a>
             </div>
-            <div class="flex items-center">
-              <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
-                <i class="fas fa-code text-gray-600"></i>
-              </div>
-              <a href="{{ $settings['leetcode'] ?? '#' }}" target="_blank" class="text-cyan-600 hover:text-cyan-800 hover:underline font-medium text-sm transition-colors">
-                {{ $settings['leetcode'] ?? 'LeetCode not provided' }}
+                      
+            <!-- LeetCode Link -->
+            <div>
+              <a href="{{$settings['leetcode'] ?? 'https://leetcode.com'}}" target="_blank"
+                 class="inline-flex items-center px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black text-sm font-medium rounded-md transition-colors duration-200">
+                <i class="fas fa-code mr-2"></i>
+                LeetCode
               </a>
             </div>
-            <div class="flex items-center">
-              <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
-                <i class="fab fa-linkedin-in text-gray-600"></i>
-              </div>
-              <a href="{{ $settings['linkedin'] ?? '#' }}" target="_blank" class="text-cyan-600 hover:text-cyan-800 hover:underline font-medium text-sm transition-colors">
-                {{ $settings['linkedin'] ?? 'LinkedIn not provided' }}
+                      
+            <!-- LinkedIn Link -->
+            <div>
+              <a href="{{$settings['linkedin'] ?? 'https://linkedin.com'}}" target="_blank"
+                 class="inline-flex items-center px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-medium rounded-md transition-colors duration-200">
+                <i class="fab fa-linkedin-in mr-2"></i>
+                LinkedIn
               </a>
             </div>
           </div>

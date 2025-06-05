@@ -71,8 +71,6 @@ Route::get('/help', [WelcomepageController::class, 'help'])->name('help');
 
 Route::get('/users',[UsersController::class, 'NavUsers']);
 
-// Route::get('/verify', [MailSendController::class, 'verify'])->name('verifymail');
-
 Route::get('/verify', [Authentication::class, 'verify']);
 
 Route::get('/profile',[UsersController::class, 'NavUsers']);
@@ -85,7 +83,7 @@ Route::get("/navcreateproject",[ProjectController::class,'navcreateproject']);
 
 Route::post('/CreateProject',[ProjectController::class,'CreateProject']);
 
-Route::get('/view/{id}',[ProjectController::class,'viewProject']);
+Route::get('/view/{project}',[ProjectController::class,'viewProject']);
 
 Route::get('/profession/search',[SkillsController::class,'getProfession']);
 

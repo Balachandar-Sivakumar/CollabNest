@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Mtvs\EloquentHashids\HasHashid;
+use Mtvs\EloquentHashids\HashidRouting;
 
-class Projects extends Model
+class Project extends Model
 {
+    use HasHashid, HashidRouting;
     use HasFactory;
 
   protected $fillable = [
