@@ -9,9 +9,9 @@ use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\View\ViewServiceProvider;
 use App\Models\Profession;
-use App\Models\SoftSkills;
+use App\Models\SoftSkill;
 use App\Models\Interest;
-use App\Models\Skills;
+use App\Models\Skill;
 use App\Models\UserTag;
 
 
@@ -58,7 +58,7 @@ class UsersController extends Controller
 
         foreach(json_decode(json_encode(array_filter(array_map('trim', explode(',', $request->technical_skills))))) as $skill){
             UserTag::create([
-                'tag_id'=>Skills::where('skill',$skill)->value('id'),
+                'tag_id'=>Skill::where('skill',$skill)->value('id'),
                 'user_id'=>Auth::user()->id,
                 'tag_model'=>'tech_skill'
             ]);
@@ -70,7 +70,7 @@ class UsersController extends Controller
 
              UserTag::create([
 
-                'tag_id'=>SoftSkills::where('soft_skills',$st_skill)->value('id'),
+                'tag_id'=>SoftSkill::where('soft_skills',$st_skill)->value('id'),
                 'user_id'=>Auth::user()->id,
                 'tag_model'=>'soft_skill'
             ]);

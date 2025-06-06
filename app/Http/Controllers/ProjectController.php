@@ -8,6 +8,7 @@ use App\Models\Project;
 use Illuminate\Auth\Events\Validated;
 use Vinkla\Hashids\Facades\Hashids;
 use App\Models\User;
+use App\Models\Skill;
 
 class ProjectController extends Controller
 {
@@ -18,45 +19,63 @@ class ProjectController extends Controller
     }
 
     public function navcreateproject(){
-        return view('projectForm');
+        return view('createProject');
     }
 
-public function CreateProject(Request $request)
-{
+    public function CreateProject(Request $request)
+    {
+      
 
-  
-    $validated = $request->validate([
-        'title' => 'required|string|max:255',
-        'description' => 'required|string',
-        'goals' => 'required|string',
-        'requirement_documents' => 'nullable|file|mimes:pdf,doc,docx|max:3072',
-        'skills_required' => 'required|string',
-        'git_repo_url' => 'required|url',
-        'is_private' => 'required|in:0,1',
-    ]);
+          $validated =  $request->validate([
+        'title' => 'required',
+        'description' => 'required',
+        'goals' => 'required',
+        'skills_required' => 'nullable|array',
+        'github' => 'nullable|url|max:255',
+        'trello' => 'nullable|url|max:255',
+        'is_private' => 'required|boolean',
+        ]);
 
-    if ($request->hasFile('requirement_documents')) {
-        $path = $request->file('requirement_documents')->store('files', 'public');
-        $validated['requirement_documents'] = $path;
+
+        $validated['owner_id']=Auth::user()->id;
+        $document_path=[];
+        if($request->hasFile('requirement_documents')){
+            foreach($request->file('requirement_documents') as $file){
+                $document_path[] = $file->store('projectDocuments','public');
+            }
+           
+        }
+
+        if($request->hasFile('logo')){
+            $logo_path = $request->file('logo')->store('files','public');
+        }
+
+        $skills=[];
+
+        foreach($validated['skills_required'] as $skill){
+            $skills[]=Skill::where('skill',$skill)->value('id');
+        }
+
+        $validated['requirement_documents'] = json_encode($document_path);
+        $validated['logo']=$logo_path;
+        $validated['project_url']=json_encode(['github'=>$validated['github'],'trello'=>$validated['trello']]);
+        $validated['skills_required']=json_encode($skills);
+        
+
+        Project::create($validated);
+
+        return redirect()->route('projects')->with('success', 'Project created!');
     }
-
-     
-    $validated['skills_required'] = json_encode(array_map('trim', explode(',', $validated['skills_required'])));
-
-    $validated['owner_id'] = Auth::user()->id; 
-
-    
-       
-    Project::create($validated);
-
-    return redirect()->route('projects')->with('success', 'Project created!');
-}
 
     public function viewProject(Project $project)
     {
-        // $user = User::with('projects')->findOrFail($project);
-
         return view('viewProject', compact('project'));
+    }
+
+    public function navUpdateProject($id){
+        
+        $project = Project::where('id',$id)->first();
+        return view('updateProject',compact('project'));
     }
 
 }

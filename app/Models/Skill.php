@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Mtvs\EloquentHashids\HasHashid;
 use Mtvs\EloquentHashids\HashidRouting;
 
-class SoftSkills extends Model
+class Skill extends Model
 {
     use HasHashid, HashidRouting;
     use HasFactory;
+
 }

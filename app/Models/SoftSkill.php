@@ -7,12 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Mtvs\EloquentHashids\HasHashid;
 use Mtvs\EloquentHashids\HashidRouting;
 
-class ProjectTeam extends Model
+class SoftSkill extends Model
 {
     use HasHashid, HashidRouting;
     use HasFactory;
-      protected $fillable = [
-        'project_id',
-        'user_id',
-    ];
 }

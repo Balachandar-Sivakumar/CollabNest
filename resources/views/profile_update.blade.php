@@ -207,7 +207,7 @@
                   $tech_skills_id = \App\Models\UserTag::where('tag_model','tech_skill')->where('user_id',Auth::user()->id)->pluck('id') ?? [];
                   $tech_skills = [];
                   foreach($tech_skills_id as $tech_id){
-                    $tech_skills[]=\App\Models\Skills::where('id', $tech_id)->value('skill');
+                    $tech_skills[]=\App\Models\Skill::where('id', $tech_id)->value('skill');
                   }
               @endphp
                
@@ -242,7 +242,7 @@
                   $soft_skills_id = \App\Models\UserTag::where('tag_model','soft_skill')->where('user_id',Auth::user()->id)->pluck('tag_id') ?? [];
                   $soft_skills=[];
                   foreach($soft_skills_id as $soft_skill){
-                    $soft_skills[]=\App\Models\SoftSkills::where('id',$soft_skill)->value('soft_skills');
+                    $soft_skills[]=\App\Models\SoftSkill::where('id',$soft_skill)->value('soft_skills');
                   }
               @endphp
               

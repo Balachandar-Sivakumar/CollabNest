@@ -61,7 +61,7 @@
             
           @if($skills->user_id !== Auth::user()->id)
           <div class="mt-3 text-center">
-              <a href="{{ asset('storage/' . $pdf) }}" target="_blank" download class="inline-flex items-center text-sm text-cyan-600 hover:text-cyan-800 font-medium transition-colors">
+              <a href="{{ asset('storage/' . $pdf) }}"target="_blank" download class="inline-flex items-center text-sm text-cyan-600 hover:text-cyan-800 font-medium transition-colors">
                 <i class="fas fa-file-pdf mr-2"></i>
                 Download Resume
               </a>
@@ -100,7 +100,7 @@
                     $tech_skill_id = \App\Models\UserTag::where('user_id',Auth::user()->id)->where('tag_model','tech_skill')->pluck('tag_id');
 
                         foreach ($tech_skill_id ?? [] as $skill_id) {
-                            $tech_skill[] = \App\Models\Skills::where('id', $skill_id)->value('skill');
+                            $tech_skill[] = \App\Models\Skill::where('id', $skill_id)->value('skill');
                         }
                 @endphp
 
@@ -114,7 +114,7 @@
               $soft_skills_id = \App\Models\UserTag::where('user_id',Auth::user()->id)->where('tag_model','tech_skill')->pluck('tag_id');
               $soft_skills=[];
               foreach($soft_skills_id ?? [] as $soft_skill){
-                $soft_skills[]=\App\Models\SoftSkills::where('id',$soft_skill)->value('soft_skills');
+                $soft_skills[]=\App\Models\SoftSkill::where('id',$soft_skill)->value('soft_skills');
               }
             @endphp
             <div class="bg-gray-50 p-3 rounded-lg">

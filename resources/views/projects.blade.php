@@ -33,13 +33,14 @@
     @foreach($projects as $project)
       <!-- Project Card 1 -->
       <div class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition">
+        <img src="{{asset('storage/'.$project->logo)}}" alt="project image">
         <h2 class="text-xl font-bold text-gray-800 mb-2">{{$project->title}}</h2>
         <p class="text-gray-600 text-sm mb-3">{{$project->description}}</p>
         <div class="mb-2">
           <strong class="text-sm">Skills:</strong>
           <div class="flex flex-wrap mt-1">
             @foreach(json_decode($project->skills_required) as $skill)
-            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2 mb-1">{{$skill}}</span>
+            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2 mb-1">{{\App\Models\Skill::where('id',$skill)->value('skill')}}</span>
            @endforeach
           </div>
         </div>

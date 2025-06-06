@@ -28,22 +28,23 @@
       <!-- Header -->
       <div class="flex justify-between items-start flex-wrap gap-4">
         <div>
+          
           <h1 class="text-4xl font-bold text-gray-900">{{ $project->title }}</h1>
           <div class="flex items-center mt-2 space-x-4 text-sm text-gray-600">
             <span class="px-3 py-1 rounded-full font-medium 
               {{ $project->is_private ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700' }}">
               {{ $project->is_private ? 'Private' : 'Public' }}
             </span>
-            <span>Owned by <strong>{{ Auth::user()->name ?? 'Unknown' }}</strong></span>
+            <span>Owned by <strong>{{ \App\Models\User::where('id',$project->owner_id )->value('name')}}</strong></span>
           </div>
         </div>
         <div class="flex gap-3">
           <a href="{{url()->previous()}}" class="flex items-center px-4 py-2 text-sm bg-white border rounded-md shadow-sm hover:bg-gray-50 text-gray-700">
             <i class="fas fa-arrow-left mr-2"></i> Back
           </a>
-          <button class="flex items-center px-4 py-2 text-sm text-white bg-indigo-600 rounded-md shadow hover:bg-indigo-700">
+          <a href="/navUpdateProject/{{$project->id}}" class="flex items-center px-4 py-2 text-sm text-white bg-indigo-600 rounded-md shadow hover:bg-indigo-700">
             <i class="fas fa-edit mr-2"></i> Edit
-          </button>
+          </a>
         </div>
       </div>
 
@@ -80,11 +81,12 @@
               <h3 class="text-lg font-semibold mb-2 flex items-center">
                 <i class="fas fa-tools mr-2 text-indigo-500"></i> Skills Required
               </h3>
+
               @if($project->skills_required)
                 <div class="flex flex-wrap gap-2">
                   @foreach (json_decode($project->skills_required) as $skill)
                     <span class="skill-tag inline-block px-3 py-1 rounded-full text-sm bg-indigo-100 text-indigo-800">
-                      {{ $skill }}
+                      {{ App\Models\Skill::where('id',$skill)->value('skill') }}
                     </span>
                   @endforeach
                 </div>
@@ -95,8 +97,7 @@
 
             <!-- GitHub Repo -->
             <div>
-             
-             
+
             </div>
 
             <!-- Documents -->
@@ -114,20 +115,6 @@
               @endif
             </div>
 
-            <!-- Team -->
-            <div>
-              <h3 class="text-lg font-semibold mb-2 flex items-center">
-                <i class="fas fa-users mr-2 text-indigo-500"></i> Team
-              </h3>
-              <div class="flex -space-x-3">
-                @foreach (range(1, 3) as $i)
-                  <img class="h-10 w-10 rounded-full ring-2 ring-white" src="https://randomuser.me/api/portraits/women/{{ $i * 10 }}.jpg" alt="Member">
-                @endforeach
-                <span class="flex items-center justify-center h-10 w-10 rounded-full bg-gray-300 ring-2 ring-white text-gray-700 text-sm font-semibold">
-                  +3
-                </span>
-              </div>
-            </div>
 
           </div>
         </div>
@@ -142,7 +129,7 @@
               <i class="fas fa-share-alt mr-2"></i> Share
             </button>
             <button class="flex items-center px-3 py-1.5 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
-              <i class="fas fa-user-plus mr-2"></i> Invite
+              <i class="fas fa-user-plus mr-2"></i> Request
             </button>
           </div>
         </div>

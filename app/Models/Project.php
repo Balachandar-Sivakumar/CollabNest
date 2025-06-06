@@ -12,14 +12,16 @@ class Project extends Model
     use HasHashid, HashidRouting;
     use HasFactory;
 
-  protected $fillable = [
-        'title',
-        'description',
-        'goals',
-        'requirement_documents',
-        'skills_required',
-        'is_private',
-        'git_repo_url',
-        'owner_id',
-    ];
+         protected $fillable = [
+            'title',
+            'logo',
+            'description',
+            'goals',
+            'requirement_documents',
+            'skills_required',
+            'project_url',
+            'is_private',
+            'owner_id',
+        ];
+
 }

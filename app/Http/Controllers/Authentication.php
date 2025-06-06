@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeMail;
 use App\Models\Interest;
 use App\Models\Profession;
-use App\Models\Skills;
+use App\Models\Skill;
 use App\Models\UserTag;
 
 class Authentication extends Controller
@@ -83,7 +83,7 @@ class Authentication extends Controller
         }
         foreach($request->skills as $skill){
              UserTag::create([
-                'tag_id'=>Skills::where('skill',$skill)->value('id'),
+                'tag_id'=>Skill::where('skill',$skill)->value('id'),
                 'user_id'=>$user->id,
                 'tag_model'=>'tech_skill'
             ]);
