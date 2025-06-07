@@ -129,7 +129,7 @@ class ProjectController extends Controller
         $update = [
             'owner_id'=>Auth::user()->id,
             'title'=>$request->title,
-            'logo'=>$logo_path ?? $project->logo_path,
+            'logo'=>$logo_path ?? $project->logo,
             'description'=>$request->description,
             'goals'=>$request->goals,
             'requirement_documents'=>json_encode($document_path),
