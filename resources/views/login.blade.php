@@ -62,7 +62,7 @@
         </form>
         <p class="text-center text-xs text-gray-400 mt-8">
           Don't have an account? 
-          <a class="text-[#3b56f5] font-semibold hover:underline" href="/register">Sign up</a>
+          <a class="text-[#3b56f5] font-semibold hover:underline" href="/navregister">Sign up</a>
         </p>
       </div>
       

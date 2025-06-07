@@ -52,7 +52,7 @@
     <div class="flex-1 max-w-lg" data-aos="fade-right">
       <h2 class="text-4xl font-extrabold leading-tight mb-6">
         Welcome to <span class="text-blue-600">CollabNest</span><br />
-        Your Ultimate Collaborative Work Platform
+        Your Ultimate Collaborative Work Platform/profile
       </h2>
       <p class="text-gray-700 mb-8 text-lg leading-relaxed" data-aos="fade-up" data-aos-delay="200">
         Bridging the gap between skilled individuals and meaningful collaboration.

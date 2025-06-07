@@ -5,13 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Create Account</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Inter', sans-serif;
+    }
+    .tag {
+      transition: all 0.2s ease;
+    }
+    .tag:hover {
+      transform: translateY(-1px);
+    }
+    .remove-tag {
+      transition: all 0.2s ease;
+    }
+    .remove-tag:hover {
+      transform: scale(1.2);
     }
   </style>
 </head>
@@ -41,7 +52,7 @@
 
           <!-- Step 1 -->
           <div class="step_1">
-            <div id="errorMessage1" class="text-red-600 text-sm bg-red-300 text-center  mb-4 hidden"></div>
+            <div id="errorMessage1" class="text-red-600 text-sm bg-red-300 text-center mb-4 hidden"></div>
             <h2 class="text-center text-black text-lg font-extrabold mb-8">Create Account</h2>
 
             <input name="name" value="{{ old('name') }}"
@@ -80,151 +91,262 @@
           </div>
 
           <!-- Step 2 -->
+          <div class="step_2 hidden">
+            <div id="errorMessage" class="text-red-600 bg-red-300 text-center text-white text-sm mb-4 hidden"></div>
 
-            <div class="step_2 hidden">
-              <div id="errorMessage" class="text-red-600 bg-red-300 text-center text-white text-sm mb-4 hidden"></div>
-
-              <div x-data="{ professionInput: '', selectedProfessions: [] }"
-                   x-init="$watch('professionInput', v => selectedProfessions = v.split(',').map(p => p.trim()).filter(Boolean))">
-                <label class="block font-semibold text-gray-700 mb-2 text-lg">Profession(s)</label>
-                <input type="text" x-model="professionInput" placeholder="e.g. Developer, Designer"
-                       class="w-full px-3 py-2 border border-gray-300 rounded text-sm text-black focus:ring-1 focus:ring-cyan-400"/>
-                <template x-for="(p, i) in selectedProfessions" :key="i">
-                  <input type="hidden" name="profession[]" :value="p">
-                </template>
-              </div>
-
-              <div class="mt-4" x-data="{ skillsInput: '', selectedSkills: [] }"
-                   x-init="$watch('skillsInput', v => selectedSkills = v.split(',').map(s => s.trim()).filter(Boolean))">
-                <label class="block font-semibold text-gray-700 mb-2 text-lg">Technical Skills</label>
-                <input type="text" x-model="skillsInput" placeholder="e.g. PHP, Laravel, VueJS"
-                       class="w-full px-3 py-2 border border-gray-300 rounded text-sm text-black focus:ring-1 focus:ring-cyan-400"/>
-                <template x-for="(s, i) in selectedSkills" :key="i">
-                  <input type="hidden" name="skills[]" :value="s">
-                </template>
-              </div>
-
-              <div class="mt-4" x-data="{ input: '', interests: [] }"
-                   x-init="$watch('input', v => interests = v.split(',').map(i => i.trim()).filter(Boolean))">
-                <label class="block font-semibold text-gray-700 mb-2 text-lg">Interests</label>
-                <input type="text" x-model="input" placeholder="e.g. AI, Web3, HealthTech"
-                       class="w-full px-3 py-2 border border-gray-300 rounded text-sm text-black focus:ring-1 focus:ring-cyan-400"/>
-                <template x-for="(i, idx) in interests" :key="idx">
-                  <input type="hidden" name="interests[]" :value="i">
-                </template>
-              </div>
-
-              <div class="mt-6">
-                <label class="block font-semibold text-gray-700 mb-2 text-lg">Availability</label>
-                <select name="availability"
-                        class="w-full border border-gray-300 rounded px-3 py-2 mb-2 text-sm text-black focus:outline-none focus:ring-1 focus:ring-cyan-400">
-                  <option value="" disabled selected>Select Availability</option>
-                  <option value="Weekdays">Weekdays</option>
-                  <option value="Weekends">Weekends</option>
-                  <option value="Full-time">Full-time</option>
-                  <option value="Part-time">Part-time</option>
-                  <option value="Freelance">Freelance</option>
-                  <option value="Night shifts">Night shifts</option>
-                  <option value="Remote Only">Remote Only</option>
-                  <option value="Onsite Only">Onsite Only</option>
-                  <option value="Flexible">Flexible</option>
-                </select>
-              </div>
-
-              <div class="pt-6 flex flex-col gap-2">
-                <button type="button" id="prevbtn"
-                        class="w-full bg-gray-300 text-gray-800 font-semibold text-xs py-3 rounded hover:bg-gray-400 transition-colors">
-                  Previous
-                </button>
-
-                <button type="submit"
-                        class="w-full bg-gradient-to-r from-indigo-400 to-teal-300 text-white font-semibold text-xs py-3 rounded hover:from-indigo-500 hover:to-teal-400 transition-colors">
-                  Complete Registration
+            <!-- Profession Input -->
+            <div class="profession-container">
+              <label class="block font-semibold text-gray-700 mb-2 text-lg">Profession(s)</label>
+              <div class="flex items-center">
+                <input type="text" id="professionInput" placeholder="e.g. Developer, Designer"
+                       class="flex-1 px-3 py-2 border border-gray-300 rounded text-sm text-black focus:ring-1 focus:ring-cyan-400"/>
+                <button type="button" id="addProfession" class="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                  <i class="fas fa-plus"></i>
                 </button>
               </div>
+              <div id="professionTags" class="flex flex-wrap mt-2"></div>
+              <div id="professionHiddenInputs"></div>
+            </div>
+              <ul id="profession_suggession"
+                  class="absolute mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-48 overflow-auto ">
+              </ul>
+            <!-- Skills Input -->
+            <div class="mt-4 skills-container">
+              <label class="block font-semibold text-gray-700 mb-2 text-lg">Technical Skills</label>
+              <div class="flex items-center">
+                <input type="text" id="skillsInput" placeholder="e.g. PHP, Laravel, VueJS"
+                       class="flex-1 px-3 py-2 border border-gray-300 rounded text-sm text-black focus:ring-1 focus:ring-cyan-400"/>
+                <button type="button" id="addSkill" class="ml-2 px-3 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+              <div id="skillsTags" class="flex flex-wrap mt-2"></div>
+              <div id="skillsHiddenInputs"></div>
             </div>
 
+              <ul id="skills_suggession"
+                  class="absolute mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-48 overflow-auto ">
+              </ul>
+
+            <!-- Interests Input -->
+            <div class="mt-4 interests-container">
+              <label class="block font-semibold text-gray-700 mb-2 text-lg">Interests</label>
+              <div class="flex items-center">
+                <input type="text" id="interestsInput" placeholder="e.g. AI, Web3, HealthTech"
+                       class="flex-1 px-3 py-2 border border-gray-300 rounded text-sm text-black focus:ring-1 focus:ring-cyan-400"/>
+                <button type="button" id="addInterest" class="ml-2 px-3 py-2 bg-purple-500 text-white rounded hover:bg-purple-600">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+              <div id="interestsTags" class="flex flex-wrap mt-2"></div>
+              <div id="interestsHiddenInputs"></div>
+            </div>
+
+             <ul id="interests_suggession"
+                  class="absolute mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-48 overflow-auto ">
+              </ul>
+
+            <div class="mt-6">
+              <label class="block font-semibold text-gray-700 mb-2 text-lg">Availability</label>
+              <select name="availability"
+                      class="w-full border border-gray-300 rounded px-3 py-2 mb-2 text-sm text-black focus:outline-none focus:ring-1 focus:ring-cyan-400">
+                <option value="" disabled selected>Select Availability</option>
+                <option value="Weekdays">Weekdays</option>
+                <option value="Weekends">Weekends</option>
+                <option value="Full-time">Full-time</option>
+                <option value="Part-time">Part-time</option>
+                <option value="Freelance">Freelance</option>
+                <option value="Night shifts">Night shifts</option>
+                <option value="Remote Only">Remote Only</option>
+                <option value="Onsite Only">Onsite Only</option>
+                <option value="Flexible">Flexible</option>
+              </select>
+            </div>
+
+            <div class="pt-6 flex flex-col gap-2">
+              <button type="button" id="prevbtn"
+                      class="w-full bg-gray-300 text-gray-800 font-semibold text-xs py-3 rounded hover:bg-gray-400 transition-colors">
+                Previous
+              </button>
+
+              <button type="submit"
+                      class="w-full bg-gradient-to-r from-indigo-400 to-teal-300 text-white font-semibold text-xs py-3 rounded hover:from-indigo-500 hover:to-teal-400 transition-colors">
+                Complete Registration
+              </button>
+            </div>
+          </div>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- JavaScript Validation Logic -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ 
   <script>
-    const form = document.getElementById('detailsForm');
-    const step1 = document.querySelector('.step_1');
-    const step2 = document.querySelector('.step_2');
-    const nextBtn = document.getElementById('nextbtn');
-    const errorBox1 = document.getElementById('errorMessage1');
-    const errorBox2 = document.getElementById('errorMessage');
-    const password = document.getElementById('password');
-    const confirmPassword = document.getElementById('confirm_password');
-    const passwordError = document.getElementById('password_error');
+
+$(function () {
+    const form = $('#detailsForm'), step1 = $('.step_1'), step2 = $('.step_2'),
+          nextBtn = $('#nextbtn'), errorBox1 = $('#errorMessage1'), errorBox2 = $('#errorMessage'),
+          password = $('#password'), confirmPassword = $('#confirm_password'), passwordError = $('#password_error');
     
-
-    step2.classList.add('hidden');
-
-  
-    confirmPassword.addEventListener('input', () => {
-      passwordError.classList.toggle('hidden', password.value === confirmPassword.value);
-    });
-
-    nextBtn.addEventListener('click', e => {
-      e.preventDefault();
-
-      const name = form.name.value.trim();
-      const email = form.email.value.trim();
-      const pwd = password.value;
-      const confirmPwd = confirmPassword.value;
-      const agreed = document.getElementById('termsCheckbox').checked;
-
-      if (!name) return showError(errorBox1, 'Full name is required.');
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError(errorBox1, 'A valid email is required.');
-      if (pwd.length < 6) return showError(errorBox1, 'Password must be at least 6 characters.');
-      if (pwd !== confirmPwd) return showError(errorBox1, 'Passwords do not match.');
-      if (!agreed) return showError(errorBox1, 'You must agree to the Terms of Service.');
-
-      errorBox1.classList.add('hidden');
-      step1.classList.add('hidden');
-      step2.classList.remove('hidden');
-
+     
+     let professionTags = [],
+      skillsTags = [],
+      interestsTags = [];
+    
+      confirmPassword.on('input', () => passwordError.toggleClass('hidden', password.val() === confirmPassword.val()));
+    
+      nextBtn.on('click', e => {
+        e.preventDefault();
+        const name = form.find('[name="name"]').val().trim(),
+              email = form.find('[name="email"]').val().trim(),
+              pwd = password.val(), confirmPwd = confirmPassword.val(),
+              agreed = $('#termsCheckbox').is(':checked');
       
-    });
-
-
-    // STEP 2 Validation
-    form.addEventListener('submit', e => {
-      const profession = document.querySelector('input[x-model="professionInput"]').value.trim();
-      const skills = document.querySelector('input[x-model="skillsInput"]').value.trim();
-      const interests = document.querySelector('input[x-model="input"]').value.trim();
-      const availability = form.availability.value;
-
-      if (!profession) return blockSubmit(e, errorBox2, 'Please enter at least one profession.');
-      if (!skills) return blockSubmit(e, errorBox2, 'Please enter at least one skill.');
-      if (!interests) return blockSubmit(e, errorBox2, 'Please enter at least one interest.');
-      if (!availability) return blockSubmit(e, errorBox2, 'Please select your availability.');
-
-      errorBox2.classList.add('hidden');
-
-      localStorage.clear();
-    });
-
-    function showError(box, message) {
-      box.textContent = message;
-      box.classList.remove('hidden');
-    }
-
-    function blockSubmit(e, box, message) {
-      e.preventDefault();
-      showError(box, message);
-    }
-
-    const prevBtn = document.getElementById('prevbtn');
-
-        prevBtn.addEventListener('click', () => {
-          step2.classList.add('hidden');
-          step1.classList.remove('hidden');
+        if (!name) return showError(errorBox1, 'Full name is required.');
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError(errorBox1, 'A valid email is required.');
+        if (pwd.length < 6) return showError(errorBox1, 'Password must be at least 6 characters.');
+        if (pwd !== confirmPwd) return showError(errorBox1, 'Passwords do not match.');
+        if (!agreed) return showError(errorBox1, 'You must agree to the Terms of Service.');
+      
+        errorBox1.addClass('hidden');
+        step1.addClass('hidden');
+        step2.removeClass('hidden');
+      });
+    
+      $('#prevbtn').on('click', () => {
+        step2.addClass('hidden');
+        step1.removeClass('hidden');
+      });
+    
+      form.on('submit', e => {
+        if (!professionTags.length) return stopSubmit(e, 'Please enter at least one profession.');
+        if (!skillsTags.length) return stopSubmit(e, 'Please enter at least one skill.');
+        if (!interestsTags.length) return stopSubmit(e, 'Please enter at least one interest.');
+        if (!$('[name="availability"]').val()) return stopSubmit(e, 'Please select your availability.');
+        errorBox2.addClass('hidden');
+      });
+    
+      function stopSubmit(e, msg) {
+        e.preventDefault();
+        showError(errorBox2, msg);
+      }
+    
+      function setupTagInput(inputId, addBtnId, containerId, hiddenId, tagArray, color, name) {
+        const input = $(inputId), addBtn = $(addBtnId), tagsBox = $(containerId), hiddenBox = $(hiddenId);
+      
+        input.on('keypress', e => {
+          if (e.which === 13 || e.which === 44) {
+            e.preventDefault();
+            addTag();
+          }
         });
+      
+        addBtn.on('click', addTag);
+      
+        function addTag() {
+          const val = input.val().trim();
+          if (val && !tagArray.includes(val)) {
+            tagArray.push(val);
+            updateTags();
+            input.val('');
+          }
+        }
+      
+        function updateTags() {
+          tagsBox.empty(); hiddenBox.empty();
+          tagArray.forEach((tag, i) => {
+            tagsBox.append(`
+              <span class="tag inline-flex items-center px-2 py-1 mr-1 mb-1 text-xs font-medium rounded bg-${color}-100 text-${color}-800">
+                ${tag}
+                <button type="button" class="ml-1 text-${color}-500 hover:text-${color}-700 remove-tag" data-index="${i}" data-type="${name}">
+                  <i class="fas fa-times"></i>
+                </button>
+              </span>`);
+            hiddenBox.append(`<input type="hidden" name="${name}[]" value="${tag}">`);
+          });
+        }
+      
+        return { updateTags };
+      }
+    
+      
+      let prof = setupTagInput('#professionInput', '#addProfession', '#professionTags', '#professionHiddenInputs', professionTags, 'blue', 'profession');
+      let skills = setupTagInput('#skillsInput', '#addSkill', '#skillsTags', '#skillsHiddenInputs', skillsTags, 'indigo', 'skills');
+      let interests = setupTagInput('#interestsInput', '#addInterest', '#interestsTags', '#interestsHiddenInputs', interestsTags, 'purple', 'interests');
+    
+      $(document).on('click', '.remove-tag', function () {
+        const index = $(this).data('index'), type = $(this).data('type');
+        if (type === 'profession') { professionTags.splice(index, 1); prof.updateTags(); }
+        else if (type === 'skills') { skillsTags.splice(index, 1); skills.updateTags(); }
+        else if (type === 'interests') { interestsTags.splice(index, 1); interests.updateTags(); }
+      });
+    
+      function showError(box, msg) {
+        box.text(msg).removeClass('hidden');
+      }
+    
+     function setupTagSuggestion({ inputId, listId, fetchUrl, dataKey, tagArray, updateFunc }) {
+      const $input = $(`#${inputId}`);
+      const $list = $(`#${listId}`);
+    
+      $input.on('input', () => {
+        const query = $input.val().trim();
+        $list.empty();
+        if (!query) return;
+      
+        fetch(`${fetchUrl}${encodeURIComponent(query)}`)
+          .then(res => res.json())
+          .then(data => {
+            if (!data.length) return $list.append('<li class="p-2 text-gray-500">No matches found</li>');
+            data.forEach(item => {
+              $list.append(`<li class="p-2 hover:bg-gray-100 cursor-pointer" data-${dataKey}="${item}">${item}</li>`);
+            });
+          })
+          .catch(err => console.error('Fetch error:', err));
+      });
+    
+      $(document).on('click', `#${listId} li`, function () {
+        const selected = $(this).data(dataKey);
+        if (selected && !tagArray.includes(selected)) {
+          tagArray.push(selected);
+          updateFunc();
+        }
+        $input.val('');
+        $list.empty();
+      });
+    }
+    
+    // Setup suggestions
+    setupTagSuggestion({
+      inputId: 'professionInput',
+      listId: 'profession_suggession',
+      fetchUrl: '/profession/search?q=',
+      dataKey: 'profession',
+      tagArray: professionTags,
+      updateFunc: prof.updateTags
+    });
+    
+    setupTagSuggestion({
+      inputId: 'skillsInput',
+      listId: 'skills_suggession',
+      fetchUrl: '/skills/search?q=',
+      dataKey: 'skill',
+      tagArray: skillsTags,
+      updateFunc: skills.updateTags
+    });
+    
+    setupTagSuggestion({
+      inputId: 'interestsInput',
+      listId: 'interests_suggession',
+      fetchUrl: '/interests/search?q=',
+      dataKey: 'interest',
+      tagArray: interestsTags,
+      updateFunc: interests.updateTags
+    });
+});
+
   </script>
+
 </body>
 </html>

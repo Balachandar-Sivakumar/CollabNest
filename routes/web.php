@@ -12,6 +12,8 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\WelcomepageController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\MailSendController;
+use App\Http\Controllers\SkillsController;
+use App\Models\Skills;
 
 // Home page
 Route::get('/', [Authentication::class, 'welcome']);
@@ -54,9 +56,6 @@ Route::get('/messages', [MessageController::class, 'index'])->name('messages');
 // Meetings page
 Route::get('/meetings', [MeetingController::class, 'index'])->name('meetings');
 
-// Files page
-Route::get('/files', [FileController::class, 'index'])->name('files');
-
 // Settings page
 Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
 
@@ -72,8 +71,6 @@ Route::get('/help', [WelcomepageController::class, 'help'])->name('help');
 
 Route::get('/users',[UsersController::class, 'NavUsers']);
 
-// Route::get('/verify', [MailSendController::class, 'verify'])->name('verifymail');
-
 Route::get('/verify', [Authentication::class, 'verify']);
 
 Route::get('/profile',[UsersController::class, 'NavUsers']);
@@ -81,3 +78,19 @@ Route::get('/profile',[UsersController::class, 'NavUsers']);
 Route::get('/profile/edit',[UsersController::class, 'navedit']);
 
 Route::post('/profile/update',[UsersController::class, 'profileUpdate']);
+
+Route::get("/navcreateproject",[ProjectController::class,'navcreateproject']);
+
+Route::post('/CreateProject',[ProjectController::class,'CreateProject']);
+
+Route::get('/view/{project}',[ProjectController::class,'viewProject']);
+
+Route::get('/profession/search',[SkillsController::class,'getProfession']);
+
+Route::get('/skills/search',[SkillsController::class,'getSkills']);
+
+Route::get('/interests/search',[SkillsController::class,'getInterests']);
+
+Route::get('/softSkill/search',[SkillsController::class,'getSoftskills']);
+
+Route::get('/navUpdateProject/{id}',[ProjectController::class,'navUpdateProject']);

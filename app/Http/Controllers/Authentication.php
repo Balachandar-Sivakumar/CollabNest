@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeMail;
+use App\Models\Interest;
+use App\Models\Profession;
+use App\Models\Skill;
+use App\Models\UserTag;
 
 class Authentication extends Controller
 {
@@ -44,7 +48,9 @@ class Authentication extends Controller
         if (Auth::check()) {
             return redirect('/dashboard');
         }
-                // dd($request);
+
+    
+
         $request->validate([
             'name'         => 'required',
             'email'        => 'required|email|unique:users,email',
@@ -66,11 +72,34 @@ class Authentication extends Controller
             'verified_at' => now(),
         ]);
 
+        
+
+        foreach($request->profession as $prof){
+            UserTag::create([
+                'tag_id'=>Profession::where('profession',$prof)->value('id'),
+                'user_id'=>$user->id,
+                'tag_model'=>'profession'
+            ]);
+        }
+        foreach($request->skills as $skill){
+             UserTag::create([
+                'tag_id'=>Skill::where('skill',$skill)->value('id'),
+                'user_id'=>$user->id,
+                'tag_model'=>'tech_skill'
+            ]);
+            
+        }
+        foreach($request->interests as $interest){
+             UserTag::create([
+                'tag_id'=>Interest::where('interest',$interest)->value('id'),
+                'user_id'=>$user->id,
+                'tag_model'=>'interest'
+            ]);
+            
+        }
+
         // Save profile settings
         $settings = [
-            'profession'       => $request->profession,
-            'technical_skills' => $request->skills,
-            'interests'        => $request->interests,
             'availability'     => $request->availability,
         ];
 
@@ -79,7 +108,7 @@ class Authentication extends Controller
             'profile_settings' => json_encode($settings),
         ]);
      
-        Auth::login($user);
+    
         Mail::to($user->email)->send(new WelcomeMail($token,$user));
         
         return view('verification-success')->with('user', $user);
