@@ -2,18 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Projects;
-use App\Models\User;
+
 use Illuminate\Support\Facades\Auth;
 use App\Models\UserProfile;
 use Illuminate\Http\Request;
-use Illuminate\View\ViewServiceProvider;
 use App\Models\Profession;
 use App\Models\SoftSkill;
 use App\Models\Interest;
 use App\Models\Skill;
 use App\Models\UserTag;
-
+use Illuminate\Support\Facades\Storage;
 
 
 class UsersController extends Controller
@@ -106,10 +104,21 @@ class UsersController extends Controller
 
   
     if($request->hasFile('profile_image')){
+
+      if (isset($data->image) && Storage::disk('public')->exists($data->image)) {
+                Storage::disk('public')->delete($data->image);
+            }
+
         $path = $request->file('profile_image')->store('assets','public');
         $data->image=$path;
     }
+
     if($request->hasFile('resume')){
+
+        if(isset($data->resume) && Storage::disk('public')->exists($data->resume)){
+            Storage::disk('public')->delete($data->resume);
+        }
+
         $resume_path = $request->file('resume')->store('files','public');
         $data->resume = $resume_path;
     }

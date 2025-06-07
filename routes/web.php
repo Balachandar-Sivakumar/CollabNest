@@ -94,3 +94,5 @@ Route::get('/interests/search',[SkillsController::class,'getInterests']);
 Route::get('/softSkill/search',[SkillsController::class,'getSoftskills']);
 
 Route::get('/navUpdateProject/{id}',[ProjectController::class,'navUpdateProject']);
+
+Route::post('/UpdateProject/{id}',[ProjectController::class,'UpdateProject']);
