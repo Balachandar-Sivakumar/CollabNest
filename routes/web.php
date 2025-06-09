@@ -46,7 +46,7 @@ Route::get('/team', [TeamController::class, 'index'])->name('team');
 Route::get('/projects', [ProjectController::class, 'index'])->name('projects');
 
 // Tasks page
-Route::get('/tasks', [TaskController::class, 'index'])->name('tasks');
+// Route::get('/tasks', [TaskController::class, 'index'])->name('tasks');
 
 // Messages page
 Route::get('/messages', [MessageController::class, 'index'])->name('messages');
@@ -93,6 +93,23 @@ Route::get('/interests/search',[SkillsController::class,'getInterests']);
 
 Route::get('/softSkill/search',[SkillsController::class,'getSoftskills']);
 
+Route::middleware(['auth'])->group(function () {
+    Route::resource('tasks', \App\Http\Controllers\TaskController::class)->except(['show']);
+    Route::get('tasks/{task}', [\App\Http\Controllers\TaskController::class, 'show'])->name('tasks.show');
+});
+
 Route::get('/navUpdateProject/{id}',[ProjectController::class,'navUpdateProject']);
 
-Route::post('/UpdateProject/{id}',[ProjectController::class,'UpdateProject']);
+
+// Route::get('/view/{project}', [ProjectController::class, 'viewProject'])->name('projects.view');
+
+
+
+Route::get('/navcreateproject', [ProjectController::class, 'navcreateproject'])->name('projects.create');
+
+Route::post('/createproject', [ProjectController::class, 'createProject'])->name('projects.store');
+
+Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+
+Route::get('/projects/{hashid}', [ProjectController::class, 'viewProject'])->name('projects.view');
+Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');

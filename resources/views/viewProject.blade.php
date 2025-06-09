@@ -95,6 +95,7 @@
               @endif
             </div>
 
+
             <!-- GitHub Repo -->
             <div>
 
@@ -136,6 +137,28 @@
       </div>
 
     </div>
+
+    <!-- Add this section right before the closing </div> of your main content (before the max-w-5xl mx-auto space-y-10 closing div) -->
+
+<!-- Tasks Section -->
+<div class="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200">
+  <div class="px-6 py-4 border-b border-gray-200">
+    <h2 class="text-xl font-semibold flex items-center">
+      <i class="fas fa-tasks mr-2 text-indigo-500"></i> Project Tasks
+    </h2>
+  </div>
+  
+  <div class="divide-y divide-gray-200">
+    <!-- Task Filters -->
+    <div class="px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+      <a href="{{ route('tasks.create') }}" class="flex items-center px-3 py-1.5 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
+        <i class="fas fa-plus mr-2"></i> New Task
+      </a>
+
+      
+    </div>
+
+   
   </main>
 </body>
 </html>

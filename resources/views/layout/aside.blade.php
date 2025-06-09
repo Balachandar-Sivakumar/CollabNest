@@ -48,11 +48,6 @@
     <i class="fas fa-box"></i><span>Projects</span>
   </a>
 
-  <a href="{{ route('tasks') }}"
-     class="flex items-center space-x-2 py-2 px-3 rounded-md 
-            {{ request()->routeIs('tasks') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
-    <i class="fas fa-check-square"></i><span>Tasks</span>
-  </a>
 
   <a href="{{ route('messages') }}"
      class="flex items-center space-x-2 py-2 px-3 rounded-md 
