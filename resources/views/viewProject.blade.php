@@ -42,9 +42,11 @@
           <a href="{{url()->previous()}}" class="flex items-center px-4 py-2 text-sm bg-white border rounded-md shadow-sm hover:bg-gray-50 text-gray-700">
             <i class="fas fa-arrow-left mr-2"></i> Back
           </a>
-          <a href="/navUpdateProject/{{$project->id}}" class="flex items-center px-4 py-2 text-sm text-white bg-indigo-600 rounded-md shadow hover:bg-indigo-700">
+          @if($project->owner_id === Auth::user()->id)
+            <a href="/navUpdateProject/{{$project->id}}" class="flex items-center px-4 py-2 text-sm text-white bg-indigo-600 rounded-md shadow hover:bg-indigo-700">
             <i class="fas fa-edit mr-2"></i> Edit
-          </a>
+            </a>
+          @endif  
         </div>
       </div>
 
@@ -128,9 +130,11 @@
             <button class="flex items-center px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-100">
               <i class="fas fa-share-alt mr-2"></i> Share
             </button>
-            <button class="flex items-center px-3 py-1.5 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
-              <i class="fas fa-user-plus mr-2"></i> Request
-            </button>
+            @if($project->owner_id !== Auth::user()->id)
+                <button class="flex items-center px-3 py-1.5 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
+                  <i class="fas fa-user-plus mr-2"></i> Request
+                </button>
+            @endif    
           </div>
         </div>
       </div>

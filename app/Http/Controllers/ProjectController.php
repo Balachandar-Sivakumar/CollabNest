@@ -19,6 +19,13 @@ class ProjectController extends Controller
         return view('projects',compact('projects'));
     }
 
+    public function navMyProject(){
+
+        $projects = Project::where('owner_id',Auth::user()->id)->get();
+
+        return view('MyProject',compact('projects'));
+    }
+
     public function navcreateproject(){
         return view('createProject');
     }
