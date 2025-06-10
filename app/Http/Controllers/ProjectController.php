@@ -16,7 +16,7 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::all();
-        return view('projects',compact('projects'));
+        return view('AllProjects',compact('projects'));
     }
 
     public function navMyProject(){

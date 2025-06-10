@@ -20,7 +20,7 @@
 
   <main class="flex-1 p-6">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-semibold">All projects</h1>
+      <h1 class="text-2xl font-semibold">My Projects</h1>
       <a href="/navcreateproject" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition">
         <i class="fas fa-plus mr-2"></i> Create New Project
       </a>
