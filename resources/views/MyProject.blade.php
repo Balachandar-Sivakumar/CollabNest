@@ -47,5 +47,6 @@
       @endforeach
     </div>
   </main>
+
 </body>
 </html>
