@@ -7,11 +7,9 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\MeetingController;
-use App\Http\Controllers\FileController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\WelcomepageController;
 use App\Http\Controllers\UsersController;
-use App\Http\Controllers\MailSendController;
 use App\Http\Controllers\SkillsController;
 use App\Models\Skills;
 
@@ -99,3 +97,9 @@ Route::get('/softSkill/search',[SkillsController::class,'getSoftskills']);
 Route::get('/navUpdateProject/{id}',[ProjectController::class,'navUpdateProject'])->name('editProject');
 
 Route::post('/UpdateProject/{id}',[ProjectController::class,'UpdateProject']);
+
+// Route::get('/project/request/{id}/accept', [ProjectController::class, 'acceptRequest'])->name('project.accept');
+
+// Route::get('/project/request/{id}/reject', [ProjectController::class, 'rejectRequest'])->name('project.reject');
+Route::get('/request/{project}', [ProjectController::class, 'sendRequest'])->name('request');
+

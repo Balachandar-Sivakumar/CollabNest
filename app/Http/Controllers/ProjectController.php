@@ -10,6 +10,8 @@ use Vinkla\Hashids\Facades\Hashids;
 use App\Models\User;
 use App\Models\Skill;
 use Illuminate\Support\Facades\Storage;
+use App\Mail\ProjectRequestMail;
+use Illuminate\Support\Facades\Mail;
 
 class ProjectController extends Controller
 {
@@ -145,10 +147,51 @@ class ProjectController extends Controller
             'is_private'=>$request->is_private
         ];
 
+        
+
         Project::where('id',$id)->update($update);
+
+       
 
         return redirect("projects")->with('success','Project updated successfully');
 
         }
+
+    public function sendRequest($id)
+    {
+        $project = Project::findOrFail($id);
+
+        if ($project->owner_id === Auth::id()) {
+            return redirect()->back()->with('error', 'You cannot request your own project.');
+        } 
+
+        $owner = User::find($project->owner_id);
+        $requester = Auth::user();
+
+         Mail::to($owner->email)->send(new ProjectRequestMail($requester, $project));
+
+        return redirect()->back()->with('success', 'Request sent to the project owner!');
+    }
+
+    // public function acceptRequest(Request $request, $id)
+    // {
+    //     $userId = $request->query('user');
+        
+    //     return redirect('/dashboard')->with('success', 'You accepted the request.');
+    // }
+
+    // public function rejectRequest(Request $request, $id)
+    // {
+    //     $userId = $request->query('user');
+
+    //     $project = Project::findOrFail($id);
+    //     if (Auth::id() !== $project->owner_id) {
+    //         abort(403, 'Unauthorized action.');
+    //     }
+
+    //     return redirect('/dashboard')->with('info', 'You rejected the request for project: ' . $project->name);
+    // }
+
+
 
 }
