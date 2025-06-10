@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Mtvs\EloquentHashids\HasHashid;
 use Mtvs\EloquentHashids\HashidRouting;
 
+
 class Project extends Model
 {
     use HasHashid, HashidRouting;
@@ -24,4 +25,7 @@ class Project extends Model
             'owner_id',
         ];
 
+        public function tasks(){
+    return $this->hasMany(Task::class);
+    }
 }

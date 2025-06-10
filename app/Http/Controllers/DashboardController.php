@@ -9,6 +9,10 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        return view('dashboard');
+        $calendarEvents = [
+            ['title' => 'Team Meeting', 'start' => now()->toDateString()],
+            ['title' => 'Project Deadline', 'start' => now()->addDays(2)->toDateString()],
+        ];
+        return view('dashboard', compact('calendarEvents'));
     }
 }

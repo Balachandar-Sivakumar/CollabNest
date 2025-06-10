@@ -34,10 +34,11 @@
   @include('layout.aside')
    
   <!-- Main Form -->
-  <form action="/UpdateProject/{{ $project->id }}" method="POST" enctype="multipart/form-data"
+  <form action="/UpdateProject/{{$project->id}}" method="POST" enctype="multipart/form-data"
         class="w-full max-w-5xl bg-white shadow-xl mx-auto my-6 rounded-xl p-8">
     @csrf
-    @method('PUT')
+
+      
  <h2 class="text-2xl font-bold text-gray-800">Update Project</h2>
     
 
@@ -75,7 +76,7 @@
                   class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">{{ old('goals', $project->goals) }}</textarea>
       </div>
 
-      <!-- Requirement Documents -->
+          <!-- Requirement Documents -->
       <div class="col-span-1">
         <label class="block text-sm font-medium text-gray-700 mb-2">Current Documents</label>
         <div class="space-y-2 mb-3">
@@ -94,7 +95,6 @@
         <p class="text-xs text-gray-500 mt-2">PDF, DOC, DOCX files accepted (max 5MB each)</p>
         <input type="hidden" name="removed_documents" id="removed_documents" value="">
       </div>
-
 
       @php 
 
@@ -134,14 +134,14 @@
       <!-- Git Repo -->
       <div class="col-span-1">
         <label for="github" class="block text-sm font-medium text-gray-700 mb-2">GitHub URL</label>
-        <input type="url" name="github" id="github" value="{{ old('github', $project->github) }}" placeholder="https://github.com/your-project"
+        <input type="url" name="github" id="github" value="{{ old('github', json_decode($project->project_url,true)['github']) }}" placeholder="https://github.com/your-project"
                class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
       </div>
 
       <!-- Trello link -->
       <div class="col-span-1">
         <label for="trello" class="block text-sm font-medium text-gray-700 mb-2">Trello URL</label>
-        <input type="url" name="trello" id="trello" value="{{ old('trello', $project->trello) }}" placeholder="https://trello.com/b/your-board"
+        <input type="url" name="trello" id="trello" value="{{ old('trello', json_decode($project->project_url,true)['trello']) }}" placeholder="https://trello.com/b/your-board"
                class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
       </div>
 
@@ -155,9 +155,11 @@
         </select>
       </div>
 
-      <div class="flex justify-between items-center mb-8">
+    </div>
+
      
-      <div class="flex space-x-3">
+     
+      <div class="flex space-x-8 w-full justify-between mt-9">
         <a href="{{ url()->previous() }}" 
            class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
           <i class="fas fa-times mr-2"></i> Cancel
@@ -166,8 +168,7 @@
                 class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition">
           <i class="fas fa-save mr-2"></i> Save Changes
         </button>
-      </div>
-    </div>
+  
     </div>
   </form>
 
@@ -258,6 +259,16 @@ function setupTagSystem(inputSelector, addButtonSelector, tagsContainerSelector,
       }
 
        setupSuggestion('technical-skills-input', 'skills_suggession', '/skills/search?q=', 'add-technical-skill');
+
+       let required_documets = $('#requirement_documents').val().split(',');
+
+       let removedDocuments =[];
+
+    function removeDocument(button, docPath) {
+      removedDocuments.push(docPath);
+      $('#removed_documents').val(JSON.stringify(removedDocuments));
+      $(button).closest('div').remove();
+    }
 
   </script>
 </body>
