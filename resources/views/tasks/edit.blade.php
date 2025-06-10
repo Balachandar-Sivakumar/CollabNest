@@ -2,6 +2,12 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
+    @if(session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+            {{ session('success') }}
+        </div>
+    @endif
+
     <div class="flex justify-center">
         <div class="w-full max-w-2xl">
             <div class="bg-white rounded-lg shadow-md overflow-hidden">
@@ -10,7 +16,7 @@
                 </div>
 
                 <div class="p-6">
-                    <form method="POST" action="{{ route('tasks.update', $task) }}">
+                    <form method="POST" action="{{ route('tasks.update', $task->id) }}">
                         @csrf
                         @method('PUT')
 
@@ -39,7 +45,7 @@
                             </label>
                             <textarea id="description" rows="3"
                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('description') border-red-500 @enderror" 
-                                   name="description">{{ old('description', $task->description) }}</textarea>
+                                   name="description" required>{{ old('description', $task->description) }}</textarea>
 
                             @error('description')
                                 <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
@@ -90,7 +96,7 @@
                             </label>
                             <select id="status" 
                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('status') border-red-500 @enderror" 
-                                   name="status">
+                                   name="status" required>
                                 <option value="pending" {{ old('status', $task->status) == 'pending' ? 'selected' : '' }}>Pending</option>
                                 <option value="in_progress" {{ old('status', $task->status) == 'in_progress' ? 'selected' : '' }}>In Progress</option>
                                 <option value="completed" {{ old('status', $task->status) == 'completed' ? 'selected' : '' }}>Completed</option>

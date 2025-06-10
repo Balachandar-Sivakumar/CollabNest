@@ -1016,11 +1016,101 @@ div.loadingPlaceholder-date {
     bottom: 0px;
   }
 }
-/*
-*****************************************
-* Responsive Design
-*****************************************
-*/
+
+/* --- Message Bubble Animations --- */
+@keyframes chat-bounce-in {
+  0% { transform: scale(0.95) translateY(20px); opacity: 0; }
+  80% { transform: scale(1.02) translateY(-2px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); }
+}
+.message-card .message {
+  animation: chat-bounce-in 0.35s cubic-bezier(.68,-0.55,.27,1.55);
+  transition: box-shadow 0.2s, background 0.2s;
+  box-shadow: 0 2px 8px 0 rgba(99,102,241,0.06);
+}
+.message-card.mc-sender .message {
+  background: linear-gradient(90deg, var(--primary-color), #8b5cf6 90%);
+  color: #fff !important;
+  box-shadow: 0 4px 16px 0 rgba(99,102,241,0.10);
+}
+.message-card:not(.mc-sender) .message {
+  background: linear-gradient(90deg, #f3f4f6 60%, #e0e7ff 100%);
+  color: #374151;
+}
+
+/* --- Message Hover Effects --- */
+.message-card .message:hover {
+  box-shadow: 0 6px 24px 0 rgba(99,102,241,0.18);
+  filter: brightness(1.03);
+}
+
+/* --- Sender/Receiver Avatar Animation --- */
+.avatar {
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.avatar:hover {
+  box-shadow: 0 4px 16px 0 rgba(99,102,241,0.18);
+  transform: scale(1.07);
+}
+
+/* --- Typing Indicator Animation --- */
+.typing-dots .dot {
+  background: var(--primary-color);
+  animation: jump 1s infinite;
+}
+.typing-dots .dot-1 { animation-delay: 0.1s; }
+.typing-dots .dot-2 { animation-delay: 0.2s; }
+.typing-dots .dot-3 { animation-delay: 0.3s; }
+
+/* --- Send Button Animation --- */
+.messenger-sendCard .send-button svg {
+  transition: transform 0.15s, color 0.2s;
+}
+.messenger-sendCard .send-button svg:hover {
+  color: #8b5cf6;
+  transform: scale(1.2) rotate(-10deg);
+}
+
+/* --- Custom Scrollbar for Messaging View --- */
+.messenger-messagingView .m-body::-webkit-scrollbar {
+  width: 8px;
+  background: #f3f4f6;
+}
+.messenger-messagingView .m-body::-webkit-scrollbar-thumb {
+  background: #c7d2fe;
+  border-radius: 8px;
+}
+.messenger-messagingView .m-body {
+  scrollbar-width: thin;
+  scrollbar-color: #c7d2fe #f3f4f6;
+}
+
+/* --- Modern Card Shadow for List Items --- */
+.messenger-list-item {
+  border-radius: 10px;
+  transition: background 0.15s, box-shadow 0.2s;
+}
+.messenger-list-item:hover {
+  background: #f3f4f6;
+  box-shadow: 0 2px 8px 0 rgba(99,102,241,0.10);
+}
+
+/* --- Info Panel Animation --- */
+.messenger-infoView {
+  animation: fadeIn 0.4s;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+
+/* --- Responsive Improvements --- */
+@media (max-width: 700px) {
+  .message-card .message {
+    font-size: 15px;
+    padding: 8px 12px;
+  }
+}
 @media (max-width: 1060px) {
   .messenger-infoView {
     position: fixed;

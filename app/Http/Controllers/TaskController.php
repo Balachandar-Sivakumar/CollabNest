@@ -21,13 +21,17 @@ class TaskController extends Controller
         // Tasks assigned to me
         $receivedTasks = Task::where('assigned_to', Auth::id())->get();
 
-        return view('viewProject', compact('tasks', 'assignedTasks', 'receivedTasks'));
+        // Fetch a project (example: the first project)
+        $project = Project::first();
+
+        return view('viewProject', compact('tasks', 'assignedTasks', 'receivedTasks', 'project'));
     }
 
-    public function create(Project $project)
+    public function create()
     {
         $users = User::where('id', '!=', Auth::id())->get();
-        return view('tasks.create', compact('users', 'project'));
+        $projects = Project::all(); // Fetch all projects
+        return view('tasks.create', compact('users', 'projects'));
     }
 
     public function store(Request $request)
@@ -70,7 +74,6 @@ class TaskController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'project_id' => 'required|exists:projects,id',
             'assigned_to' => 'required|exists:users,id',
             'due_date' => 'nullable|date',
             'status' => 'nullable|in:pending,in_progress,completed'
@@ -78,7 +81,8 @@ class TaskController extends Controller
 
         $task->update($validated);
 
-        return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
+        // Redirect to the index page with a success message
+        return redirect()->back()->with('success', 'Task status updated!');
     }
 
     public function destroy(Task $task)

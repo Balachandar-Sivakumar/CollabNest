@@ -55,9 +55,9 @@
                         <label class="text-gray-700 font-medium md:text-right md:col-span-1">Status</label>
                         <div class="md:col-span-3">
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
-                                @if($task->status == 'completed') bg-green-100 text-green-800
-                                @elseif($task->status == 'in_progress') bg-blue-100 text-blue-800
-                                @else bg-gray-100 text-gray-800
+                                @if($task->status == 'completed') bg-green-100; text-green-800;
+                                @elseif($task->status == 'in_progress') bg-blue-100; text-blue-800;
+                                @else bg-gray-100; text-gray-800;
                                 @endif">
                                 {{ ucfirst(str_replace('_', ' ', $task->status)) }}
                             </span>

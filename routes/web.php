@@ -1,4 +1,4 @@
- <?php
+<?php
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Authentication;
@@ -58,6 +58,7 @@ Route::get('/meetings', [MeetingController::class, 'index'])->name('meetings');
 
 // Settings page
 Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
 
 Route::get('/how-it-works', [WelcomePageController::class, 'howItWorks'])->name('how-it-works');
 
@@ -145,3 +146,5 @@ Route::middleware(['auth'])->group(function () {
  Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
 Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
 Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
+
+

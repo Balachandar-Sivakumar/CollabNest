@@ -7,6 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+   <script src="//unpkg.com/alpinejs" defer></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
     .skill-tag {
@@ -22,7 +23,7 @@
 
   @include('layout.aside')
 
-  <main class="flex-1 px-6 md:px-12 py-10">
+  <main class="flex-1  h-screen overflow-y-auto p-6">
     <div class="max-w-5xl mx-auto space-y-10">
 
       <!-- Header -->
@@ -180,7 +181,34 @@
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $task->title }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $task->assignee->name }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $task->due_date ? $task->due_date->format('Y-m-d') : 'N/A' }}</td>
-                                            <td class="py-2 px-4 border-b border-gray-200">{{ ucfirst(str_replace('_', ' ', $task->status)) }}</td>
+                                            <td class="py-2 px-4 border-b border-gray-200">
+    <div class="relative" x-data="{ open: false }">
+        <span
+            @click="open = !open"
+            class="px-2 py-1 rounded text-xs font-semibold cursor-pointer {{ $statusClasses[$task->status] ?? '' }}"
+        >
+            {{ ucfirst(str_replace('_', ' ', $task->status)) }}
+        </span>
+        <div
+            x-show="open"
+            @click.away="open = false"
+            class="absolute left-0 mt-1 w-32 bg-white border rounded shadow-lg z-10"
+            x-transition
+        >
+            <form method="POST" action="{{ route('tasks.update', $task) }}">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="title" value="{{ $task->title }}">
+                <input type="hidden" name="description" value="{{ $task->description }}">
+                <input type="hidden" name="assigned_to" value="{{ $task->assigned_to }}">
+                <input type="hidden" name="due_date" value="{{ $task->due_date }}">
+                <button type="submit" name="status" value="pending" class="block w-full text-left px-4 py-2 text-yellow-700 hover:bg-yellow-100 {{ $task->status == 'pending' ? 'font-bold' : '' }}">Pending</button>
+                <button type="submit" name="status" value="in_progress" class="block w-full text-left px-4 py-2 text-blue-700 hover:bg-blue-100 {{ $task->status == 'in_progress' ? 'font-bold' : '' }}">In Progress</button>
+                <button type="submit" name="status" value="completed" class="block w-full text-left px-4 py-2 text-green-700 hover:bg-green-100 {{ $task->status == 'completed' ? 'font-bold' : '' }}">Completed</button>
+            </form>
+        </div>
+    </div>
+</td>
                                             <td class="py-2 px-4 border-b border-gray-200 space-x-2">
                                                 <a href="{{ route('tasks.show', $task) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm">View</a>
                                                 <a href="{{ route('tasks.edit', $task) }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded text-sm">Edit</a>
@@ -218,7 +246,34 @@
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $task->title }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $task->assigner->name }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $task->due_date ? $task->due_date->format('Y-m-d') : 'N/A' }}</td>
-                                            <td class="py-2 px-4 border-b border-gray-200">{{ ucfirst(str_replace('_', ' ', $task->status)) }}</td>
+                                            <td class="py-2 px-4 border-b border-gray-200">
+                                                <div class="relative" x-data="{ open: false }">
+        <span
+            @click="open = !open"
+            class="px-2 py-1 rounded text-xs font-semibold cursor-pointer {{ $statusClasses[$task->status] ?? '' }}"
+        >
+            {{ ucfirst(str_replace('_', ' ', $task->status)) }}
+        </span>
+        <div
+            x-show="open"
+            @click.away="open = false"
+            class="absolute left-0 mt-1 w-32 bg-white border rounded shadow-lg z-10"
+            x-transition
+        >
+            <form method="POST" action="{{ route('tasks.update', $task) }}">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="title" value="{{ $task->title }}">
+                <input type="hidden" name="description" value="{{ $task->description }}">
+                <input type="hidden" name="assigned_to" value="{{ $task->assigned_to }}">
+                <input type="hidden" name="due_date" value="{{ $task->due_date }}">
+                <button type="submit" name="status" value="pending" class="block w-full text-left px-4 py-2 text-yellow-700 hover:bg-yellow-100 {{ $task->status == 'pending' ? 'font-bold' : '' }}">Pending</button>
+                <button type="submit" name="status" value="in_progress" class="block w-full text-left px-4 py-2 text-blue-700 hover:bg-blue-100 {{ $task->status == 'in_progress' ? 'font-bold' : '' }}">In Progress</button>
+                <button type="submit" name="status" value="completed" class="block w-full text-left px-4 py-2 text-green-700 hover:bg-green-100 {{ $task->status == 'completed' ? 'font-bold' : '' }}">Completed</button>
+            </form>
+        </div>
+    </div>
+                                            </td>
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 <a href="{{ route('tasks.show', $task) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm">View</a>
                                             </td>

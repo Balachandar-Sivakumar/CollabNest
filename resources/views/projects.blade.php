@@ -18,7 +18,8 @@
   <!-- Sidebar -->
   @include('layout.aside')
 
-  <main class="flex-1 p-6">
+
+  <main class="flex-1 h-screen overflow-y-auto p-6">
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-semibold">My Projects</h1>
       <a href="/navcreateproject" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition">
@@ -27,28 +28,23 @@
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-
-
-    @foreach($projects as $project)
-      <!-- Project Card 1 -->
-      <div class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition">
-        <img src="{{asset('storage/'.$project->logo)}}" alt="project image">
-        <h2 class="text-xl font-bold text-gray-800 mb-2">{{$project->title}}</h2>
-        <p class="text-gray-600 text-sm mb-3">{{$project->description}}</p>
-        <div class="mb-2">
-          <strong class="text-sm">Skills:</strong>
-          <div class="flex flex-wrap mt-1">
-            @foreach(json_decode($project->skills_required) as $skill)
-            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2 mb-1">{{\App\Models\Skill::where('id',$skill)->value('skill')}}</span>
-           @endforeach
+      @foreach($projects as $project)
+        <!-- Project Card -->
+        <div class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition">
+          <img src="{{asset('storage/'.$project->logo)}}" alt="project image">
+          <h2 class="text-xl font-bold text-gray-800 mb-2">{{$project->title}}</h2>
+          <p class="text-gray-600 text-sm mb-3">{{$project->description}}</p>
+          <div class="mb-2">
+            <strong class="text-sm">Skills:</strong>
+            <div class="flex flex-wrap mt-1">
+              @foreach(json_decode($project->skills_required) as $skill)
+                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2 mb-1">{{\App\Models\Skill::where('id',$skill)->value('skill')}}</span>
+              @endforeach
+            </div>
           </div>
+          <a href="/view/{{$project->hashid}}" class="text-blue-600 text-sm hover:underline">View Details</a>
         </div>
-        <a href="/view/{{$project->hashid}}" class="text-blue-600 text-sm hover:underline">View Details</a>
-      </div>
-    @endforeach
-
-
+      @endforeach
     </div>
   </main>
 </body>

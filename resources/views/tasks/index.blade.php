@@ -10,8 +10,8 @@
                 </div>
 
                 <div class="p-6">
-                    @if (session('success'))
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4" role="alert">
+                    @if(session('success'))
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
                             {{ session('success') }}
                         </div>
                     @endif
@@ -64,6 +64,13 @@
                     @if($receivedTasks->isEmpty())
                         <p class="text-gray-600">No tasks assigned to you.</p>
                     @else
+                        @php
+    $statusClasses = [
+        'pending' => 'bg-yellow-100 text-yellow-800',
+        'in_progress' => 'bg-blue-100 text-blue-800',
+        'completed' => 'bg-green-100 text-green-800',
+    ];
+@endphp
                         <div class="overflow-x-auto">
                             <table class="min-w-full bg-white">
                                 <thead>
@@ -77,16 +84,43 @@
                                 </thead>
                                 <tbody>
                                     @foreach($receivedTasks as $task)
-                                        <tr class="hover:bg-gray-50">
-                                            <td class="py-2 px-4 border-b border-gray-200">{{ $task->title }}</td>
-                                            <td class="py-2 px-4 border-b border-gray-200">{{ $task->assigner->name }}</td>
-                                            <td class="py-2 px-4 border-b border-gray-200">{{ $task->due_date ? $task->due_date->format('Y-m-d') : 'N/A' }}</td>
-                                            <td class="py-2 px-4 border-b border-gray-200">{{ ucfirst(str_replace('_', ' ', $task->status)) }}</td>
-                                            <td class="py-2 px-4 border-b border-gray-200">
-                                                <a href="{{ route('tasks.show', $task) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm">View</a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
+<tr class="hover:bg-gray-50 group">
+    <td class="py-2 px-4 border-b border-gray-200">{{ $task->title }}</td>
+    <td class="py-2 px-4 border-b border-gray-200">{{ $task->assigner->name }}</td>
+    <td class="py-2 px-4 border-b border-gray-200">{{ $task->due_date ? $task->due_date->format('Y-m-d') : 'N/A' }}</td>
+    <td class="py-2 px-4 border-b border-gray-200">
+        <div class="relative" x-data="{ open: false }">
+        <span
+            @click="open = !open"
+            class="px-2 py-1 rounded text-xs font-semibold cursor-pointer {{ $statusClasses[$task->status] ?? '' }}"
+        >
+            {{ ucfirst(str_replace('_', ' ', $task->status)) }}
+        </span>
+        <div
+            x-show="open"
+            @click.away="open = false"
+            class="absolute left-0 mt-1 w-32 bg-white border rounded shadow-lg z-10"
+            x-transition
+        >
+            <form method="POST" action="{{ route('tasks.update', $task) }}">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="title" value="{{ $task->title }}">
+                <input type="hidden" name="description" value="{{ $task->description }}">
+                <input type="hidden" name="assigned_to" value="{{ $task->assigned_to }}">
+                <input type="hidden" name="due_date" value="{{ $task->due_date }}">
+                <button type="submit" name="status" value="pending" class="block w-full text-left px-4 py-2 text-yellow-700 hover:bg-yellow-100 {{ $task->status == 'pending' ? 'font-bold' : '' }}">Pending</button>
+                <button type="submit" name="status" value="in_progress" class="block w-full text-left px-4 py-2 text-blue-700 hover:bg-blue-100 {{ $task->status == 'in_progress' ? 'font-bold' : '' }}">In Progress</button>
+                <button type="submit" name="status" value="completed" class="block w-full text-left px-4 py-2 text-green-700 hover:bg-green-100 {{ $task->status == 'completed' ? 'font-bold' : '' }}">Completed</button>
+            </form>
+        </div>
+    </div>
+    </td>
+    <td class="py-2 px-4 border-b border-gray-200">
+        <a href="{{ route('tasks.show', $task) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm">View</a>
+    </td>
+</tr>
+@endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -97,3 +131,5 @@
     </div>
 </div>
 @endsection
+
+<!-- Add this to your <head> if Alpine.js is not already loaded -->
