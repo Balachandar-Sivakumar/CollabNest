@@ -66,7 +66,7 @@
 
                     <!-- Actions -->
                     <div class="flex flex-wrap justify-end space-x-4 pt-6">
-                        <a href="{{ route('tasks.index') }}" 
+                        <a href="{{ url()->previous() }}" 
                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                             Back to List
                         </a>

@@ -41,5 +41,6 @@ class Task extends Model
         return $this->belongsTo(Project::class); // 👈 this is the missing relationship
     }
 
-    
+    // In Task.php model
+
 }

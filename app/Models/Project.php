@@ -25,4 +25,7 @@ class Project extends Model
             'owner_id',
         ];
 
+        public function tasks(){
+    return $this->hasMany(Task::class);
+    }
 }

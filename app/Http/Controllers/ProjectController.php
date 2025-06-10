@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Skill;
+use App\Models\Task; // Make sure to import the Task model
 
 class ProjectController extends Controller
 {
@@ -68,13 +69,25 @@ class ProjectController extends Controller
 
         Project::create($validated);
 
-        return redirect()->route('projects')->with('success', 'Project created!');
+        return redirect()->route('projects.index')->with('success', 'Project created!');
     }
 
-    public function viewProject(Project $project)
-    {
-        return view('viewProject', compact('project'));
-    }
+public function viewProject(Project $project)
+{
+$user = \Illuminate\Support\Facades\Auth::user(); 
+$userId = $user->id;
+
+    $assignedTasks = Task::where('project_id', $project->id)
+                         ->where('assigned_by', $userId)
+                         ->get();
+
+    $receivedTasks = Task::where('project_id', $project->id)
+                         ->where('assigned_to', $userId)
+                         ->get();
+
+    return view('viewProject', compact('project', 'assignedTasks', 'receivedTasks'));
+}
+
 
     public function navUpdateProject($id)
     {
@@ -150,6 +163,6 @@ class ProjectController extends Controller
 
         $project->update($update);
 
-        return redirect()->route('projects')->with('success', 'Project updated successfully!');
+        return redirect()->route('projects.index')->with('success', 'Project updated successfully!');
     }
 }

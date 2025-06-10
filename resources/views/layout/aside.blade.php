@@ -42,7 +42,7 @@
     <i class="fas fa-users"></i><span>Team</span>
   </a>
 
-  <a href="{{ route('projects') }}"
+  <a href="{{ route('projects.index') }}"
      class="flex items-center space-x-2 py-2 px-3 rounded-md 
             {{ request()->routeIs('projects') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
     <i class="fas fa-box"></i><span>Projects</span>
