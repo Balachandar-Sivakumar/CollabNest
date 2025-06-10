@@ -7,19 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Mtvs\EloquentHashids\HasHashid;
 use Mtvs\EloquentHashids\HashidRouting;
 
-class Projects extends Model
+class Interest extends Model
 {
     use HasHashid, HashidRouting;
     use HasFactory;
-
-  protected $fillable = [
-        'title',
-        'description',
-        'goals',
-        'requirement_documents',
-        'skills_required',
-        'is_private',
-        'git_repo_url',
-        'owner_id',
-    ];
 }

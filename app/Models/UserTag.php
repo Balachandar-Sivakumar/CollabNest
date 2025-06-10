@@ -4,11 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Mtvs\EloquentHashids\HasHashid;
-use Mtvs\EloquentHashids\HashidRouting;
 
-class SoftSkills extends Model
+class UserTag extends Model
 {
-    use HasHashid, HashidRouting;
     use HasFactory;
+
+    protected $fillable = ['tag_id', 'user_id', 'tag_model'];
 }

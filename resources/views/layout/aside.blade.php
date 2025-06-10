@@ -30,6 +30,7 @@
         </a>
       </div>
     <nav class="flex flex-col space-y-2 px-6 text-sm font-semibold">
+
   <a href="{{ route('dashboard') }}"
      class="flex items-center space-x-2 py-2 px-3 rounded-md 
             {{ request()->routeIs('dashboard') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
@@ -42,11 +43,27 @@
     <i class="fas fa-users"></i><span>Team</span>
   </a>
 
-  <a href="{{ route('projects') }}"
+  <div>
+      <a id="project" 
      class="flex items-center space-x-2 py-2 px-3 rounded-md 
-            {{ request()->routeIs('projects') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
-    <i class="fas fa-box"></i><span>Projects</span>
+        hover:bg-gray-100 text-gray-900  cursor-pointer">
+    <i class="fas fa-box"></i><span >Projects</span>
   </a>
+
+    <div class="branch  {{ request()->routeIs('projects') || request()->routeIs('navMyProject') || request()->routeIs('viewProject')  || request()->routeIs('editProject') || request()->routeIs('navCreateProject') ?'block' :'hidden'}}">
+        <a href="{{ route('projects') }}"
+        class="flex items-center space-x-2 py-2 px-3 rounded-md 
+              {{ request()->routeIs('projects') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
+        <i></i><i></i><span id="project">All project</span>
+        </a>
+
+      <a href="{{ route('navMyProject') }}"
+        class="flex items-center space-x-2 py-2 px-3 rounded-md 
+            {{ request()->routeIs('navMyProject')  ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
+        <i></i><i></i><span id="project">My project</span>
+      </a>
+    </div>
+  </div>
 
   <a href="{{ route('tasks') }}"
      class="flex items-center space-x-2 py-2 px-3 rounded-md 
@@ -88,3 +105,14 @@
       </form>
     </div>
   </aside>
+
+
+  <script>
+let project = document.querySelector('#project'),
+    branches = document.querySelector('.branch');
+
+    project.addEventListener('click', (e) => {
+      branches.style.display = branches.style.display === 'block' ? 'none' : 'block';
+    });
+
+  </script>

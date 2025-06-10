@@ -4,58 +4,193 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Projects;
+use App\Models\Project;
 use Illuminate\Auth\Events\Validated;
 use Vinkla\Hashids\Facades\Hashids;
 use App\Models\User;
+use App\Models\Skill;
+use Illuminate\Support\Facades\Storage;
+use App\Mail\ProjectRequestMail;
+use Illuminate\Support\Facades\Mail;
 
 class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Projects::all();
+        $projects = Project::all();
         return view('projects',compact('projects'));
     }
 
+    public function navMyProject(){
+
+        $projects = Project::where('owner_id',Auth::user()->id)->get();
+
+        return view('MyProject',compact('projects'));
+    }
+
     public function navcreateproject(){
-        return view('projectForm');
+        return view('createProject');
     }
 
-public function CreateProject(Request $request)
-{
+    public function CreateProject(Request $request)
+    {
+      
 
-  
-    $validated = $request->validate([
-        'title' => 'required|string|max:255',
-        'description' => 'required|string',
-        'goals' => 'required|string',
-        'requirement_documents' => 'nullable|file|mimes:pdf,doc,docx|max:3072',
-        'skills_required' => 'required|string',
-        'git_repo_url' => 'required|url',
-        'is_private' => 'required|in:0,1',
-    ]);
+        $validated =  $request->validate([
+        'title' => 'required',
+        'description' => 'required',
+        'goals' => 'required',
+        'skills_required' => 'nullable|array',
+        'github' => 'nullable|url|max:255',
+        'trello' => 'nullable|url|max:255',
+        'is_private' => 'required|boolean',
+        ]);
 
-    if ($request->hasFile('requirement_documents')) {
-        $path = $request->file('requirement_documents')->store('files', 'public');
-        $validated['requirement_documents'] = $path;
+
+        $validated['owner_id']=Auth::user()->id;
+        $document_path=[];
+        if($request->hasFile('requirement_documents')){
+            foreach($request->file('requirement_documents') as $file){
+                $document_path[] = $file->store('projectDocuments','public');
+            }
+           
+        }
+
+        if($request->hasFile('logo')){
+            $logo_path = $request->file('logo')->store('files','public');
+        }
+
+        $skills=[];
+
+        foreach($validated['skills_required'] as $skill){
+            $skills[]=Skill::where('skill',$skill)->value('id');
+        }
+
+        $validated['requirement_documents'] = json_encode($document_path);
+        $validated['logo']=$logo_path;
+        $validated['project_url']=json_encode(['github'=>$validated['github'],'trello'=>$validated['trello']]);
+        $validated['skills_required']=json_encode($skills);
+        
+
+        Project::create($validated);
+
+        return redirect()->route('projects')->with('success', 'Project created!');
     }
 
-     
-    $validated['skills_required'] = json_encode(array_map('trim', explode(',', $validated['skills_required'])));
+    public function viewProject(Project $project)
+    {
+        return view('viewProject', compact('project'));
+    }
 
-    $validated['owner_id'] = Auth::user()->id; 
+    public function navUpdateProject($id){
+        
+        $project = Project::where('id',$id)->first();
+        return view('updateProject',compact('project'));
+    }
 
-    
+    public function UpdateProject(Request $request,$id){
        
-    Projects::create($validated);
+           $request->validate([
+        'title' => 'required',
+        'description' => 'required',
+        'goals' => 'required',
+        'technical_skills' => 'required',
+        'github'=>'required',
+        'trello'=>'required',
+        'is_private' => 'required|boolean',
+        ]);
 
-    return redirect()->route('projects')->with('success', 'Project created!');
-}
+        $project = Project::where('id',$id)->first();
+       
+        if($request->hasFile('logo')){
+            if(isset($project->logo) && Storage::disk('public')->exists($project->logo)){
+                Storage::disk('public')->delete($project->logo);
+            }
+               $logo_path = $request->file('logo')->store('files','public');
+        }
 
-public function viewProject(Projects $project)
-{
-    return view('viewProject', compact('project'));
-}
+        $document_path=json_decode($project->requirement_documents);
+        $removed_docs = json_decode($request->removed_documents) ?? [];
+
+        //Removing paths fron database remove docs
+        $document_path = array_filter($document_path, function($doc) use ($removed_docs) {
+                return !in_array($doc, $removed_docs);
+            });
+
+            //deleting from local storage
+        foreach($removed_docs as $removed){
+            if(Storage::disk('public')->exists($removed)){
+                Storage::disk('public')->delete($removed);
+            }
+        }
+
+        if($request->hasFile('requirement_documents')){
+            foreach($request->file('requirement_documents') as $file){
+                array_push($document_path, $file->store('projectDocuments','public'));
+            } 
+        }
+
+        $skills=[];
+        foreach(json_decode(json_encode(array_filter(array_map('trim', explode(',', $request->technical_skills))))) as $skill){
+            $skills[]=Skill::where('skill',$skill)->value('id');
+        }
+
+        $update = [
+            'owner_id'=>Auth::user()->id,
+            'title'=>$request->title,
+            'logo'=>$logo_path ?? $project->logo,
+            'description'=>$request->description,
+            'goals'=>$request->goals,
+            'requirement_documents'=>json_encode($document_path),
+            'skills_required'=> json_encode($skills),
+            'project_url'=>json_encode(['github'=>$request->github,'trello'=>$request->trello]),
+            'is_private'=>$request->is_private
+        ];
+
+        
+
+        Project::where('id',$id)->update($update);
+
+       
+
+        return redirect("projects")->with('success','Project updated successfully');
+
+        }
+
+    public function sendRequest($id)
+    {
+        $project = Project::findOrFail($id);
+
+        if ($project->owner_id === Auth::id()) {
+            return redirect()->back()->with('error', 'You cannot request your own project.');
+        } 
+
+        $owner = User::find($project->owner_id);
+        $requester = Auth::user();
+
+         Mail::to($owner->email)->send(new ProjectRequestMail($requester, $project));
+
+        return redirect()->back()->with('success', 'Request sent to the project owner!');
+    }
+
+    // public function acceptRequest(Request $request, $id)
+    // {
+    //     $userId = $request->query('user');
+        
+    //     return redirect('/dashboard')->with('success', 'You accepted the request.');
+    // }
+
+    // public function rejectRequest(Request $request, $id)
+    // {
+    //     $userId = $request->query('user');
+
+    //     $project = Project::findOrFail($id);
+    //     if (Auth::id() !== $project->owner_id) {
+    //         abort(403, 'Unauthorized action.');
+    //     }
+
+    //     return redirect('/dashboard')->with('info', 'You rejected the request for project: ' . $project->name);
+    // }
 
 
 

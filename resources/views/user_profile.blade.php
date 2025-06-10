@@ -61,7 +61,7 @@
             
           @if($skills->user_id !== Auth::user()->id)
           <div class="mt-3 text-center">
-              <a href="{{ asset('storage/' . $pdf) }}" target="_blank" download class="inline-flex items-center text-sm text-cyan-600 hover:text-cyan-800 font-medium transition-colors">
+              <a href="{{ asset('storage/' . $pdf) }}"target="_blank" download class="inline-flex items-center text-sm text-cyan-600 hover:text-cyan-800 font-medium transition-colors">
                 <i class="fas fa-file-pdf mr-2"></i>
                 Download Resume
               </a>
@@ -78,7 +78,11 @@
           <div>
             <h1 class="text-3xl font-bold text-gray-900 tracking-tight">{{ Auth::user()->name }}</h1>
             <div class="mt-3 flex flex-wrap gap-2">
-              @foreach($settings['profession'] ?? [] as $n)
+              @php 
+                $professions_id = \App\Models\UserTag::where('user_id',Auth::user()->id)->where('tag_model','profession')->pluck('tag_id');
+              @endphp
+              
+              @foreach($professions_id ?? [] as $n)
                 <span class="bg-cyan-50 text-cyan-700 text-xs font-medium px-3 py-1.5 rounded-full border border-cyan-100">{{ App\Models\Profession::where('id',$n)->value('profession')}}</span>
               @endforeach
             </div>
@@ -93,12 +97,11 @@
             <div class="bg-gray-50 p-3 rounded-lg">
                 @php
                     $tech_skill = [];
+                    $tech_skill_id = \App\Models\UserTag::where('user_id',Auth::user()->id)->where('tag_model','tech_skill')->pluck('tag_id');
 
-                    if ($settings['technical_skills']) {
-                        foreach ($settings['technical_skills'] as $skill_id) {
-                            $tech_skill[] = \App\Models\Skills::where('id', $skill_id)->value('skill');
+                        foreach ($tech_skill_id ?? [] as $skill_id) {
+                            $tech_skill[] = \App\Models\Skill::where('id', $skill_id)->value('skill');
                         }
-                    }
                 @endphp
 
               <p class="text-gray-500 text-xs font-medium mb-1">Technical Skills</p>
@@ -106,21 +109,30 @@
                 {{ implode(', ', $tech_skill) ?: 'Not specified' }}
               </p>
             </div>
+
+            @php 
+              $soft_skills_id = \App\Models\UserTag::where('user_id',Auth::user()->id)->where('tag_model','tech_skill')->pluck('tag_id');
+              $soft_skills=[];
+              foreach($soft_skills_id ?? [] as $soft_skill){
+                $soft_skills[]=\App\Models\SoftSkill::where('id',$soft_skill)->value('soft_skills');
+              }
+            @endphp
             <div class="bg-gray-50 p-3 rounded-lg">
               <p class="text-gray-500 text-xs font-medium mb-1">Soft Skills</p>
-              <p class="font-semibold text-gray-700">{{ implode(', ', $settings['soft_skills'] ?? []) ?: 'Not specified' }}</p>
+              <p class="font-semibold text-gray-700">{{ implode(', ', $soft_skills) ??  'Not specified' }}</p>
             </div>
             <div class="bg-gray-50 p-3 rounded-lg">
               <p class="text-gray-500 text-xs font-medium mb-1">Skill Level</p>
               <p class="font-semibold text-gray-700">{{ $settings['skill_level'] ?? 'Not specified' }}</p>
             </div>
             @php
-                    $interests =[];
-            if($settings['interests']){
-              foreach($settings['interests'] as $interest_id){
-                $interests[]=\App\Models\Interests::where('id',$interest_id)->value('interest');
+              $interests =[];
+              $interests_id = \App\Models\UserTag::where('user_id',Auth::user()->id)->where('tag_model','interest')->pluck('tag_id');
+          
+              foreach($interests_id as $int){
+                $interests[]=\App\Models\Interest::where('id',$int)->value('interest');
               }
-            }
+         
             @endphp
             <div class="bg-gray-50 p-3 rounded-lg">
               <p class="text-gray-500 text-xs font-medium mb-1">Interests</p>
@@ -144,30 +156,33 @@
             </p>
           </div>
 
-          <!-- Links -->
-          <div class="space-y-3">
-            <div class="flex items-center">
-              <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
-                <i class="fab fa-github text-gray-600"></i>
-              </div>
-              <a href="{{ $settings['github'] ?? '#' }}" target="_blank" class="text-cyan-600 hover:text-cyan-800 hover:underline font-medium text-sm transition-colors">
-                {{ $settings['github'] ?? 'GitHub not provided' }}
+    
+          <!-- Social Links -->
+          <div class="flex flex-wrap gap-4 items-center">
+            <!-- GitHub Link -->
+            <div>
+              <a href="{{$settings['github'] ?? 'https://github.com'}}" target="_blank"
+                 class="inline-flex items-center px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium rounded-md transition-colors duration-200">
+                <i class="fab fa-github mr-2"></i>
+                GitHub
               </a>
             </div>
-            <div class="flex items-center">
-              <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
-                <i class="fas fa-code text-gray-600"></i>
-              </div>
-              <a href="{{ $settings['leetcode'] ?? '#' }}" target="_blank" class="text-cyan-600 hover:text-cyan-800 hover:underline font-medium text-sm transition-colors">
-                {{ $settings['leetcode'] ?? 'LeetCode not provided' }}
+                      
+            <!-- LeetCode Link -->
+            <div>
+              <a href="{{$settings['leetcode'] ?? 'https://leetcode.com'}}" target="_blank"
+                 class="inline-flex items-center px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black text-sm font-medium rounded-md transition-colors duration-200">
+                <i class="fas fa-code mr-2"></i>
+                LeetCode
               </a>
             </div>
-            <div class="flex items-center">
-              <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
-                <i class="fab fa-linkedin-in text-gray-600"></i>
-              </div>
-              <a href="{{ $settings['linkedin'] ?? '#' }}" target="_blank" class="text-cyan-600 hover:text-cyan-800 hover:underline font-medium text-sm transition-colors">
-                {{ $settings['linkedin'] ?? 'LinkedIn not provided' }}
+                      
+            <!-- LinkedIn Link -->
+            <div>
+              <a href="{{$settings['linkedin'] ?? 'https://linkedin.com'}}" target="_blank"
+                 class="inline-flex items-center px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-medium rounded-md transition-colors duration-200">
+                <i class="fab fa-linkedin-in mr-2"></i>
+                LinkedIn
               </a>
             </div>
           </div>

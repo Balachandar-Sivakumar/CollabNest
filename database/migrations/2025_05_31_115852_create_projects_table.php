@@ -15,13 +15,15 @@ return new class extends Migration
             $table->id();
 
             $table->string('title');
+            $table->string('logo');
             $table->text('description')->nullable();
             $table->text('goals')->nullable();
-            $table->string('requirement_documents')->nullable(); 
+            $table->json('requirement_documents')->nullable(); 
             $table->json('skills_required')->nullable(); 
-            $table->string('git_repo_url')->nullable();
+            $table->string('project_url')->nullable();
             $table->integer('is_private');
             $table->unsignedBigInteger('owner_id'); 
+            $table->timestamp('deleted_at')->nullable();
             $table->foreign('owner_id')->references('id')->on('users')->onDelete('cascade');
 
             $table->timestamps();

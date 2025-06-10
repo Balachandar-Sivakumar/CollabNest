@@ -43,6 +43,9 @@ Route::get('/team', [TeamController::class, 'index'])->name('team');
 // Projects page
 Route::get('/projects', [ProjectController::class, 'index'])->name('projects');
 
+//MY project
+Route::get('/navMyProject',[ProjectController::class,'navMyProject'])->name('navMyProject');
+
 // Tasks page
 Route::get('/tasks', [TaskController::class, 'index'])->name('tasks');
 
@@ -77,11 +80,11 @@ Route::get('/profile/edit',[UsersController::class, 'navedit']);
 
 Route::post('/profile/update',[UsersController::class, 'profileUpdate']);
 
-Route::get("/navcreateproject",[ProjectController::class,'navcreateproject']);
+Route::get("/navcreateproject",[ProjectController::class,'navcreateproject'])->name('navCreateProject');
 
 Route::post('/CreateProject',[ProjectController::class,'CreateProject']);
 
-Route::get('/view/{project}',[ProjectController::class,'viewProject']);
+Route::get('/view/{project}',[ProjectController::class,'viewProject'])->name('viewProject');
 
 Route::get('/profession/search',[SkillsController::class,'getProfession']);
 
@@ -90,3 +93,13 @@ Route::get('/skills/search',[SkillsController::class,'getSkills']);
 Route::get('/interests/search',[SkillsController::class,'getInterests']);
 
 Route::get('/softSkill/search',[SkillsController::class,'getSoftskills']);
+
+Route::get('/navUpdateProject/{id}',[ProjectController::class,'navUpdateProject'])->name('editProject');
+
+Route::post('/UpdateProject/{id}',[ProjectController::class,'UpdateProject']);
+
+// Route::get('/project/request/{id}/accept', [ProjectController::class, 'acceptRequest'])->name('project.accept');
+
+// Route::get('/project/request/{id}/reject', [ProjectController::class, 'rejectRequest'])->name('project.reject');
+Route::get('/request/{project}', [ProjectController::class, 'sendRequest'])->name('request');
+
