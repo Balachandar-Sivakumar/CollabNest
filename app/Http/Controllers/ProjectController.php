@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Projects;
 use Illuminate\Auth\Events\Validated;
-// use SebastianBergmann\CodeCoverage\Report\Xml\Project;
 use Vinkla\Hashids\Facades\Hashids;
 use App\Models\User;
 
@@ -55,8 +54,6 @@ public function CreateProject(Request $request)
 
 public function viewProject(Projects $project)
 {
-    // $user = User::with('projects')->findOrFail($project);
-
     return view('viewProject', compact('project'));
 }
 

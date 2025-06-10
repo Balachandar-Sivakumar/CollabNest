@@ -7,11 +7,9 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\MeetingController;
-use App\Http\Controllers\FileController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\WelcomepageController;
 use App\Http\Controllers\UsersController;
-use App\Http\Controllers\MailSendController;
 use App\Http\Controllers\SkillsController;
 use App\Models\Skills;
 
