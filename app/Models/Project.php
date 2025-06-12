@@ -23,6 +23,7 @@ class Project extends Model
             'project_url',
             'is_private',
             'owner_id',
+            'status'
         ];
 
         public function tasks(){

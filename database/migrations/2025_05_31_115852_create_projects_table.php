@@ -22,6 +22,7 @@ return new class extends Migration
             $table->json('skills_required')->nullable(); 
             $table->string('project_url')->nullable();
             $table->integer('is_private');
+            $table->integer('status');
             $table->unsignedBigInteger('owner_id'); 
             $table->timestamp('deleted_at')->nullable();
             $table->foreign('owner_id')->references('id')->on('users')->onDelete('cascade');

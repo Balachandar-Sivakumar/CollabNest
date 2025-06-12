@@ -67,6 +67,10 @@
       </div>
     </div>
 
+    @php 
+      $image = json_decode($skills->profile_settings,true)['image'] ?? '';
+    @endphp
+
     <!-- Form -->
     <form action="/profile/update" method="POST" enctype="multipart/form-data" class="p-6 md:p-8 space-y-8">
       @csrf
@@ -80,7 +84,7 @@
             <div class="flex items-center space-x-4">
               <div class="relative">
                 <div class="h-24 w-24 rounded-full bg-gray-200 overflow-hidden border-2 border-white shadow">
-                  <img id="profile-preview" src="{{ Auth::user()->profile_image ?? 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->name).'&color=7F9CF5&background=EBF4FF' }}" 
+                  <img id="profile-preview" src="{{ $image ? asset('storage/' . $image) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->name).'&color=7F9CF5&background=EBF4FF' }}" 
                        alt="Profile Preview" class="h-full w-full object-cover">
                 </div>
                 <label for="profile_image" class="absolute -bottom-2 -right-2 bg-white p-1.5 rounded-full shadow-md cursor-pointer hover:bg-gray-100">
@@ -477,6 +481,116 @@ setupSuggestion('interests-input','interests_suggession','/interests/search?quer
 
       
 });
+
+
+
+
+    $(document).ready(function() {
+      // Form validation
+      $('form').on('submit', function(e) {
+        let isValid = true;
+        const errors = [];
+        
+        // Validate Name
+        const name = $('#name').val().trim();
+        if (!name) {
+          errors.push('Full name is required');
+          $('#name').addClass('border-red-500');
+          isValid = false;
+        } else {
+          $('#name').removeClass('border-red-500');
+        }
+        
+        // Validate Profession (at least one)
+        const professions = $('#profession-values').val();
+        if (!professions) {
+          errors.push('At least one profession is required');
+          $('.input-tag-container').first().addClass('border-red-500');
+          isValid = false;
+        } else {
+          $('.input-tag-container').first().removeClass('border-red-500');
+        }
+        
+        // Validate Technical Skills (at least one)
+        const techSkills = $('#technical-skills-values').val();
+        if (!techSkills) {
+          errors.push('At least one technical skill is required');
+          $('#technical-skills-tags').closest('.input-tag-container').addClass('border-red-500');
+          isValid = false;
+        } else {
+          $('#technical-skills-tags').closest('.input-tag-container').removeClass('border-red-500');
+        }
+        
+        // Validate URLs format if provided
+        const validateUrl = (url, fieldName) => {
+          if (url && !/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/.test(url)) {
+            errors.push(`Please enter a valid ${fieldName} URL`);
+            $(`#${fieldName}`).addClass('border-red-500');
+            return false;
+          }
+          $(`#${fieldName}`).removeClass('border-red-500');
+          return true;
+        };
+        
+        validateUrl($('#github').val().trim(), 'github');
+        validateUrl($('#linkedin').val().trim(), 'linkedin');
+        validateUrl($('#leetcode').val().trim(), 'leetcode');
+        
+        // Validate Years of Experience if provided
+        const yearsExp = $('input[name="years_of_experience"]').val();
+        if (yearsExp && (isNaN(yearsExp) || yearsExp < 0 || yearsExp > 50)) {
+          errors.push('Years of experience must be between 0 and 50');
+          $('input[name="years_of_experience"]').addClass('border-red-500');
+          isValid = false;
+        } else {
+          $('input[name="years_of_experience"]').removeClass('border-red-500');
+        }
+        
+        // Validate file types
+        const profileImage = $('#profile_image')[0].files[0];
+        if (profileImage && !profileImage.type.match('image.*')) {
+          errors.push('Profile image must be an image file (JPEG, PNG, etc.)');
+          isValid = false;
+        }
+        
+        const resumeFile = $('#resume')[0].files[0];
+        if (resumeFile && !resumeFile.name.match(/\.(pdf)$/i)) {
+          errors.push('Resume must be a PDF file');
+          isValid = false;
+        }
+        
+        // Show errors if any
+        if (!isValid) {
+          e.preventDefault();
+          
+          // Remove any existing error messages
+          $('.error-message').remove();
+          
+          // Show error messages
+          if (errors.length > 0) {
+            const errorHtml = `
+              <div class="error-message mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700">
+                <div class="flex items-center">
+                  <i class="fas fa-exclamation-circle mr-2"></i>
+                  <strong>Please fix the following issues:</strong>
+                </div>
+                <ul class="mt-2 ml-6 list-disc">
+                  ${errors.map(error => `<li>${error}</li>`).join('')}
+                </ul>
+              </div>
+            `;
+            
+            $(errorHtml).insertAfter('.bg-gradient-to-r');
+          }
+        }
+      });
+      
+      // Real-time validation for inputs
+      $('input, textarea, select').on('input change', function() {
+        $(this).removeClass('border-red-500');
+      });
+    });
+
   </script>
 </body>
 </html>

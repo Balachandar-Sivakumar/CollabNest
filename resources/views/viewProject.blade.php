@@ -6,14 +6,8 @@
   <meta content="width=device-width, initial-scale=1" name="viewport" />
   <title>{{ $project->title }} | TeamCollab Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
-<<<<<<< HEAD
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-   <script src="//unpkg.com/alpinejs" defer></script>
-=======
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
->>>>>>> origin/dev
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -72,10 +66,6 @@
       <!-- Header -->
       <div class="flex justify-between items-start flex-wrap gap-4">
         <div>
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/dev
           <h1 class="text-4xl font-bold text-gray-900">{{ $project->title }}</h1>
           <div class="flex items-center mt-2 space-x-4 text-sm text-gray-600">
             <span class="px-3 py-1 rounded-full font-medium 
@@ -89,12 +79,9 @@
           <a href="{{ url()->previous() }}" class="flex items-center px-4 py-2 text-sm bg-white border rounded-md shadow-sm hover:bg-gray-50 text-gray-700">
             <i class="fas fa-arrow-left mr-2"></i> Back
           </a>
-<<<<<<< HEAD
-          <a href="/navUpdateProject/{{ $project->id }}" class="flex items-center px-4 py-2 text-sm text-white bg-indigo-600 rounded-md shadow hover:bg-indigo-700">
-=======
+          
           @if($project->owner_id === Auth::user()->id)
           <a href="/navUpdateProject/{{$project->id}}" class="flex items-center px-4 py-2 text-sm text-white bg-indigo-600 rounded-md shadow hover:bg-indigo-700">
->>>>>>> origin/dev
             <i class="fas fa-edit mr-2"></i> Edit
           </a>
           @endif
@@ -103,10 +90,6 @@
 
       <!-- Project Details Card -->
       <div class="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200">
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/dev
         <div class="p-8 space-y-10">
 
           <!-- Description -->
@@ -137,21 +120,6 @@
               <h3 class="text-lg font-semibold mb-2 flex items-center">
                 <i class="fas fa-tools mr-2 text-indigo-500"></i> Skills Required
               </h3>
-<<<<<<< HEAD
-              @if($project->skills_required && json_decode($project->skills_required))
-                <div class="flex flex-wrap gap-2">
-                  @foreach(json_decode($project->skills_required) as $skill)
-                    @php
-                      $skillName = \App\Models\Skill::where('id', $skill)->value('skill');
-                    @endphp
-                    @if($skillName)
-                      <span class="skill-tag inline-block px-3 py-1 rounded-full text-sm bg-indigo-100 text-indigo-800">
-                        {{ $skillName }}
-                      </span>
-                    @endif
-                  @endforeach
-                </div>
-=======
 
               @if($project->skills_required)
               <div class="flex flex-wrap gap-2">
@@ -161,7 +129,6 @@
                 </span>
                 @endforeach
               </div>
->>>>>>> origin/dev
               @else
               <p class="text-gray-500 italic">Not specified</p>
               @endif
@@ -181,8 +148,28 @@
               <p class="text-gray-500 italic">No documents uploaded</p>
               @endif
             </div>
+
+            <span class="px-3 py-1 rounded-full text-sm font-medium 
+            @if($project->status == 0) bg-yellow-100 text-yellow-800
+            @elseif($project->status == 1) bg-green-100 text-green-800
+            @elseif($project->status == 2) bg-orange-100 text-orange-800
+         0
+            @else bg-gray-100 text-gray-800
+            @endif">Project Status :
+              @php
+                  $statusText = match($project->status) {
+                      0 => 'OPEN',
+                      1 => 'ACTIVE',
+                      default => 'CLOSED',
+                  };
+              @endphp
+
+              {{ $statusText }}
+            </span>
           </div>
         </div>
+
+
 
         <!-- Footer -->
         <div class="bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-between items-center">
@@ -195,12 +182,19 @@
             </button>
             <form action="{{ route('request', ['project' => $project->id]) }}" method="POST">
     @csrf
-  @if($project->owner_id !== Auth::user()->id)
+@if($project->owner_id !== Auth::user()->id)
     <a href="{{ route('request', ['project' => $project->id]) }}"
        class="flex items-center px-3 py-1.5 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
-       <i class="fas fa-user-plus mr-2"></i> Request
+        <i class="fas fa-user-plus mr-2"></i> Request
+    </a>
+@else
+    <a href="#"
+       class="flex items-center px-3 py-1.5 text-sm text-white bg-green-600 rounded-md hover:bg-green-700">
+        <i class="fas fa-paper-plane mr-2"></i> Invite
     </a>
 @endif
+
+    
 
 
           </div>
@@ -366,8 +360,4 @@
 </div>
   </main>
 </body>
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/dev
 </html>

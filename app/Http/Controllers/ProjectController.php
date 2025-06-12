@@ -8,22 +8,15 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Skill;
-<<<<<<< HEAD
-use App\Models\Task; // Make sure to import the Task model
-=======
-use Illuminate\Support\Facades\Storage;
 use App\Mail\ProjectRequestMail;
 use Illuminate\Support\Facades\Mail;
->>>>>>> origin/dev
+use App\Models\Task;
 
 class ProjectController extends Controller
 {
     public function index()
     {
         $projects = Project::all();
-<<<<<<< HEAD
-        return view('projects', compact('projects'));
-=======
         return view('AllProjects',compact('projects'));
     }
 
@@ -32,7 +25,6 @@ class ProjectController extends Controller
         $projects = Project::where('owner_id',Auth::user()->id)->get();
 
         return view('MyProject',compact('projects'));
->>>>>>> origin/dev
     }
 
     public function navcreateproject()
@@ -42,6 +34,8 @@ class ProjectController extends Controller
 
     public function CreateProject(Request $request)
     {
+
+       
         $validated = $request->validate([
             'title' => 'required',
             'description' => 'required',
@@ -55,14 +49,19 @@ class ProjectController extends Controller
         $validated['owner_id'] = Auth::user()->id;
 
         // Handle file uploads
-        $document_path = [];
-        if ($request->hasFile('requirement_documents')) {
-            foreach ($request->file('requirement_documents') as $file) {
-                $document_path[] = $file->store('projectDocuments', 'public');
+        $document_path=[];
+        if($request->file('requirement_documents')){
+            foreach($request->file('requirement_documents') as $ind=>$file){
+               if(isset($file) && isset($request->doc_names[$ind])){
+                    $name = $request->doc_names[$ind];
+                    $document_path[$name] = $file->store('projectDocuments','public');
+               }
+  
             }
         }
 
-        $logo_path = null;
+    
+        $logo_path = '';
         if ($request->hasFile('logo')) {
             $logo_path = $request->file('logo')->store('files', 'public');
         }
@@ -83,27 +82,28 @@ class ProjectController extends Controller
             'trello' => $validated['trello'] ?? ''
         ]);
         $validated['skills_required'] = json_encode($skills);
+        $validated['status']=0;
 
         Project::create($validated);
 
-        return redirect()->route('projects.index')->with('success', 'Project created!');
+        return redirect()->route('projects')->with('success', 'Project created!');
     }
 
-public function viewProject(Project $project)
-{
-$user = \Illuminate\Support\Facades\Auth::user(); 
-$userId = $user->id;
+    public function viewProject(Project $project)
+    {
+    $user = \Illuminate\Support\Facades\Auth::user(); 
+    $userId = $user->id;
 
-    $assignedTasks = Task::where('project_id', $project->id)
-                         ->where('assigned_by', $userId)
-                         ->get();
+        $assignedTasks = Task::where('project_id', $project->id)
+                             ->where('assigned_by', $userId)
+                             ->get();
 
-    $receivedTasks = Task::where('project_id', $project->id)
-                         ->where('assigned_to', $userId)
-                         ->get();
+        $receivedTasks = Task::where('project_id', $project->id)
+                             ->where('assigned_to', $userId)
+                             ->get();
 
-    return view('viewProject', compact('project', 'assignedTasks', 'receivedTasks'));
-}
+        return view('viewProject', compact('project', 'assignedTasks', 'receivedTasks'));
+    }
 
 
     public function navUpdateProject($id)
@@ -114,6 +114,7 @@ $userId = $user->id;
 
     public function UpdateProject(Request $request, $id)
     {
+        dd($request);
         $request->validate([
             'title' => 'required',
             'description' => 'required',
@@ -178,12 +179,6 @@ $userId = $user->id;
             'is_private' => $request->is_private,
         ];
 
-<<<<<<< HEAD
-        $project->update($update);
-
-        return redirect()->route('projects.index')->with('success', 'Project updated successfully!');
-    }
-=======
         
 
         Project::where('id',$id)->update($update);
@@ -231,5 +226,4 @@ $userId = $user->id;
 
 
 
->>>>>>> origin/dev
 }
