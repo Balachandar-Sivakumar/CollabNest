@@ -44,13 +44,12 @@
           @endphp
 
           <!-- Profile Image -->
-          <div class="relative group">
-            <img class="w-36 h-36 rounded-full object-cover border-4 border-cyan-100 shadow-md transition-all duration-300 group-hover:border-cyan-300"
-                 src="{{ $imagePath ? asset('storage/' . $imagePath) : asset('images/default-profile.png') }}" alt="Profile Picture">
-            <div class="absolute inset-0 bg-cyan-50 bg-opacity-30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-              <span class="text-xs font-medium text-cyan-800 bg-white px-2 py-1 rounded-full">Profile</span>
+            <div class="h-24 w-24 rounded-full bg-gray-200 overflow-hidden border-2 border-white shadow">
+              <img id="profile-preview" 
+                   src="{{ $imagePath ? asset('storage/' . $imagePath) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&color=7F9CF5&background=EBF4FF' }}" 
+                   alt="Profile Preview" 
+                   class="h-full w-full object-cover">
             </div>
-          </div>
 
           <!-- Resume PDF Preview -->
           @if($pdf)
@@ -160,6 +159,7 @@
           <!-- Social Links -->
           <div class="flex flex-wrap gap-4 items-center">
             <!-- GitHub Link -->
+             @if(isset($settings['github']))
             <div>
               <a href="{{$settings['github'] ?? 'https://github.com'}}" target="_blank"
                  class="inline-flex items-center px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium rounded-md transition-colors duration-200">
@@ -167,8 +167,10 @@
                 GitHub
               </a>
             </div>
+            @endif
                       
             <!-- LeetCode Link -->
+             @if(isset($settings['leetcode']))
             <div>
               <a href="{{$settings['leetcode'] ?? 'https://leetcode.com'}}" target="_blank"
                  class="inline-flex items-center px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black text-sm font-medium rounded-md transition-colors duration-200">
@@ -176,8 +178,10 @@
                 LeetCode
               </a>
             </div>
+            @endif
                       
             <!-- LinkedIn Link -->
+             @if(isset($settings['linkedin']))
             <div>
               <a href="{{$settings['linkedin'] ?? 'https://linkedin.com'}}" target="_blank"
                  class="inline-flex items-center px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-medium rounded-md transition-colors duration-200">
@@ -185,6 +189,7 @@
                 LinkedIn
               </a>
             </div>
+            @endif
           </div>
 
           <!-- Button -->

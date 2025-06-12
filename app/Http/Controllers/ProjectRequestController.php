@@ -82,4 +82,21 @@ class ProjectRequestController extends Controller
 
         return redirect('/dashboard')->with('info', 'You rejected the request for project: ' . $project->name);
     }
+
+        public function sendInvite(Request $request, $id)
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        $project = Project::findOrFail($id);
+
+        Mail::raw("You have been invited to join the project: {$project->title}", function ($message) use ($request) {
+            $message->to($request->email)
+                    ->subject('Project Invitation');
+        });
+
+        return redirect()->back()->with('success', 'Invitation email sent!');
+    }
+
 }

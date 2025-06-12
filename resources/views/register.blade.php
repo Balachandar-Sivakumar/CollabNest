@@ -92,7 +92,7 @@
 
           <!-- Step 2 -->
           <div class="step_2 hidden">
-            <div id="errorMessage" class="text-red-600 bg-red-300 text-center text-white text-sm mb-4 hidden"></div>
+            <div id="errorMessage" class="text-red-600; bg-red-300 text-center; text-white; text-sm mb-4 hidden"></div>
 
             <!-- Profession Input -->
             <div class="profession-container">

@@ -8,6 +8,6 @@ class MessageController extends Controller
 {
     public function index()
     {
-        return redirect('chatify/4'); // create resources/views/messages.blade.php
+        return redirect('chatify/4'); 
     }
 }

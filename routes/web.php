@@ -44,11 +44,17 @@ Route::get('/team', [TeamController::class, 'index'])->name('team');
 // Projects page
 Route::get('/projects', [ProjectController::class, 'index'])->name('projects');
 
+Route::get("/navcreateproject",[ProjectController::class,'navcreateproject'])->name('navCreateProject');
+
+Route::post('/CreateProject',[ProjectController::class,'CreateProject']);
+
+Route::get('/view/{project}',[ProjectController::class,'viewProject'])->name('viewProject');
+
 //MY project
 Route::get('/navMyProject',[ProjectController::class,'navMyProject'])->name('navMyProject');
 
 // Tasks page
-Route::get('/tasks', [TaskController::class, 'index'])->name('tasks');
+// Route::get('/tasks', [TaskController::class, 'index'])->name('tasks');
 
 // Messages page
 Route::get('/messages', [MessageController::class, 'index'])->name('messages');
@@ -60,6 +66,7 @@ Route::get('/meetings', [MeetingController::class, 'index'])->name('meetings');
 
 // Settings page
 Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
 
 Route::get('/how-it-works', [WelcomePageController::class, 'howItWorks'])->name('how-it-works');
 
@@ -81,12 +88,6 @@ Route::get('/profile/edit',[UsersController::class, 'navedit']);
 
 Route::post('/profile/update',[UsersController::class, 'profileUpdate']);
 
-Route::get("/navcreateproject",[ProjectController::class,'navcreateproject'])->name('navCreateProject');
-
-Route::post('/CreateProject',[ProjectController::class,'CreateProject']);
-
-Route::get('/view/{project}',[ProjectController::class,'viewProject'])->name('viewProject');
-
 Route::get('/profession/search',[SkillsController::class,'getProfession']);
 
 Route::get('/skills/search',[SkillsController::class,'getSkills']);
@@ -94,6 +95,43 @@ Route::get('/skills/search',[SkillsController::class,'getSkills']);
 Route::get('/interests/search',[SkillsController::class,'getInterests']);
 
 Route::get('/softSkill/search',[SkillsController::class,'getSoftskills']);
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('tasks', \App\Http\Controllers\TaskController::class)->except(['show']);
+    Route::get('tasks/{task}', [\App\Http\Controllers\TaskController::class, 'show'])->name('tasks.show');
+});
+
+
+    Route::middleware(['auth'])->group(function () {
+    // List tasks
+    Route::get('tasks', [TaskController::class, 'index'])->name('tasks.index');
+    
+    // Create task
+    Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
+    Route::post('tasks', [TaskController::class, 'store'])->name('tasks.store');
+    
+    // View single task
+    Route::get('tasks/{task}', [TaskController::class, 'show'])
+        ->name('tasks.show')
+        ->middleware('can:view,task');
+    
+    // Edit task
+    Route::get('tasks/{task}/edit', [TaskController::class, 'edit'])
+        ->name('tasks.edit')
+        ->middleware('can:update,task');
+    Route::put('tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+    Route::patch('tasks/{task}', [TaskController::class, 'update']);
+    
+    // Delete task
+    Route::delete('tasks/{task}', [TaskController::class, 'destroy'])
+        ->name('tasks.destroy')
+        ->middleware('can:delete,task');
+});
+
+// Make sure you have routes defined like this:
+ Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
+Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
 
 Route::get('/navUpdateProject/{id}',[ProjectController::class,'navUpdateProject'])->name('editProject');
 
@@ -104,6 +142,8 @@ Route::get('/project/request/{requesterId}/accept', [ProjectRequestController::c
 Route::get('/project/request/{requester}/reject', [ProjectRequestController::class, 'rejectRequest'])->name('project.reject');
 
 Route::get('/request/{project}', [ProjectRequestController::class, 'sendRequest'])->name('request');
+
+Route::post('/projects/{id}/invite', [ProjectRequestController::class, 'sendInvite'])->name('project.sendInvite');
 
 
 

@@ -1,34 +1,30 @@
-<aside class="w-72 bg-white border-r border-gray-200 flex flex-col justify-between min-w-72" style="width: 350px;">
-    <div>
-      <div class="px-5 pt-5 pb-5" style="display:flex; align-items:center; gap:8px">
-        <div class="w-30 h-30 rounded overflow-hidden">
+<aside class=" bg-white border-r border-gray-200 flex flex-col justify-between " style="width: 25%;">
+  <div>
+    <div class=" h-100; flex items-center " style="padding: 0px 40px 0px 5px;">
+      <div class="w-100 h-auto rounded overflow-hidden">
         <img
           src="assets/logo.png"
           alt="CollabNest Logo"
           class="w-full h-full object-contain"
         />
       </div>
-        <a class="text-indigo-700 font-semibold text-lg" href="#">CollabNest</a>
-      </div>
-      <div class="px-6 mb-6">
-        <a href="/profile">
-          <div class="flex items-center space-x-4 bg-gray-100 rounded-lg py-3 px-4">
-            
-            @php
-             $profile = App\Models\UserProfile::where('user_id',Auth::user()->id)->first();
-            
-                $image = json_decode($profile->profile_settings,true)['image'] ?? null;
-            @endphp
- 
-          <img alt="Profile" class="rounded-full w-10 h-10 object-cover" src="{{asset('storage/'. $image) ?? '' }}" />
+      <a class="text-indigo-700 font-semibold text-lg" href="#">CollabNest</a>
+    </div>
+    <div class="px-6 mb-6">
+      <a href="/profile">
+        <div class="flex items-center space-x-4 bg-gray-100 rounded-lg py-3 px-4">
+          @php
+            $profile = App\Models\UserProfile::where('user_id',Auth::user()->id)->first();
+            $image = json_decode($profile->profile_settings,true)['image'] ?? null;
+          @endphp
+          <img alt="Profile" class="rounded-full w-10 h-10 object-cover" src="{{ $image ? asset('storage/'. $image) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->name).'&color=7F9CF5&background=EBF4FF'}}" />
           <div>
-           
             <p class="font-semibold text-gray-900 text-sm leading-tight">{{ Auth::user()->name }}</p>
             <p class="text-gray-500 text-xs leading-tight">{{ Auth::user()->email }}</p>
           </div>
         </div>
-        </a>
-      </div>
+      </a>
+    </div>
     <nav class="flex flex-col space-y-2 px-6 text-sm font-semibold">
 
   <a href="{{ route('dashboard') }}"
@@ -51,7 +47,7 @@
   </a>
 
     <div class="branch  {{ request()->routeIs('projects') || request()->routeIs('navMyProject') || request()->routeIs('viewProject')  || request()->routeIs('editProject') || request()->routeIs('navCreateProject') ?'block' :'hidden'}}">
-        <a href="{{ route('projects') }}"
+        <a href="{{route('projects')}}"
         class="flex items-center space-x-2 py-2 px-3 rounded-md 
               {{ request()->routeIs('projects') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
         <i></i><i></i><span id="project">All project</span>
@@ -65,7 +61,7 @@
     </div>
   </div>
 
-  <a href="{{ route('tasks') }}"
+  <a href=""
      class="flex items-center space-x-2 py-2 px-3 rounded-md 
             {{ request()->routeIs('tasks') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
     <i class="fas fa-check-square"></i><span>Tasks</span>

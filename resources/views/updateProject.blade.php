@@ -76,25 +76,98 @@
                   class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">{{ old('goals', $project->goals) }}</textarea>
       </div>
 
-          <!-- Requirement Documents -->
-      <div class="col-span-1">
-        <label class="block text-sm font-medium text-gray-700 mb-2">Current Documents</label>
-        <div class="space-y-2 mb-3">
-          @foreach(json_decode($project->requirement_documents ?? '[]') as $doc)
-            <div class="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg">
-              <span class="text-sm truncate">{{ basename($doc) }}</span>
-              <button type="button" class="text-red-500 hover:text-red-700" onclick="removeDocument(this, '{{ $doc }}')">
-                <i class="fas fa-trash-alt"></i>
-              </button>
-            </div>
-          @endforeach
-        </div>
-        <label for="requirement_documents" class="block text-sm font-medium text-gray-700 mb-2">Add New Documents</label>
-        <input type="file" name="requirement_documents[]" id="requirement_documents" multiple accept=".pdf,.doc,.docx"
-               class="w-full text-sm file:bg-blue-50 file:text-blue-700 file:px-4 file:py-2 file:rounded-lg file:border-0 file:text-sm file:font-medium hover:file:bg-blue-100 transition">
-        <p class="text-xs text-gray-500 mt-2">PDF, DOC, DOCX files accepted (max 5MB each)</p>
-        <input type="hidden" name="removed_documents" id="removed_documents" value="">
+<!-- Requirement Documents -->
+<div class="col-span-1">
+  <label class="block text-sm font-medium text-gray-700 mb-2">Documents</label>
+  
+  <!-- Current Documents -->
+  @if($project->requirement_documents)
+  <div class="mb-4">
+    <p class="text-xs font-medium text-gray-500 mb-1">Current Documents:</p>
+    <div class="space-y-2">
+      @foreach(json_decode($project->requirement_documents, true) as $name => $path)
+      <div class="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg">
+        <span class="text-sm truncate">{{ $name }}</span>
+        <button type="button" class="text-red-500 hover:text-red-700" 
+                onclick="removeExistingDoc(this, '{{ $name }}', '{{ $path }}')">
+          <i class="fas fa-trash-alt text-sm"></i>
+        </button>
       </div>
+      @endforeach
+    </div>
+  </div>
+  @endif
+
+<!-- New Documents Section -->
+
+  <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+    <i class="fas fa-file-alt text-blue-500 mr-2"></i>
+    Project Documents
+  </h3>
+  
+  <div id="document-fields" class="space-y-4">
+    <!-- Initial document field - styled as a card -->
+    <div class="document-group bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 transition-colors">
+      <div class="flex flex-col md:flex-row gap-4">
+        <!-- Document Name Field -->
+        <div class="flex-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+            <i class="fas fa-tag text-blue-400 mr-2 text-xs"></i>
+            Document Name
+          </label>
+          <div class="relative">
+            <input type="text" name="doc_names[]" placeholder="e.g. Technical Specifications" 
+                   class="w-full px-4 py-2.5 pl-8 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition"
+                   required>
+            <i class="fas fa-file-signature absolute left-3 top-3.5 text-gray-400 text-sm"></i>
+          </div>
+        </div>
+        
+        <!-- File Upload Field -->
+        <div class="flex-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+            <i class="fas fa-cloud-upload-alt text-blue-400 mr-2 text-xs"></i>
+            Upload File
+          </label>
+          <div class="flex items-center gap-2">
+            <label class="flex-1 cursor-pointer">
+              <div class="flex items-center justify-between px-4 py-2.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition">
+                <span class="text-sm text-gray-600 truncate">
+                  <i class="fas fa-file mr-2 text-blue-500"></i>
+                  <span class="file-name">Choose file...</span>
+                </span>
+                <i class="fas fa-search text-blue-500"></i>
+              </div>
+              <input type="file" name="requirement_documents[]" 
+                     class="hidden" 
+                     accept=".pdf,.doc,.docx" required>
+            </label>
+            <button type="button" onclick="removeField(this)" 
+                    class="px-3 py-2.5 text-red-500 hover:text-red-700 transition bg-red-50 hover:bg-red-100 rounded-lg">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Add More Button -->
+  <button type="button" onclick="addField()" 
+          class="w-full flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg shadow-sm hover:shadow-md transition-all">
+    <i class="fas fa-plus-circle mr-2"></i>
+    Add Another Document
+  </button>
+  
+  <!-- Help Text -->
+  <div class="flex items-start text-xs text-gray-500 p-2 bg-blue-50 rounded-lg">
+    <i class="fas fa-info-circle text-blue-400 mr-2 mt-0.5"></i>
+    <div>
+      <p class="font-medium">Accepted formats: PDF, Word (DOC/DOCX)</p>
+      <p>Maximum file size: 5MB per document</p>
+    </div>
+  </div>
+</div>
 
       @php 
 
@@ -155,7 +228,30 @@
         </select>
       </div>
 
-    </div>
+<!-- Status with icons -->
+<div class="col-span-1">
+  <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Project Status</label>
+  <select name="status" id="status"
+          class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+    <option value="open" {{ $project->status == 0 ? 'selected' : '' }}>
+      <span class="inline-flex items-center">
+        <i class="fas fa-door-open text-green-500 mr-2"></i> Open
+      </span>
+    </option>
+    <option value="active" {{ $project->status == 1 ? 'selected' : '' }}>
+      <span class="inline-flex items-center">
+        <i class="fas fa-spinner text-blue-500 mr-2"></i> Active
+      </span>
+    </option>
+    <option value="closed" {{ $project->status == 2 ? 'selected' : '' }}>
+      <span class="inline-flex items-center">
+        <i class="fas fa-lock text-red-500 mr-2"></i> Closed
+      </span>
+    </option>
+  </select>
+</div>
+
+
 
      
      
@@ -169,7 +265,7 @@
           <i class="fas fa-save mr-2"></i> Save Changes
         </button>
   
-    </div>
+      </div>
   </form>
 
   <script>
@@ -268,6 +364,66 @@ function setupTagSystem(inputSelector, addButtonSelector, tagsContainerSelector,
       removedDocuments.push(docPath);
       $('#removed_documents').val(JSON.stringify(removedDocuments));
       $(button).closest('div').remove();
+    }
+
+
+        function addField() {
+      const container = document.getElementById('document-fields');
+      const field = document.createElement('div');
+      field.className = 'document-group flex flex-col md:flex-row gap-3 items-start md:items-end';
+      field.innerHTML = `
+      <div class="flex-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+            <i class="fas fa-tag text-blue-400 mr-2 text-xs"></i>
+            Document Name
+          </label>
+          <div class="relative">
+            <input type="text" name="doc_names[]" placeholder="e.g. Technical Specifications" 
+                   class="w-full px-4 py-2.5 pl-8 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition"
+                   required>
+            <i class="fas fa-file-signature absolute left-3 top-3.5 text-gray-400 text-sm"></i>
+          </div>
+        </div>
+        
+        <!-- File Upload Field -->
+        <div class="flex-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+            <i class="fas fa-cloud-upload-alt text-blue-400 mr-2 text-xs"></i>
+            Upload File
+          </label>
+          <div class="flex items-center gap-2">
+            <label class="flex-1 cursor-pointer">
+              <div class="flex items-center justify-between px-4 py-2.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition">
+                <span class="text-sm text-gray-600 truncate">
+                  <i class="fas fa-file mr-2 text-blue-500"></i>
+                  <span class="file-name">Choose file...</span>
+                </span>
+                <i class="fas fa-search text-blue-500"></i>
+              </div>
+              <input type="file" name="requirement_documents[]" 
+                     class="hidden" 
+                     accept=".pdf,.doc,.docx" required>
+            </label>
+            <button type="button" onclick="removeField(this)" 
+                    class="px-3 py-2.5 text-red-500 hover:text-red-700 transition bg-red-50 hover:bg-red-100 rounded-lg">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `;
+      container.appendChild(field);
+    }
+
+    function removeField(button) {
+      const fieldGroup = button.closest('.document-group');
+      if (document.querySelectorAll('.document-group').length > 1) {
+        fieldGroup.remove();
+      } else {
+        // Reset the first field instead of removing it
+        const inputs = fieldGroup.querySelectorAll('input');
+        inputs[0].value = '';
+        inputs[1].value = '';
+      }
     }
 
   </script>
