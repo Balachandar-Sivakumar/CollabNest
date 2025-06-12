@@ -12,6 +12,7 @@ use App\Http\Controllers\WelcomepageController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\SkillsController;
 use App\Models\Skills;
+use App\Http\Controllers\ProjectRequestController;
 
 // Home page
 Route::get('/', [Authentication::class, 'welcome']);
@@ -98,8 +99,12 @@ Route::get('/navUpdateProject/{id}',[ProjectController::class,'navUpdateProject'
 
 Route::post('/UpdateProject/{id}',[ProjectController::class,'UpdateProject']);
 
-// Route::get('/project/request/{id}/accept', [ProjectController::class, 'acceptRequest'])->name('project.accept');
+Route::get('/project/request/{requesterId}/accept', [ProjectRequestController::class, 'acceptRequest']);
 
-// Route::get('/project/request/{id}/reject', [ProjectController::class, 'rejectRequest'])->name('project.reject');
-Route::get('/request/{project}', [ProjectController::class, 'sendRequest'])->name('request');
+Route::get('/project/request/{requester}/reject', [ProjectRequestController::class, 'rejectRequest'])->name('project.reject');
+
+Route::get('/request/{project}', [ProjectRequestController::class, 'sendRequest'])->name('request');
+
+
+
 

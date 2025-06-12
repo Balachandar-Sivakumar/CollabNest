@@ -3,63 +3,83 @@
 namespace App\Http\Controllers;
 
 use App\Models\ProjectRequest;
+use App\Models\ProjectTeam;
 use Illuminate\Http\Request;
+use App\Models\Project;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use App\Mail\ProjectRequestMail;
+use Illuminate\Support\Facades\Mail;
 
 class ProjectRequestController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+    public function sendRequest($id)
+{
+    $project = Project::findOrFail($id);
+    $owner = User::find($project->owner_id);
+    $requester = Auth::user();
+
+    if ($project->owner_id === Auth::id()) {
+        return redirect()->back()->with('error', 'You cannot request your own project.');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+
+    ProjectRequest::create([
+        'user_id'    => $requester->id,
+        'project_id' => $project->id,
+    ]);
+
+    Mail::to($owner->email)->send(new ProjectRequestMail($requester, $project));
+
+    return redirect()->back()->with('success', 'Request sent to the project owner!');
+}
+
+
+    public function acceptRequest(Request $request, $id)
     {
-        //
+        $userId = $request->query('user'); 
+        $requester = User::findOrFail($userId);
+
+        $projectRequest = ProjectRequest::where('user_id', $userId)->firstOrFail();
+        $project = Project::findOrFail($projectRequest->project_id);
+        $owner = User::findOrFail($project->owner_id);
+
+        // Store in project team table
+        ProjectTeam::create([
+            'project_id' => $project->id,
+            'user_id' => $requester->id,
+            'owner_id' => $project->owner_id,
+        ]);
+
+        // ✅ Retrieve old requester data from session
+        $requesters = session()->get('requester_name', []);
+        $requesters[] = [
+            'name' => $requester->name,
+            'skill' => $requester->skill ?? 'Backend Developer',
+        ];
+        session()->put('requester_name', $requesters);
+
+        // ✅ Project & owner info remains same
+        session()->put([
+            'owner_name' => $owner->name,
+            'project_title' => $project->title,
+            'project_created' => $project->created_at,
+            'project_status' => $project->status,
+            'project_description' => $project->description,
+        ]);
+
+        return redirect('/team')->with('success', 'Request accepted and team updated!');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function rejectRequest(Request $request, $id)
     {
-        //
-    }
+        $userId = $request->query('user');
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(ProjectRequest $projectRequest)
-    {
-        //
-    }
+        $project = Project::findOrFail($id);
+        if (Auth::id() !== $project->owner_id) {
+            abort(403, 'Unauthorized action.');
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ProjectRequest $projectRequest)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, ProjectRequest $projectRequest)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(ProjectRequest $projectRequest)
-    {
-        //
+        return redirect('/dashboard')->with('info', 'You rejected the request for project: ' . $project->name);
     }
 }

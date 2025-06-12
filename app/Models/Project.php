@@ -23,5 +23,11 @@ class Project extends Model
             'is_private',
             'owner_id',
         ];
+        
+        public function requesters()
+        {
+            return $this->belongsToMany(User::class, 'project_requests', 'project_id', 'user_id');
+        }
+
 
 }

@@ -10,8 +10,7 @@ use Vinkla\Hashids\Facades\Hashids;
 use App\Models\User;
 use App\Models\Skill;
 use Illuminate\Support\Facades\Storage;
-use App\Mail\ProjectRequestMail;
-use Illuminate\Support\Facades\Mail;
+
 
 class ProjectController extends Controller
 {
@@ -77,9 +76,13 @@ class ProjectController extends Controller
         return redirect()->route('projects')->with('success', 'Project created!');
     }
 
-    public function viewProject(Project $project)
+        public function viewProject(Project $project)
     {
-        return view('viewProject', compact('project'));
+
+        return view('viewProject', [
+            'project' => $project,
+            'requesters' => $project->requesters,
+        ]);
     }
 
     public function navUpdateProject($id){
@@ -129,6 +132,7 @@ class ProjectController extends Controller
                 array_push($document_path, $file->store('projectDocuments','public'));
             } 
         }
+        dd($document_path);
 
         $skills=[];
         foreach(json_decode(json_encode(array_filter(array_map('trim', explode(',', $request->technical_skills))))) as $skill){
@@ -157,40 +161,7 @@ class ProjectController extends Controller
 
         }
 
-    public function sendRequest($id)
-    {
-        $project = Project::findOrFail($id);
 
-        if ($project->owner_id === Auth::id()) {
-            return redirect()->back()->with('error', 'You cannot request your own project.');
-        } 
-
-        $owner = User::find($project->owner_id);
-        $requester = Auth::user();
-
-         Mail::to($owner->email)->send(new ProjectRequestMail($requester, $project));
-
-        return redirect()->back()->with('success', 'Request sent to the project owner!');
-    }
-
-    // public function acceptRequest(Request $request, $id)
-    // {
-    //     $userId = $request->query('user');
-        
-    //     return redirect('/dashboard')->with('success', 'You accepted the request.');
-    // }
-
-    // public function rejectRequest(Request $request, $id)
-    // {
-    //     $userId = $request->query('user');
-
-    //     $project = Project::findOrFail($id);
-    //     if (Auth::id() !== $project->owner_id) {
-    //         abort(403, 'Unauthorized action.');
-    //     }
-
-    //     return redirect('/dashboard')->with('info', 'You rejected the request for project: ' . $project->name);
-    // }
 
 
 
