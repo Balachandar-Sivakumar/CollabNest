@@ -12,6 +12,17 @@
     body {
       font-family: 'Inter', sans-serif;
     }
+    .password-container {
+      position: relative;
+    }
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #6b7280;
+    }
   </style>
 </head>
 <body>
@@ -41,25 +52,38 @@
       <!-- Left side: Login form -->
       <div class="flex-1 p-10 md:p-16 flex flex-col justify-center">
         <h2 class="text-black text-xl font-semibold mb-8 text-center md:text-left">Login</h2>
-        <form class="space-y-6" method="POST" action="/login">
-          @csrf
-          <div>
-            <input class="w-full bg-[#f0f0f0] rounded-lg py-3 px-4 text-sm text-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3b56f5]" name="email" placeholder="Username or email" type="text"/>
-          </div>
-          <div class="relative">
-            <input class="w-full bg-[#f0f0f0] rounded-lg py-3 px-4 text-sm text-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3b56f5]" name="password" placeholder="Password" type="password"/>
-            <button class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-semibold" type="button">
-              Forgot password ?
-            </button>
-          </div>
-          <div class="flex items-center space-x-2">
-            <input class="w-4 h-4 rounded border-gray-300 text-[#3b56f5] focus:ring-[#3b56f5]" id="remember" type="checkbox"/>
-            <label class="text-xs text-gray-500 select-none" for="remember">Remember me</label>
-          </div>
-          <button type="submit" class="w-full bg-gradient-to-r from-indigo-400 to-teal-300 text-white font-semibold text-xs py-3 rounded hover:from-indigo-500 hover:to-teal-400 transition-colors">
-            Login
-          </button>
-        </form>
+<form class="space-y-6" method="POST" action="/login">
+    @csrf
+    <div>
+        <input class="w-full bg-[#f0f0f0] rounded-lg py-3 px-4 text-sm text-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3b56f5]" 
+               name="email" 
+               placeholder="Username or email" 
+               type="text"
+               value="{{ old('email') }}"/>
+    </div>
+    <div class="password-container">
+        <input class="w-full bg-[#f0f0f0] rounded-lg py-3 px-4 text-sm text-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3b56f5]" 
+               name="password" 
+               placeholder="Password" 
+               type="password" 
+               id="loginPassword"/>
+        <i class="toggle-password fas fa-eye" data-target="loginPassword"></i>
+        <button class="absolute right-16 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-semibold" type="button">
+            Forgot password ?
+        </button>
+    </div>
+    <div class="flex items-center space-x-2">
+        <input class="w-4 h-4 rounded border-gray-300 text-[#3b56f5] focus:ring-[#3b56f5]" 
+               id="remember" 
+               name="remember" 
+               type="checkbox"
+               {{ old('remember') ? 'checked' : '' }}/>
+        <label class="text-xs text-gray-500 select-none" for="remember">Remember me</label>
+    </div>
+    <button type="submit" class="w-full bg-gradient-to-r from-indigo-400 to-teal-300 text-white font-semibold text-xs py-3 rounded hover:from-indigo-500 hover:to-teal-400 transition-colors">
+        Login
+    </button>
+</form>
         <p class="text-center text-xs text-gray-400 mt-8">
           Don't have an account? 
           <a class="text-[#3b56f5] font-semibold hover:underline" href="/navregister">Sign up</a>
@@ -77,5 +101,49 @@
     </div>
   </div>
 
+  <script>
+    // Password visibility toggle
+    document.addEventListener('DOMContentLoaded', function() {
+
+      let checkBox=document.querySelector('input[name="remember"]'),
+          email = document.querySelector('input[name="email"]');
+
+      if(localStorage.getItem('rememberMe')==='true' && localStorage.getItem('email')){
+        email.value = localStorage.getItem('email');
+        checkBox.checked = true;    
+      }
+
+      document.querySelector('form').addEventListener('submit',()=>{
+        if(checkBox.checked){
+          localStorage.setItem('rememberMe','true')
+          localStorage.setItem('email',email.value)
+        }else{
+          localStorage.removeItem('rememberMe')
+          localStorage.removeItem('email')
+
+        }
+      })
+
+      const toggleButtons = document.querySelectorAll('.toggle-password');
+      
+      toggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const targetId = this.getAttribute('data-target');
+          const input = document.getElementById(targetId);
+          const icon = this;
+          
+          if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+          } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html>

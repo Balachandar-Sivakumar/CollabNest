@@ -42,6 +42,25 @@
               @endforeach
             </div>
           </div>
+                <!-- Owner Info -->
+       @php 
+          $profile = \App\Models\UserProfile::where('user_id',Auth::user()->id)->value('profile_settings');
+          $image = json_decode($profile,true)['image'];
+          $name = \App\Models\User::where('id',Auth::user()->id)->value('name')
+        
+       @endphp
+      
+      
+            <div class="flex items-center mt-4">
+              <img src="{{ $image ? asset('storage/' . $image) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->name).'&color=7F9CF5&background=EBF4FF' }}"
+                   alt="Owner photo"
+                   class="w-8 h-8 rounded-full object-cover mr-2">
+
+              <div class="text-sm text-gray-700">
+                <span class="block text-gray-500 text-s">Owned by:</span>
+                <span class="text-lg font-medium">{{ $name }}</span>
+              </div>
+            </div>
           <a href="/view/{{$project->hashid}}" class="text-blue-600 text-sm hover:underline">View Details</a>
         </div>
       @endforeach

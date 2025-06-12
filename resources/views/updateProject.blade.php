@@ -89,7 +89,7 @@
       <div class="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg">
         <span class="text-sm truncate">{{ $name }}</span>
         <button type="button" class="text-red-500 hover:text-red-700" 
-                onclick="removeExistingDoc(this, '{{ $name }}', '{{ $path }}')">
+                onclick="removeDocument(this, '{{ $name }}')">
           <i class="fas fa-trash-alt text-sm"></i>
         </button>
       </div>
@@ -97,6 +97,7 @@
     </div>
   </div>
   @endif
+
 
 <!-- New Documents Section -->
 
@@ -117,8 +118,7 @@
           </label>
           <div class="relative">
             <input type="text" name="doc_names[]" placeholder="e.g. Technical Specifications" 
-                   class="w-full px-4 py-2.5 pl-8 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition"
-                   required>
+                   class="w-full px-4 py-2.5 pl-8 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition">
             <i class="fas fa-file-signature absolute left-3 top-3.5 text-gray-400 text-sm"></i>
           </div>
         </div>
@@ -140,12 +140,13 @@
               </div>
               <input type="file" name="requirement_documents[]" 
                      class="hidden" 
-                     accept=".pdf,.doc,.docx" required>
+                     accept=".pdf,.doc,.docx">
             </label>
             <button type="button" onclick="removeField(this)" 
                     class="px-3 py-2.5 text-red-500 hover:text-red-700 transition bg-red-50 hover:bg-red-100 rounded-lg">
               <i class="fas fa-trash"></i>
             </button>
+            <input type="hidden" name="removed_documents" id="removed_documents" value="">
           </div>
         </div>
       </div>
@@ -355,8 +356,6 @@ function setupTagSystem(inputSelector, addButtonSelector, tagsContainerSelector,
       }
 
        setupSuggestion('technical-skills-input', 'skills_suggession', '/skills/search?q=', 'add-technical-skill');
-
-       let required_documets = $('#requirement_documents').val().split(',');
 
        let removedDocuments =[];
 

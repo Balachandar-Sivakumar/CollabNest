@@ -11,6 +11,7 @@ use App\Models\Skill;
 use App\Mail\ProjectRequestMail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Task;
+use Dom\Document;
 
 class ProjectController extends Controller
 {
@@ -114,7 +115,9 @@ class ProjectController extends Controller
 
     public function UpdateProject(Request $request, $id)
     {
-        dd($request);
+
+  
+   
         $request->validate([
             'title' => 'required',
             'description' => 'required',
@@ -140,19 +143,28 @@ class ProjectController extends Controller
         $document_path = json_decode($project->requirement_documents, true) ?? [];
         $removed_docs = json_decode($request->removed_documents, true) ?? [];
 
-        $document_path = array_filter($document_path, function ($doc) use ($removed_docs) {
-            return !in_array($doc, $removed_docs);
-        });
-
-        foreach ($removed_docs as $removed) {
-            if (Storage::disk('public')->exists($removed)) {
-                Storage::disk('public')->delete($removed);
+        foreach($removed_docs as $remove){
+            if(isset($document_path[$remove])){
+                $file_path = $document_path[$remove];
+                if(Storage::disk('public')->exists($file_path)){
+                    Storage::disk('public')->delete($file_path);
+                }
             }
         }
 
+        $document_path = array_filter($document_path, function ($key) use ($removed_docs) {
+            return !in_array($key, $removed_docs);
+        }, ARRAY_FILTER_USE_KEY);
+
+        
+
         if ($request->hasFile('requirement_documents')) {
-            foreach ($request->file('requirement_documents') as $file) {
-                $document_path[] = $file->store('projectDocuments', 'public');
+            foreach ($request->file('requirement_documents') as $ind=>$file) {
+                if(isset($file) && isset($request->doc_names[$ind])){
+                    $name = $request->doc_names[$ind];
+                    $document_path[$name] = $file->store('projectDocuments', 'public');
+                }
+                
             }
         }
 
@@ -177,16 +189,14 @@ class ProjectController extends Controller
                 'trello' => $request->trello
             ]),
             'is_private' => $request->is_private,
+            'status'=>$request->status == 'open' ? 0 :($request->status == 'active' ? 1 : ($request->status == 'closed' ? 2 : $project->status)),
         ];
 
         
 
         Project::where('id',$id)->update($update);
 
-       
-
-        return redirect("projects")->with('success','Project updated successfully');
-
+        return redirect()->route('navMyProject')->with('success','Project updated successfully');
         }
 
     public function sendRequest($id)
