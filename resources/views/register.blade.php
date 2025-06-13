@@ -24,6 +24,17 @@
     .remove-tag:hover {
       transform: scale(1.2);
     }
+    .password-container {
+      position: relative;
+    }
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #6b7280;
+    }
   </style>
 </head>
 <body>
@@ -63,13 +74,20 @@
                    class="w-full border border-gray-300 rounded px-3 py-2 mb-2 text-sm text-black focus:outline-none focus:ring-1 focus:ring-cyan-400"
                    type="email" placeholder="Your Email"/>
 
-            <input name="password"
-                   class="w-full border border-gray-300 rounded px-3 py-2 mb-2 text-sm text-black focus:outline-none focus:ring-1 focus:ring-cyan-400"
-                   type="password" placeholder="Password" id="password"/>
+            <div class="password-container mb-2">
+              <input name="password"
+                     class="w-full border border-gray-300 rounded px-3 py-2 text-sm text-black focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                     type="password" placeholder="Password" id="password"/>
+              <i class="toggle-password fas fa-eye" data-target="password"></i>
+            </div>
+            <p id="password_strength" class="text-xs mb-1 hidden">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character</p>
 
-            <input name="password_confirmation"
-                   class="w-full border border-gray-300 rounded px-3 py-2 mb-1 text-sm text-black focus:outline-none focus:ring-1 focus:ring-cyan-400"
-                   type="password" placeholder="Repeat your password" id="confirm_password"/>
+            <div class="password-container mb-1">
+              <input name="password_confirmation"
+                     class="w-full border border-gray-300 rounded px-3 py-2 text-sm text-black focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                     type="password" placeholder="Repeat your password" id="confirm_password"/>
+              <i class="toggle-password fas fa-eye" data-target="confirm_password"></i>
+            </div>
 
             <p id="password_error" class="text-red-500 text-xs mb-2 hidden">Passwords do not match</p>
 
@@ -183,110 +201,140 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
  
   <script>
-
 $(function () {
     const form = $('#detailsForm'), step1 = $('.step_1'), step2 = $('.step_2'),
           nextBtn = $('#nextbtn'), errorBox1 = $('#errorMessage1'), errorBox2 = $('#errorMessage'),
-          password = $('#password'), confirmPassword = $('#confirm_password'), passwordError = $('#password_error');
+          password = $('#password'), confirmPassword = $('#confirm_password'), passwordError = $('#password_error'),
+          passwordStrength = $('#password_strength');
     
-     
-     let professionTags = [],
-      skillsTags = [],
-      interestsTags = [];
+    let professionTags = [],
+        skillsTags = [],
+        interestsTags = [];
     
-      confirmPassword.on('input', () => passwordError.toggleClass('hidden', password.val() === confirmPassword.val()));
-    
-      nextBtn.on('click', e => {
-        e.preventDefault();
-        const name = form.find('[name="name"]').val().trim(),
-              email = form.find('[name="email"]').val().trim(),
-              pwd = password.val(), confirmPwd = confirmPassword.val(),
-              agreed = $('#termsCheckbox').is(':checked');
+    // Password visibility toggle
+    $(document).on('click', '.toggle-password', function() {
+      const target = $(this).data('target');
+      const input = $(`#${target}`);
+      const icon = $(this);
       
-        if (!name) return showError(errorBox1, 'Full name is required.');
-        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError(errorBox1, 'A valid email is required.');
-        if (pwd.length < 6) return showError(errorBox1, 'Password must be at least 6 characters.');
-        if (pwd !== confirmPwd) return showError(errorBox1, 'Passwords do not match.');
-        if (!agreed) return showError(errorBox1, 'You must agree to the Terms of Service.');
+      if (input.attr('type') === 'password') {
+        input.attr('type', 'text');
+        icon.removeClass('fa-eye').addClass('fa-eye-slash');
+      } else {
+        input.attr('type', 'password');
+        icon.removeClass('fa-eye-slash').addClass('fa-eye');
+      }
+    });
+    
+    // Password strength validation
+    password.on('input', function() {
+      const val = $(this).val();
+      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
       
-        errorBox1.addClass('hidden');
-        step1.addClass('hidden');
-        step2.removeClass('hidden');
+      if (val.length > 0 && !regex.test(val)) {
+        passwordStrength.removeClass('hidden').addClass('text-red-500');
+      } else {
+        passwordStrength.addClass('hidden');
+      }
+    });
+    
+    confirmPassword.on('input', () => {
+      passwordError.toggleClass('hidden', password.val() === confirmPassword.val());
+    });
+    
+    nextBtn.on('click', e => {
+      e.preventDefault();
+      const name = form.find('[name="name"]').val().trim(),
+            email = form.find('[name="email"]').val().trim(),
+            pwd = password.val(), confirmPwd = confirmPassword.val(),
+            agreed = $('#termsCheckbox').is(':checked');
+      
+      // Password regex validation
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      
+      if (!name) return showError(errorBox1, 'Full name is required.');
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError(errorBox1, 'A valid email is required.');
+      if (!passwordRegex.test(pwd)) return showError(errorBox1, 'Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.');
+      if (pwd !== confirmPwd) return showError(errorBox1, 'Passwords do not match.');
+      if (!agreed) return showError(errorBox1, 'You must agree to the Terms of Service.');
+      
+      errorBox1.addClass('hidden');
+      step1.addClass('hidden');
+      step2.removeClass('hidden');
+    });
+    
+    $('#prevbtn').on('click', () => {
+      step2.addClass('hidden');
+      step1.removeClass('hidden');
+    });
+    
+    form.on('submit', e => {
+      if (!professionTags.length) return stopSubmit(e, 'Please enter at least one profession.');
+      if (!skillsTags.length) return stopSubmit(e, 'Please enter at least one skill.');
+      if (!interestsTags.length) return stopSubmit(e, 'Please enter at least one interest.');
+      if (!$('[name="availability"]').val()) return stopSubmit(e, 'Please select your availability.');
+      errorBox2.addClass('hidden');
+    });
+    
+    function stopSubmit(e, msg) {
+      e.preventDefault();
+      showError(errorBox2, msg);
+    }
+    
+    function setupTagInput(inputId, addBtnId, containerId, hiddenId, tagArray, color, name) {
+      const input = $(inputId), addBtn = $(addBtnId), tagsBox = $(containerId), hiddenBox = $(hiddenId);
+    
+      input.on('keypress', e => {
+        if (e.which === 13 || e.which === 44) {
+          e.preventDefault();
+          addTag();
+        }
       });
     
-      $('#prevbtn').on('click', () => {
-        step2.addClass('hidden');
-        step1.removeClass('hidden');
-      });
+      addBtn.on('click', addTag);
     
-      form.on('submit', e => {
-        if (!professionTags.length) return stopSubmit(e, 'Please enter at least one profession.');
-        if (!skillsTags.length) return stopSubmit(e, 'Please enter at least one skill.');
-        if (!interestsTags.length) return stopSubmit(e, 'Please enter at least one interest.');
-        if (!$('[name="availability"]').val()) return stopSubmit(e, 'Please select your availability.');
-        errorBox2.addClass('hidden');
-      });
-    
-      function stopSubmit(e, msg) {
-        e.preventDefault();
-        showError(errorBox2, msg);
+      function addTag() {
+        const val = input.val().trim();
+        if (val && !tagArray.includes(val)) {
+          tagArray.push(val);
+          updateTags();
+          input.val('');
+        }
       }
     
-      function setupTagInput(inputId, addBtnId, containerId, hiddenId, tagArray, color, name) {
-        const input = $(inputId), addBtn = $(addBtnId), tagsBox = $(containerId), hiddenBox = $(hiddenId);
-      
-        input.on('keypress', e => {
-          if (e.which === 13 || e.which === 44) {
-            e.preventDefault();
-            addTag();
-          }
+      function updateTags() {
+        tagsBox.empty(); hiddenBox.empty();
+        tagArray.forEach((tag, i) => {
+          tagsBox.append(`
+            <span class="tag inline-flex items-center px-2 py-1 mr-1 mb-1 text-xs font-medium rounded bg-${color}-100 text-${color}-800">
+              ${tag}
+              <button type="button" class="ml-1 text-${color}-500 hover:text-${color}-700 remove-tag" data-index="${i}" data-type="${name}">
+                <i class="fas fa-times"></i>
+              </button>
+            </span>`);
+          hiddenBox.append(`<input type="hidden" name="${name}[]" value="${tag}">`);
         });
-      
-        addBtn.on('click', addTag);
-      
-        function addTag() {
-          const val = input.val().trim();
-          if (val && !tagArray.includes(val)) {
-            tagArray.push(val);
-            updateTags();
-            input.val('');
-          }
-        }
-      
-        function updateTags() {
-          tagsBox.empty(); hiddenBox.empty();
-          tagArray.forEach((tag, i) => {
-            tagsBox.append(`
-              <span class="tag inline-flex items-center px-2 py-1 mr-1 mb-1 text-xs font-medium rounded bg-${color}-100 text-${color}-800">
-                ${tag}
-                <button type="button" class="ml-1 text-${color}-500 hover:text-${color}-700 remove-tag" data-index="${i}" data-type="${name}">
-                  <i class="fas fa-times"></i>
-                </button>
-              </span>`);
-            hiddenBox.append(`<input type="hidden" name="${name}[]" value="${tag}">`);
-          });
-        }
-      
-        return { updateTags };
       }
     
-      
-      let prof = setupTagInput('#professionInput', '#addProfession', '#professionTags', '#professionHiddenInputs', professionTags, 'blue', 'profession');
-      let skills = setupTagInput('#skillsInput', '#addSkill', '#skillsTags', '#skillsHiddenInputs', skillsTags, 'indigo', 'skills');
-      let interests = setupTagInput('#interestsInput', '#addInterest', '#interestsTags', '#interestsHiddenInputs', interestsTags, 'purple', 'interests');
+      return { updateTags };
+    }
     
-      $(document).on('click', '.remove-tag', function () {
-        const index = $(this).data('index'), type = $(this).data('type');
-        if (type === 'profession') { professionTags.splice(index, 1); prof.updateTags(); }
-        else if (type === 'skills') { skillsTags.splice(index, 1); skills.updateTags(); }
-        else if (type === 'interests') { interestsTags.splice(index, 1); interests.updateTags(); }
-      });
-    
-      function showError(box, msg) {
-        box.text(msg).removeClass('hidden');
-      }
-    
-     function setupTagSuggestion({ inputId, listId, fetchUrl, dataKey, tagArray, updateFunc }) {
+    let prof = setupTagInput('#professionInput', '#addProfession', '#professionTags', '#professionHiddenInputs', professionTags, 'blue', 'profession');
+    let skills = setupTagInput('#skillsInput', '#addSkill', '#skillsTags', '#skillsHiddenInputs', skillsTags, 'indigo', 'skills');
+    let interests = setupTagInput('#interestsInput', '#addInterest', '#interestsTags', '#interestsHiddenInputs', interestsTags, 'purple', 'interests');
+  
+    $(document).on('click', '.remove-tag', function () {
+      const index = $(this).data('index'), type = $(this).data('type');
+      if (type === 'profession') { professionTags.splice(index, 1); prof.updateTags(); }
+      else if (type === 'skills') { skillsTags.splice(index, 1); skills.updateTags(); }
+      else if (type === 'interests') { interestsTags.splice(index, 1); interests.updateTags(); }
+    });
+  
+    function showError(box, msg) {
+      box.text(msg).removeClass('hidden');
+    }
+  
+    function setupTagSuggestion({ inputId, listId, fetchUrl, dataKey, tagArray, updateFunc }) {
       const $input = $(`#${inputId}`);
       const $list = $(`#${listId}`);
     
@@ -345,8 +393,6 @@ $(function () {
       updateFunc: interests.updateTags
     });
 });
-
   </script>
-
 </body>
 </html>

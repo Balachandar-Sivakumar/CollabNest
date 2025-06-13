@@ -143,10 +143,12 @@
                 <i class="fas fa-file-alt mr-2 text-indigo-500"></i> Requirements
               </h3>
               @if($project->requirement_documents)
-              <a href="{{ asset('storage/' . $project->requirement_documents) }}" target="_blank"
+              @foreach(json_decode($project->requirement_documents,true) as $ind=>$docs)
+              <a href="{{ asset('storage/' . $docs) }}" target="_blank"
                 class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm text-gray-700 bg-white hover:bg-gray-50">
-                <i class="fas fa-download mr-2"></i> Download Document
+                <i class="fas fa-download mr-2"></i> {{$ind}}
               </a>
+              @endforeach
               @else
               <p class="text-gray-500 italic">No documents uploaded</p>
               @endif
