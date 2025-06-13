@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>TeamCollab Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
@@ -17,59 +17,46 @@
 
   <!-- Sidebar -->
   @include('layout.aside')
-  <div class="max-w-4xl mx-auto p-6 space-y-6">
+
+  <!-- Main Content -->
+  <div class="max-w-4xl mx-auto p-6 space-y-6 w-full">
 
     <!-- Team Details -->
     <div class="bg-white shadow-md rounded-2xl p-6">
-        <h2 class="text-xl font-semibold mb-4 text-gray-800">Team Details</h2>
-        <p class="text-sm text-gray-700">
-            <!-- Replace with dynamic data -->
-            Team Name: Arichuvadi<br>
-            Created On: June 1, 2025<br>
-            Status: Active<br>
-            Description: A Tamil learning-based board game project.
-        </p>
-    </div>
-
-    <!-- Comments -->
-    <div class="bg-white shadow-md rounded-2xl p-6">
-        <h2 class="text-xl font-semibold mb-4 text-gray-800">Comments</h2>
-        <div class="space-y-3 h-60 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
-            <!-- Dynamic comments -->
-            <div class="text-sm text-gray-700">
-                <strong>John:</strong> Let’s finalize the UI mockups by Friday.
-            </div>
-            <div class="text-sm text-gray-700">
-                <strong>Mythila:</strong> Started work on the Laravel backend.
-            </div>
-        </div>
-
-        <!-- Add comment box -->
-        <form class="mt-4">
-            <textarea class="w-full p-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Write a comment..."></textarea>
-            <button type="submit" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                Post
-            </button>
-        </form>
+      <h2 class="text-xl font-semibold mb-4 text-gray-800">Team Details</h2>
+      <p class="text-sm text-gray-700 space-y-1">
+        <span><strong>Project Title:</strong> {{ session('project_title') }}</span><br>
+        <span><strong>Created On:</strong> {{ \Carbon\Carbon::parse(session('project_created'))->format('F j, Y') }}</span><br>
+        <span><strong>Status:</strong> {{ session('project_status') }}</span><br>
+        <span><strong>Description:</strong> {{ session('project_description') }}</span>
+      </p>
     </div>
 
     <!-- Team Members -->
     <div class="bg-white shadow-md rounded-2xl p-6">
-        <h2 class="text-xl font-semibold mb-4 text-gray-800">Team Members</h2>
-        <ul class="space-y-2 text-sm text-gray-700">
-            <li>👤 Mythila (Team Lead)</li>
-            <li>👤 Arjun (Backend Developer)</li>
-            <li>👤 Divya (Frontend Developer)</li>
-        </ul>
+      <h2 class="text-xl font-semibold mb-4 text-gray-800">Team Members</h2>
+      <ul class="space-y-2 text-sm text-gray-700 list-inside">
+    {{-- Team Lead --}}
+    @if(session('owner_name'))
+      <li>👤 {{ session('owner_name') }} (Team Lead)</li>
+    @endif
+
+    {{-- Requesters with Skill --}}
+    @php
+        $requesters = session('requester_name');
+    @endphp
+
+    @if(is_array($requesters) && count($requesters))
+        @foreach($requesters as $requester)
+            <li>👤 {{ $requester['name'] }} ({{ $requester['skill'] }})</li>
+        @endforeach
+    @elseif(is_string($requesters))
+        <li>👤 {{ $requesters }} (Backend Developer)</li>
+    @endif
+
+      </ul>
     </div>
 
-</div>
-
-
-</div>
-
-
-
-  
+  </div>
 </body>
 </html>

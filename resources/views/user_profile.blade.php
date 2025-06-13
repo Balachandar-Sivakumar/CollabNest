@@ -90,8 +90,13 @@
           <!-- Key Info Grid -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
             <div class="bg-gray-50 p-3 rounded-lg">
-              <p class="text-gray-500 text-xs font-medium mb-1">User ID</p>
-              <p class="font-semibold text-gray-700">{{ Auth::user()->id }}</p>
+            @php
+                use Vinkla\Hashids\Facades\Hashids;
+            @endphp
+
+            <p class="text-gray-500 text-xs font-medium mb-1">User ID</p>
+            <p class="font-semibold text-gray-700">{{ Hashids::encode(Auth::user()->id) }}</p>
+
             </div>
             <div class="bg-gray-50 p-3 rounded-lg">
                 @php

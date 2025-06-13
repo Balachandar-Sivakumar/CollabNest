@@ -12,7 +12,7 @@
         </div>
         <div class="p-6">
             <p>Hello, {{ $user->name ?? 'User' }} 👋</p>
-            <p>Thank you for registering! Please verify your email address:</p>
+            <p>Thank you for registering! Please verify your email address and Go to Login:</p>
 
             <div style="text-align: center; margin: 24px 0;">
                 <a href="{{ url('/verify') . '?token=' . $token . '&email_hash=' . $hash }}"

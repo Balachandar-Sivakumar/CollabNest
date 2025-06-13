@@ -91,7 +91,7 @@ class ProjectController extends Controller
         return redirect()->route('navMyProject')->with('success', 'Project created succesfully!');
     }
 
-    public function viewProject(Project $project)
+        public function viewProject(Project $project)
     {
     $user = \Illuminate\Support\Facades\Auth::user(); 
     $userId = $user->id;
@@ -168,7 +168,7 @@ class ProjectController extends Controller
                 
             }
         }
-
+      
         // Convert skills string to IDs
         $skills = [];
         $skillList = array_filter(array_map('trim', explode(',', $request->technical_skills)));
@@ -210,42 +210,5 @@ class ProjectController extends Controller
         }
        
     }
-
-    public function sendRequest($id)
-    {
-        $project = Project::findOrFail($id);
-
-        if ($project->owner_id === Auth::id()) {
-            return redirect()->back()->with('error', 'You cannot request your own project.');
-        } 
-
-        $owner = User::find($project->owner_id);
-        $requester = Auth::user();
-
-         Mail::to($owner->email)->send(new ProjectRequestMail($requester, $project));
-
-        return redirect()->back()->with('success', 'Request sent to the project owner!');
-    }
-
-    // public function acceptRequest(Request $request, $id)
-    // {
-    //     $userId = $request->query('user');
-        
-    //     return redirect('/dashboard')->with('success', 'You accepted the request.');
-    // }
-
-    // public function rejectRequest(Request $request, $id)
-    // {
-    //     $userId = $request->query('user');
-
-    //     $project = Project::findOrFail($id);
-    //     if (Auth::id() !== $project->owner_id) {
-    //         abort(403, 'Unauthorized action.');
-    //     }
-
-    //     return redirect('/dashboard')->with('info', 'You rejected the request for project: ' . $project->name);
-    // }
-
-
 
 }

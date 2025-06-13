@@ -11,7 +11,8 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\WelcomepageController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\SkillsController;
-use App\Models\Project;
+
+use App\Http\Controllers\ProjectRequestController;
 
 // Home page
 Route::get('/', [Authentication::class, 'welcome']);
@@ -130,16 +131,25 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Make sure you have routes defined like this:
- Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
+Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
+
 Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+
 Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
 
 Route::get('/navUpdateProject/{id}',[ProjectController::class,'navUpdateProject'])->name('editProject');
 
 Route::post('/UpdateProject/{id}',[ProjectController::class,'UpdateProject']);
 
-// Route::get('/project/request/{id}/accept', [ProjectController::class, 'acceptRequest'])->name('project.accept');
+Route::get('/project/request/{requesterId}/accept', [ProjectRequestController::class, 'acceptRequest']);
 
-// Route::get('/project/request/{id}/reject', [ProjectController::class, 'rejectRequest'])->name('project.reject');
-Route::get('/request/{project}', [ProjectController::class, 'sendRequest'])->name('request');
+Route::get('/project/request/{requester}/reject', [ProjectRequestController::class, 'rejectRequest'])->name('project.reject');
+
+Route::post('/request/{project}', [ProjectRequestController::class, 'sendRequest'])->name('request');
+
+Route::post('/projects/{project}/invite', [ProjectRequestController::class, 'sendInvite'])->name('sendInvite');
+
+
+
+
 

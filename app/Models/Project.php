@@ -25,6 +25,12 @@ class Project extends Model
             'owner_id',
             'status'
         ];
+        
+        public function requesters()
+        {
+            return $this->belongsToMany(User::class, 'project_requests', 'project_id', 'user_id');
+        }
+
 
         public function tasks(){
     return $this->hasMany(Task::class);
