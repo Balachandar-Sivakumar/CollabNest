@@ -145,6 +145,24 @@
               <p class="text-gray-500 text-xs font-medium mb-1">Experience</p>
               <p class="font-semibold text-gray-700">{{ $settings['years_of_experience'] ?? 'Not specified' }} years</p>
             </div>
+            
+            <!-- Added Date of Birth Field -->
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-gray-500 text-xs font-medium mb-1">Date of Birth</p>
+              <p class="font-semibold text-gray-700">{{ $settings['dob'] ?? 'Not specified' }}</p>
+            </div>
+            
+            <!-- Added Mobile Number Field -->
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-gray-500 text-xs font-medium mb-1">Mobile Number</p>
+              <p class="font-semibold text-gray-700">{{ $settings['mobile_number'] ?? 'Not specified' }}</p>
+            </div>
+            
+            <!-- Added Address Field -->
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-gray-500 text-xs font-medium mb-1">Address</p>
+              <p class="font-semibold text-gray-700">{{ $settings['address'] ?? 'Not specified' }}</p>
+            </div>
           </div>
 
           <!-- Bio -->
