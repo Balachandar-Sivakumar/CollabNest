@@ -129,8 +129,10 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Make sure you have routes defined like this:
- Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
+Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
+
 Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+
 Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
 
 Route::get('/navUpdateProject/{id}',[ProjectController::class,'navUpdateProject'])->name('editProject');
@@ -141,9 +143,10 @@ Route::get('/project/request/{requesterId}/accept', [ProjectRequestController::c
 
 Route::get('/project/request/{requester}/reject', [ProjectRequestController::class, 'rejectRequest'])->name('project.reject');
 
-Route::get('/request/{project}', [ProjectRequestController::class, 'sendRequest'])->name('request');
+Route::post('/request/{project}', [ProjectRequestController::class, 'sendRequest'])->name('request');
 
-Route::post('/projects/{id}/invite', [ProjectRequestController::class, 'sendInvite'])->name('project.sendInvite');
+Route::post('/projects/{project}/invite', [ProjectRequestController::class, 'sendInvite'])->name('sendInvite');
+
 
 
 

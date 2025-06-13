@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Mail\ProjectRequestMail;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\ProjectInviteMail;
+
 
 class ProjectRequestController extends Controller
 {
@@ -44,22 +46,19 @@ class ProjectRequestController extends Controller
         $project = Project::findOrFail($projectRequest->project_id);
         $owner = User::findOrFail($project->owner_id);
 
-        // Store in project team table
+
         ProjectTeam::create([
             'project_id' => $project->id,
             'user_id' => $requester->id,
             'owner_id' => $project->owner_id,
         ]);
 
-        // ✅ Retrieve old requester data from session
         $requesters = session()->get('requester_name', []);
         $requesters[] = [
             'name' => $requester->name,
             'skill' => $requester->skill ?? 'Backend Developer',
         ];
         session()->put('requester_name', $requesters);
-
-        // ✅ Project & owner info remains same
         session()->put([
             'owner_name' => $owner->name,
             'project_title' => $project->title,
@@ -83,7 +82,7 @@ class ProjectRequestController extends Controller
         return redirect('/dashboard')->with('info', 'You rejected the request for project: ' . $project->name);
     }
 
-        public function sendInvite(Request $request, $id)
+      public function sendInvite(Request $request, $id)
     {
         $request->validate([
             'email' => 'required|email'
@@ -91,12 +90,9 @@ class ProjectRequestController extends Controller
 
         $project = Project::findOrFail($id);
 
-        Mail::raw("You have been invited to join the project: {$project->title}", function ($message) use ($request) {
-            $message->to($request->email)
-                    ->subject('Project Invitation');
-        });
+        Mail::to($request->email)->send(new ProjectInviteMail($project));
 
-        return redirect()->back()->with('success', 'Invitation email sent!');
+        return redirect('/dashboard')->with('success', 'Invitation email sent!');
     }
 
 }
