@@ -48,7 +48,7 @@
       <!-- Owner Info -->
        @php 
           $profile = \App\Models\UserProfile::where('user_id',$project->owner_id)->value('profile_settings');
-          $image = json_decode($profile,true)['image'];
+          $image = json_decode($profile,true)['image'] ?? [];
           $name = \App\Models\User::where('id',$project->owner_id)->value('name')
         
        @endphp

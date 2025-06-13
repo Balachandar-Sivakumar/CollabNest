@@ -15,7 +15,7 @@
         <div class="flex items-center space-x-4 bg-gray-100 rounded-lg py-3 px-4">
           @php
             $profile = App\Models\UserProfile::where('user_id',Auth::user()->id)->first();
-            $image = json_decode($profile->profile_settings,true)['image'] ?? null;
+            $image = json_decode($profile->profile_settings,true)['image'] ?? [];
           @endphp
           <img alt="Profile" class="rounded-full w-10 h-10 object-cover" src="{{ $image ? asset('storage/'. $image) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->name).'&color=7F9CF5&background=EBF4FF'}}" />
           <div>
