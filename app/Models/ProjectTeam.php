@@ -13,4 +13,9 @@ class ProjectTeam extends Model
     use HasFactory;
     protected $fillable = ['project_id', 'user_id', 'owner_id'];
 
+        public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

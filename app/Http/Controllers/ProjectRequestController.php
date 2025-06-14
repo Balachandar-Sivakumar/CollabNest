@@ -32,8 +32,8 @@ class ProjectRequestController extends Controller
     ]);
 
     Mail::to($owner->email)->send(new ProjectRequestMail($requester, $project));
+    return redirect()->back()->with('success', 'Request sent successfully!');
 
-    return redirect()->back()->with('success', 'Request sent to the project owner!');
 }
 
 
@@ -67,7 +67,7 @@ class ProjectRequestController extends Controller
             'project_description' => $project->description,
         ]);
 
-        return redirect('/team')->with('success', 'Request accepted and team updated!');
+        return view('team')->with('success', 'Request accepted and team updated!');
     }
 
     public function rejectRequest(Request $request, $id)
@@ -79,7 +79,7 @@ class ProjectRequestController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        return redirect('/dashboard')->with('info', 'You rejected the request for project: ' . $project->name);
+        return view('/dashboard')->with('info', 'You rejected the request for project: ' . $project->name);
     }
 
       public function sendInvite(Request $request, $id)
@@ -92,7 +92,19 @@ class ProjectRequestController extends Controller
 
         Mail::to($request->email)->send(new ProjectInviteMail($project));
 
-        return redirect('/dashboard')->with('success', 'Invitation email sent!');
+        return view('/viewProject')->with('success', 'Invitation email sent!');
     }
+
+        public function viewTeam($id)
+    {
+        $project = Project::with('owner')->findOrFail($id);
+
+        $teamMembers = ProjectTeam::with('user')
+            ->where('project_id', $id)
+            ->get();
+
+        return view('team', compact('project', 'teamMembers'));
+    }
+
 
 }

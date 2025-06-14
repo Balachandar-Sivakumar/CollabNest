@@ -92,8 +92,8 @@ class ProjectController extends Controller
 
         public function viewProject(Project $project)
     {
-    $user = \Illuminate\Support\Facades\Auth::user(); 
-    $userId = $user->id;
+        $user = \Illuminate\Support\Facades\Auth::user(); 
+        $userId = $user->id;
 
         $assignedTasks = Task::where('project_id', $project->id)
                              ->where('assigned_by', $userId)

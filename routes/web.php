@@ -11,7 +11,6 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\WelcomepageController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\SkillsController;
-use App\Models\Skills;
 use App\Http\Controllers\ProjectRequestController;
 
 // Home page
@@ -147,6 +146,11 @@ Route::post('/request/{project}', [ProjectRequestController::class, 'sendRequest
 
 Route::post('/projects/{project}/invite', [ProjectRequestController::class, 'sendInvite'])->name('sendInvite');
 
+// Route::post('/project/{project}/request-join', [ProjectRequestController::class, 'sendRequest'])->name('project.request.join');
+
+Route::get('/viewProject/{id}', [ProjectRequestController::class, 'viewProject'])->name('projects.view');
+
+Route::get('/team/{id}', [ProjectRequestController::class, 'viewTeam'])->name('team.view');
 
 
 

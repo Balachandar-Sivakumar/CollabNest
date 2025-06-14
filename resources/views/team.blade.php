@@ -14,21 +14,17 @@
   </style>
 </head>
 <body class="bg-[#f8fafc] text-gray-900 min-h-screen flex">
-
-  <!-- Sidebar -->
-  @include('layout.aside')
-
   <!-- Main Content -->
-  <div class="max-w-4xl mx-auto p-6 space-y-6 w-full">
+  <div class="max-w-7xl mx-auto p-6 space-y-6 w-full">
 
     <!-- Team Details -->
     <div class="bg-white shadow-md rounded-2xl p-6">
       <h2 class="text-xl font-semibold mb-4 text-gray-800">Team Details</h2>
       <p class="text-sm text-gray-700 space-y-1">
-        <span><strong>Project Title:</strong> {{ session('project_title') }}</span><br>
-        <span><strong>Created On:</strong> {{ \Carbon\Carbon::parse(session('project_created'))->format('F j, Y') }}</span><br>
-        <span><strong>Status:</strong> {{ session('project_status') }}</span><br>
-        <span><strong>Description:</strong> {{ session('project_description') }}</span>
+        <span><strong>Project Title:</strong> {{ $project->title }}</span><br>
+        <span><strong>Created On:</strong> {{ \Carbon\Carbon::parse($project->created_at)->format('F j, Y') }}</span><br>
+        <span><strong>Status:</strong> {{ $project->status }}</span><br>
+        <span><strong>Description:</strong> {{ $project->description }}</span>
       </p>
     </div>
 
@@ -36,24 +32,13 @@
     <div class="bg-white shadow-md rounded-2xl p-6">
       <h2 class="text-xl font-semibold mb-4 text-gray-800">Team Members</h2>
       <ul class="space-y-2 text-sm text-gray-700 list-inside">
-    {{-- Team Lead --}}
-    @if(session('owner_name'))
-      <li>👤 {{ session('owner_name') }} (Team Lead)</li>
-    @endif
+        {{-- Team Lead --}}
+        <li>👤 {{ $project->owner->name }} <span class="text-gray-500">(Team Lead)</span></li>
 
-    {{-- Requesters with Skill --}}
-    @php
-        $requesters = session('requester_name');
-    @endphp
-
-    @if(is_array($requesters) && count($requesters))
-        @foreach($requesters as $requester)
-            <li>👤 {{ $requester['name'] }} ({{ $requester['skill'] }})</li>
+        {{-- Accepted Team Members --}}
+        @foreach($teamMembers as $member)
+          <li>👤 {{ $member->user->name }} <span class="text-gray-500">({{ $member->user->skill ?? 'Developer' }})</span></li>
         @endforeach
-    @elseif(is_string($requesters))
-        <li>👤 {{ $requesters }} (Backend Developer)</li>
-    @endif
-
       </ul>
     </div>
 
