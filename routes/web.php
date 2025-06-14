@@ -80,13 +80,13 @@ Route::get('/find-talent', [WelcomepageController::class, 'findTalent'])->name('
 
 Route::get('/help', [WelcomepageController::class, 'help'])->name('help');
 
-Route::get('/users',[UsersController::class, 'NavUsers']);
+Route::get('/profile/{id}',[UsersController::class, 'profile']);
+
+Route::get('/navUsers',[UsersController::class,'navUsers'])->name('navUsers');
 
 Route::get('/verify', [Authentication::class, 'verify']);
 
-Route::get('/profile',[UsersController::class, 'NavUsers']);
-
-Route::get('/profile/edit',[UsersController::class, 'navedit']);
+Route::get('/navProfile/edit',[UsersController::class, 'navedit']);
 
 Route::post('/profile/update',[UsersController::class, 'profileUpdate']);
 

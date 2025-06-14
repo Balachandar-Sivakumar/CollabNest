@@ -11,15 +11,16 @@
       <a class="text-indigo-700 font-semibold text-lg" href="#">CollabNest</a>
     </div>
     <div class="px-6 mb-6">
-      <a href="/profile">
+      <a href="/profile/{{Auth::user()->id}}">
         <div class="flex items-center space-x-4 bg-gray-100 rounded-lg py-3 px-4">
           @php
             $profile = App\Models\UserProfile::where('user_id',Auth::user()->id)->first();
-            $image = json_decode($profile->profile_settings,true)['image'] ?? [];
+            $userProfile = json_decode($profile->profile_settings,true);
+            $image = $userProfile['image'] ?? [];
           @endphp
           <img alt="Profile" class="rounded-full w-10 h-10 object-cover" src="{{ $image ? asset('storage/'. $image) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->name).'&color=7F9CF5&background=EBF4FF'}}" />
           <div>
-            <p class="font-semibold text-gray-900 text-sm leading-tight">{{ Auth::user()->name }}</p>
+            <p class="font-semibold text-gray-900 text-sm leading-tight">{{ isset($userProfile['first_name']) ? $userProfile['first_name'].' '.$userProfile['last_name'] : Auth::user()->name}}</p>
             <p class="text-gray-500 text-xs leading-tight">{{ Auth::user()->email }}</p>
           </div>
         </div>
@@ -33,10 +34,10 @@
     <i class="fas fa-home"></i><span>Dashboard</span>
   </a>
 
-  <a href="{{ route('team') }}"
+  <a href="{{ route('navUsers') }}"
      class="flex items-center space-x-2 py-2 px-3 rounded-md 
-            {{ request()->routeIs('team') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
-    <i class="fas fa-users"></i><span>Team</span>
+            {{ request()->routeIs('navUsers') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
+    <i class="fas fa-users"></i><span>Users</span>
   </a>
 
   <div>
