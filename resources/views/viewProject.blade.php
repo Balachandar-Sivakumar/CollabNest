@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>{{ $project->title }} | TeamCollab Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
@@ -195,15 +196,9 @@
               <div x-show="showRequestModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-transition>
                 <div @click.away="showRequestModal = false" class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md" x-transition>
                   <h2 class="text-lg font-semibold mb-4 text-gray-800">Request to Join Project</h2>
-                  <form method="POST" action="{{ route('project.request.join', $project->id) }}" class="bg-white p-6 rounded-xl shadow-md">
-                    @csrf
+                  <form method="POST" action="{{ route('project.request.join', ['id' => $project->id]) }}">
 
-                    <!-- From -->
-                    <div class="mb-4">
-                      <label class="block text-sm font-semibold text-gray-800 mb-1">From:</label>
-                      <input type="text" name="name" value="{{ Auth::user()->name }}" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100" readonly />
-                      <input type="email" name="email" value="{{ Auth::user()->email }}" class="w-full px-3 py-2 mt-2 border border-gray-300 rounded-md bg-gray-100" readonly />
-                    </div>
+                    @csrf
 
                     <!-- To -->
                     <div class="mb-4">
@@ -212,12 +207,24 @@
                       <input type="email" value="{{ $project->owner->email }}" class="w-full px-3 py-2 mt-2 border border-gray-300 rounded-md bg-gray-100" readonly />
                     </div>
 
-                    <!-- Subject -->
+                    <!-- From -->
                     <div class="mb-4">
-                      <label class="block text-sm font-semibold text-gray-800 mb-1">Subject:</label>
-                      <textarea class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 resize-none" rows="2" readonly>Project Request to Join '{{ $project->title }}'</textarea>
+                      <label class="block text-sm font-semibold text-gray-800 mb-1">From:</label>
+                      <input type="text" name="name" value="{{ Auth::user()->name }}" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100" readonly />
+                      <input type="email" name="email" value="{{ Auth::user()->email }}" class="w-full px-3 py-2 mt-2 border border-gray-300 rounded-md bg-gray-100" readonly />
                     </div>
 
+                    <!-- Title -->
+                    <div class="mb-4">
+                      <label for="title" class="block text-sm font-semibold text-gray-800 mb-1">Title:</label>
+                      <input type="text" id="title" name="title" value="Project Request to Join '{{ $project->title }}'" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" readonly />
+                    </div>
+
+                    <!-- Body -->
+                    <div class="mb-4">
+                      <label for="body" class="block text-sm font-semibold text-gray-800 mb-1">Body:</label>
+                      <textarea id="body" name="body" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white resize-none" placeholder="Write your message to the project owner here..."></textarea>
+                    </div>
 
                     <!-- Buttons -->
                     <div class="flex justify-end gap-3">
@@ -229,6 +236,7 @@
                       </button>
                     </div>
                   </form>
+
 
                 </div>
               </div>
@@ -264,11 +272,96 @@
             </div>
             @endif
           </div>
+
+          <!-- delete handling -->
+
+          <div id="popup" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 " style="display: none;">
+            <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+              <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirm Project Deletion</h2>
+
+              <p class="mb-4 text-sm text-gray-600">
+                This action cannot be undone. Please enter your password to confirm deletion.
+              </p>
+
+              <form method="POST" action="/projects">
+                @csrf
+                @method('DELETE')
+
+                <input type="password" name="password" id="delpassword"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-red-200"
+                  placeholder="Enter your password">
+                <input type="hidden" id="projectId" value="{{$project->id}}">
+
+                <div class="mt-6 flex justify-end gap-2">
+                  <button id="cancelbtn" type="button"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded">
+                    Cancel
+                  </button>
+                  <button type="submit" id="confrimDelete"
+                    class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">
+                    Confirm Delete
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- delete handling -->
+          @if($project->owner_id === Auth::user()->id)
+          <button id="deleteProject" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition duration-200">
+            Delete Project
+          </button>
+          @endif
+
         </div>
       </div>
     </div>
-
+    @include('team')
   </main>
+
+  <script>
+    let deletebtn = document.querySelector('#deleteProject'),
+      delpop = document.querySelector('#popup'),
+      cancel = document.querySelector('#cancelbtn');
+
+    [deletebtn, cancel].forEach(btn =>
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        delpop.style.display = delpop.style.display === 'none' ? 'flex' : 'none';
+      })
+    );
+
+    let confrinDelete = document.querySelector('#confrimDelete'),
+      delpass = document.querySelector('#delpassword'),
+      projectId = document.querySelector('#projectId');
+
+
+    confrinDelete.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      if (delpass.value.trim().length === 0) {
+        return alert('Please enter your password to delete your project');
+      }
+
+      fetch("{{ route('deleteProject') }}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          },
+          body: JSON.stringify({
+            password: delpass.value.trim(),
+            id: parseInt(projectId.value)
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          window.history.go(-1);
+        })
+        .catch(err => console.log(err));
+    });
+  </script>
+
 </body>
 
 </html>

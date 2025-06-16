@@ -20,11 +20,11 @@
         </p>
 
         <div style="margin: 20px 0;">
-            <a href="{{ url('/project/request/' . $project->id . '/accept?user=' . $requester->id) }}"
+            <a href="{{ route('project.request.accept', $requester->id) }}"
                style="display: inline-block; margin-right: 10px; padding: 10px 20px; background-color: #10b981; color: #fff; text-decoration: none; border-radius: 6px;">
                 ✅ Accept
             </a>
-            <a href="{{ url('/project/request/' . $project->id . '/reject?user=' . $requester->id) }}"
+            <a href="{{ route('project.reject', $requester->id) }}"
                style="display: inline-block; padding: 10px 20px; background-color: #ef4444; color: #fff; text-decoration: none; border-radius: 6px;">
                 ❌ Reject
             </a>

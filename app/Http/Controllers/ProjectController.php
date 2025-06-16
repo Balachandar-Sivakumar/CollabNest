@@ -8,10 +8,13 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Skill;
-use App\Mail\ProjectRequestMail;
+use App\Models\ProjectRequest;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Task;
-use Dom\Document;
+use Illuminate\Support\Facades\Hash;
+use App\Models\ProjectTeamMember;
+use App\Models\ProjectTeam;
+
 
 class ProjectController extends Controller
 {
@@ -87,24 +90,36 @@ class ProjectController extends Controller
 
         Project::create($validated);
 
-        return redirect()->route('projects')->with('success', 'Project created!');
+        return redirect()->route('navMyProject')->with('success', 'Project created succesfully!');
     }
 
-        public function viewProject(Project $project)
-    {
-        $user = \Illuminate\Support\Facades\Auth::user(); 
-        $userId = $user->id;
-
-        $assignedTasks = Task::where('project_id', $project->id)
-                             ->where('assigned_by', $userId)
-                             ->get();
-
-        $receivedTasks = Task::where('project_id', $project->id)
-                             ->where('assigned_to', $userId)
-                             ->get();
-
-        return view('viewProject', compact('project', 'assignedTasks', 'receivedTasks'));
+public function viewProject(Project $project)
+{
+    // $user = \
+    $team = ProjectTeam::where('project_id', $project->id)->first(); 
+    if (!Auth::check()) {
+    return redirect()->route('login')->with('error', 'You must be logged in to view this project.');
     }
+    $userId = Auth::user()->id;
+
+
+    $assignedTasks = Task::where('project_id', $project->id)
+                         ->where('assigned_by', $userId)
+                         ->get();
+
+    $receivedTasks = Task::where('project_id', $project->id)
+                         ->where('assigned_to', $userId)
+                         ->get();
+
+   $teamMembers = ProjectTeamMember::with('user') // eager load user
+    ->where('project_id', $project->id)
+    ->where('team_id', $team->id)
+    ->get();
+
+
+
+    return view('viewProject', compact('project', 'assignedTasks', 'receivedTasks', 'teamMembers'));
+}
 
 
     public function navUpdateProject($id)
@@ -167,8 +182,7 @@ class ProjectController extends Controller
                 
             }
         }
-        dd($document_path);
-
+      
         // Convert skills string to IDs
         $skills = [];
         $skillList = array_filter(array_map('trim', explode(',', $request->technical_skills)));
@@ -198,10 +212,17 @@ class ProjectController extends Controller
         Project::where('id',$id)->update($update);
 
         return redirect()->route('navMyProject')->with('success','Project updated successfully');
+    }
+
+    public function deleteProject(Request $request){
+    
+        if(Hash::check($request->password,Auth::user()->password)){
+            Project::where('id',$request->id)->delete();
+            return ['success'=>'Project deleted success fully'];
+        }else{
+            return ['error','Incorrect password'];
         }
-
-
-
-
+       
+    }
 
 }

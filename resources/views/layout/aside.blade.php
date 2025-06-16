@@ -33,12 +33,6 @@
     <i class="fas fa-home"></i><span>Dashboard</span>
   </a>
 
-  <a href="{{ route('team') }}"
-     class="flex items-center space-x-2 py-2 px-3 rounded-md 
-            {{ request()->routeIs('team') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
-    <i class="fas fa-users"></i><span>Team</span>
-  </a>
-
   <div>
       <a id="project" 
      class="flex items-center space-x-2 py-2 px-3 rounded-md 

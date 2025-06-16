@@ -6,16 +6,27 @@ use Illuminate\Database\Eloquent\Model;
 use Mtvs\EloquentHashids\HasHashid;
 use Mtvs\EloquentHashids\HashidRouting;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class ProjectTeam extends Model
 {
-     use HasHashid, HashidRouting;
-    use HasFactory;
-    protected $fillable = ['project_id', 'user_id', 'owner_id'];
+    use SoftDeletes;
 
-        public function user()
+    protected $fillable = [
+        'name',
+        'description',
+        'team_lead_id',
+        'project_id',
+    ];
+
+    public function teamLead()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'team_lead_id');
     }
 
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
+    }
 }

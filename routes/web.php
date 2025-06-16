@@ -20,7 +20,9 @@ Route::get('/', [Authentication::class, 'welcome']);
 Route::get('/navregister', [Authentication::class, 'navregister']);
 
 // User login
-Route::post('/login', [Authentication::class, 'loginUser']);
+Route::post('/login', [Authentication::class, 'loginUser'])->name('login');
+
+Route::get('/login', [Authentication::class, 'loginUser'])->name('login');
 
 // Login page navigation
 Route::get('/navlogin', [Authentication::class, 'navLogin']);
@@ -48,6 +50,8 @@ Route::get("/navcreateproject",[ProjectController::class,'navcreateproject'])->n
 Route::post('/CreateProject',[ProjectController::class,'CreateProject']);
 
 Route::get('/view/{project}',[ProjectController::class,'viewProject'])->name('viewProject');
+
+Route::post('/deleteProject',[ProjectController::class,'deleteProject'])->name('deleteProject');
 
 //MY project
 Route::get('/navMyProject',[ProjectController::class,'navMyProject'])->name('navMyProject');
@@ -138,19 +142,18 @@ Route::get('/navUpdateProject/{id}',[ProjectController::class,'navUpdateProject'
 
 Route::post('/UpdateProject/{id}',[ProjectController::class,'UpdateProject']);
 
-Route::get('/project/request/{requesterId}/accept', [ProjectRequestController::class, 'acceptRequest']);
+Route::get('/project/request/{request}/accept', [ProjectRequestController::class, 'acceptRequest'])->name('project.request.accept');
 
-Route::get('/project/request/{requester}/reject', [ProjectRequestController::class, 'rejectRequest'])->name('project.reject');
+Route::get('/project/request/{request}/accept', [ProjectRequestController::class, 'acceptRequest'])->name('project.request.accept');
 
-Route::post('/request/{project}', [ProjectRequestController::class, 'sendRequest'])->name('request');
+Route::get('/project/request/{request}/reject', [ProjectRequestController::class, 'rejectRequest'])->name('project.reject');
+
 
 Route::post('/projects/{project}/invite', [ProjectRequestController::class, 'sendInvite'])->name('sendInvite');
 
-// Route::post('/project/{project}/request-join', [ProjectRequestController::class, 'sendRequest'])->name('project.request.join');
+Route::post('/project/{id}/request-join', [ProjectRequestController::class, 'sendRequest'])->name('project.request.join');
 
-Route::get('/viewProject/{id}', [ProjectRequestController::class, 'viewProject'])->name('projects.view');
 
-Route::get('/team/{id}', [ProjectRequestController::class, 'viewTeam'])->name('team.view');
 
 
 

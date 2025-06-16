@@ -37,8 +37,8 @@
 
         {{-- Accepted Team Members --}}
         @foreach($teamMembers as $member)
-          <li>👤 {{ $member->user->name }} <span class="text-gray-500">({{ $member->user->skill ?? 'Developer' }})</span></li>
-        @endforeach
+        <li>👤 {{ $member->user->name }} <span class="text-gray-500">({{ $member->user->skill ?? 'Developer' }})</span></li>
+    @endforeach
       </ul>
     </div>
 

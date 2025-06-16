@@ -26,7 +26,6 @@ class WelcomeMail extends Mailable
     }
     public function build()
     {
-        // $link = url("/verify?token={$this->token}&email_hash={$this->hash}");
 
         return $this->subject('Verify Your Email')
                     ->view('verifymail')
