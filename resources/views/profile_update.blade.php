@@ -128,7 +128,7 @@
   <div>
     <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
     <input type="text" id="first_name" name="first_name"
-           value="{{ explode(' ', Auth::user()->name)[0] ?? '' }}"
+           value="{{ json_decode($skills->profile_settings,true)['first_name'] ?? '' }}"
            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
   </div>
 
@@ -136,7 +136,7 @@
   <div>
     <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
     <input type="text" id="last_name" name="last_name"
-           value="{{ explode(' ', Auth::user()->name)[1] ?? '' }}"
+           value="{{ json_decode($skills->profile_settings,true)['last_name'] ?? '' }}"
            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
   </div>
 

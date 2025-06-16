@@ -172,7 +172,22 @@
 
               {{ $statusText }}
             </span>
+
           </div>
+
+          @if($project->owner_id === Auth::user()->id)
+
+            <div class="flex gap-4">
+              <button class="px-5 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition">
+                Project Requests
+              </button>
+
+              <button class="px-5 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition">
+                Invite Requests
+              </button>
+            </div>
+
+            @endif
         </div>
 
 
@@ -357,6 +372,7 @@
         .then(res => res.json())
         .then(data => {
           window.history.go(-1);
+          window.location.href = "{{url('/navMyProject')}}";
         })
         .catch(err => console.log(err));
     });

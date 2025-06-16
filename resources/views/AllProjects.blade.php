@@ -61,7 +61,7 @@
        class="w-8 h-8 rounded-full object-cover mr-2">
 
   <div class="text-sm text-gray-700">
-    <span class="block text-gray-500 text-s">Owned by:</span>
+    <span class="block text-gray-500 text-s">Owner</span>
     <span class="text-lg font-medium">{{ $name }}</span>
   </div>
 </div>
@@ -75,6 +75,8 @@
     @endforeach
   </div>
 </main>
+
+
 
 
 </body>

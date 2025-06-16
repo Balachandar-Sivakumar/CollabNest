@@ -1,119 +1,194 @@
 <!DOCTYPE html>
-<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))" :class="{ 'dark': darkMode }">
+<html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1" name="viewport"/>
-  <title>TeamCollab Dashboard - Settings</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TeamCollab - Change Password</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/alpinejs" defer></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     body { font-family: 'Inter', sans-serif; }
-    .dark .dark\:bg-gray-900 { background-color: #1a202c; }
-    .dark .dark\:text-white { color: #fff; }
-    .dark .dark\:bg-gray-800 { background-color: #2d3748; }
-    .dark .dark\:border-gray-700 { border-color: #4a5568; }
-    .dark .dark\:placeholder-gray-400::placeholder { color: #a0aec0; }
   </style>
 </head>
-<body class="bg-[#f8fafc] dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen flex">
+<body class="bg-[#f8fafc] text-gray-900 min-h-screen flex">
 
   <!-- Sidebar -->
   @include('layout.aside')
 
   <!-- Main Content -->
-  <main class="flex-1 p-8">
-    <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 border dark:border-gray-700">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-semibold">Settings</h1>
-        <!-- Dark/Light Mode Toggle -->
-        <button @click="darkMode = !darkMode" class="focus:outline-none text-xl" :title="darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
-          <span x-show="!darkMode"><i class="fas fa-moon"></i></span>
-          <span x-show="darkMode"><i class="fas fa-sun"></i></span>
+  <main class="flex-1 p-4 md:p-8">
+    <div class="max-w-md mx-auto bg-white rounded-2xl shadow-lg border overflow-hidden" id="form-card">
+
+      <!-- Flash Message -->
+      @if(session('success'))
+        <div id="flash-message"
+             class="bg-emerald-50 text-emerald-700 text-sm absolute top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg border border-emerald-100 flex items-center gap-2">
+          <i class="fas fa-check-circle"></i>
+          {{ session('success') }}
+        </div>
+      @endif
+
+      <!-- Header -->
+      <div class="bg-blue-500 p-6 text-white rounded-t-2xl flex justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-bold">Change Password</h1>
+          <p class="text-sm text-blue-100">Secure your account with a new password</p>
+        </div>
+        <button id="toggle-dark" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-blue-400 transition">
+          <i class="fas fa-moon"></i>
         </button>
       </div>
-     <!-- Inside your form -->
-<form method="POST" action="{{ route('settings.update') }}">
-  @csrf
-  @method('PUT')
 
-  <!-- Display Name -->
-  <div class="mb-4">
-    <label class="block font-bold mb-2" for="display_name">Display Name</label>
-    <input type="text" id="display_name" name="display_name" value="{{ old('display_name', Auth::user()->name) }}"
-           class="input-field" />
-  </div>
+      <!-- Form -->
+      <div class="p-6 space-y-6">
+        <form id="password-form" method="POST" action="/resetPassword">
+          @csrf
 
-  <!-- Email -->
-  <div class="mb-4">
-    <label class="block font-bold mb-2" for="email">Email</label>
-    <input type="email" id="email" name="email" value="{{ old('email', Auth::user()->email) }}"
-           class="input-field" />
-  </div>
+          <!-- Current Password -->
+          <div class="space-y-1">
+            <label for="current_password" class="font-medium">Current Password</label>
+            <div class="relative">
+              <input type="password" name="current_password" id="current_password" required
+                     class="w-full px-4 py-2.5 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+              <button type="button" class="toggle-password absolute right-3 top-1/2 -translate-y-1/2" data-target="#current_password">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
 
-  <!-- Profession -->
-  <div class="mb-4">
-    <label class="block font-bold mb-2" for="profession">Profession</label>
-    <input type="text" id="profession" name="profession" value="{{ old('profession', Auth::user()->profession) }}"
-           class="input-field" />
-  </div>
+          <!-- New Password -->
+          <div class="space-y-1">
+            <label for="new_password" class="font-medium">New Password</label>
+            <div class="relative">
+              <input type="password" name="new_password" id="new_password" required
+                     class="w-full px-4 py-2.5 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+              <button type="button" class="toggle-password absolute right-3 top-1/2 -translate-y-1/2" data-target="#new_password">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div class="flex items-center gap-2 mt-1">
+              <div class="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div id="strength-bar" class="h-full transition-all duration-300 bg-red-500 w-0"></div>
+              </div>
+              <span id="strength-text" class="text-xs text-red-500">Weak</span>
+            </div>
+          </div>
 
-  <!-- Bio -->
-  <div class="mb-4">
-    <label class="block font-bold mb-2" for="bio">Bio</label>
-    <textarea id="bio" name="bio" rows="3"
-              class="input-field resize-none">{{ old('bio', Auth::user()->bio) }}</textarea>
-  </div>
+          <!-- Confirm Password -->
+          <div class="space-y-1">
+            <label for="new_password_confirmation" class="font-medium">Confirm Password</label>
+            <div class="relative">
+              <input type="password" name="new_password_confirmation" id="new_password_confirmation" required
+                     class="w-full px-4 py-2.5 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+              <button type="button" class="toggle-password absolute right-3 top-1/2 -translate-y-1/2" data-target="#new_password_confirmation">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <p id="match-warning" class="text-sm text-red-500 mt-1 hidden">
+              <i class="fas fa-exclamation-circle"></i> Passwords don't match
+            </p>
+          </div>
 
-  <!-- Notification -->
-  <div class="mb-4">
-    <label class="block font-bold mb-2">Notifications</label>
-    <label class="inline-flex items-center">
-      <input type="checkbox" name="email_notifications" class="form-checkbox"
-             {{ Auth::user()->email_notifications ? 'checked' : '' }}>
-      <span class="ml-2">Enable Email Notifications</span>
-    </label>
-  </div>
+          <!-- Submit -->
+          <div class="pt-4">
+            <button type="submit" id="submit-btn"
+              class="w-full py-2.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold transition">
+              Update Password
+            </button>
+          </div>
+        </form>
+      </div>
 
-  <!-- Password Reset -->
-  <div class="border-t border-gray-300 dark:border-gray-700 pt-6 mt-6">
-    <h2 class="text-xl font-semibold mb-4">Change Password</h2>
-
-    <div class="mb-4">
-      <label class="block font-bold mb-2" for="current_password">Current Password</label>
-      <input type="password" id="current_password" name="current_password" class="input-field" />
-    </div>
-
-    <div class="mb-4">
-      <label class="block font-bold mb-2" for="new_password">New Password</label>
-      <input type="password" id="new_password" name="new_password" class="input-field" />
-    </div>
-
-    <div class="mb-4">
-      <label class="block font-bold mb-2" for="new_password_confirmation">Confirm New Password</label>
-      <input type="password" id="new_password_confirmation" name="new_password_confirmation" class="input-field" />
-    </div>
-  </div>
-
-  <!-- Submit -->
-  <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-    Save Changes
-  </button>
-</form>
-
-
-      <!-- Customer Support Section -->
-      <div class="mt-10 border-t pt-6 dark:border-gray-700">
-        <h2 class="text-xl font-semibold mb-2">Customer Support</h2>
-        <p class="mb-2">Need help? Contact our support team:</p>
-        <ul>
-          <li><i class="fas fa-envelope mr-2"></i>Email: <a href="mailto:support@teamcollab.com" class="underline text-blue-600 dark:text-blue-400">support@teamcollab.com</a></li>
-          <li><i class="fas fa-phone mr-2"></i>Phone: <a href="tel:+1234567890" class="underline text-blue-600 dark:text-blue-400">+1 234 567 890</a></li>
-          <li><i class="fab fa-whatsapp mr-2"></i>WhatsApp: <a href="https://wa.me/1234567890" class="underline text-blue-600 dark:text-blue-400">Chat on WhatsApp</a></li>
+      <!-- Requirements -->
+      <div class="bg-gray-100 p-6 border-t rounded-b-2xl">
+        <h3 class="font-semibold mb-2">Password Requirements</h3>
+        <ul class="text-sm space-y-1 text-gray-600">
+          <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Minimum 8 characters</li>
+          <li><i class="fas fa-check-circle text-green-500 mr-2"></i> At least one uppercase letter</li>
+          <li><i class="fas fa-check-circle text-green-500 mr-2"></i> At least one number</li>
+          <li><i class="fas fa-check-circle text-green-500 mr-2"></i> At least one special character</li>
         </ul>
       </div>
+
     </div>
   </main>
+
+  <script>
+    $(function () {
+      // Flash message auto-hide
+      setTimeout(() => $('#flash-message').fadeOut(), 3000);
+
+      // Dark mode toggle
+      let isDark = localStorage.getItem('darkMode') === 'true';
+      if (isDark) $('html').addClass('dark');
+      $('#toggle-dark').on('click', function () {
+        isDark = !isDark;
+        $('html').toggleClass('dark', isDark);
+        localStorage.setItem('darkMode', isDark);
+        $(this).find('i').toggleClass('fa-moon fa-sun');
+      });
+
+      // Toggle password visibility
+      $('.toggle-password').on('click', function () {
+        const input = $($(this).data('target'));
+        const icon = $(this).find('i');
+        const type = input.attr('type') === 'password' ? 'text' : 'password';
+        input.attr('type', type);
+        icon.toggleClass('fa-eye fa-eye-slash');
+      });
+
+      function updateStrength(password) {
+        let strength = 0;
+        if (password.length >= 8) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+        const bar = $('#strength-bar');
+        const text = $('#strength-text');
+
+        bar.width(`${strength * 25}%`);
+        text.removeClass('text-red-500 text-yellow-500 text-green-500');
+
+        if (strength <= 1) {
+          bar.addClass('bg-red-500');
+          text.addClass('text-red-500').text('Weak');
+        } else if (strength === 2) {
+          bar.removeClass('bg-red-500').addClass('bg-yellow-500');
+          text.addClass('text-yellow-500').text('Medium');
+        } else {
+          bar.removeClass('bg-yellow-500').addClass('bg-green-500');
+          text.addClass('text-green-500').text('Strong');
+        }
+      }
+
+      function checkMatch() {
+        const pass = $('#new_password').val();
+        const confirm = $('#new_password_confirmation').val();
+        if (confirm && pass !== confirm) {
+          $('#match-warning').removeClass('hidden');
+          $('#submit-btn').prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+        } else {
+          $('#match-warning').addClass('hidden');
+          $('#submit-btn').prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+        }
+      }
+
+      $('#new_password').on('input', function () {
+        updateStrength(this.value);
+        checkMatch();
+      });
+
+      $('#new_password_confirmation').on('input', checkMatch);
+
+      $('#password-form').on('submit', function (e) {
+        if ($('#new_password').val() !== $('#new_password_confirmation').val()) {
+          e.preventDefault();
+        }
+      });
+    });
+  </script>
 </body>
 </html>
