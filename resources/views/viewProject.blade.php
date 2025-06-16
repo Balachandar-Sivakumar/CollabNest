@@ -172,10 +172,25 @@
 
               {{ $statusText }}
             </span>
+
           </div>
+
+          @if($project->owner_id === Auth::user()->id)
+
+            <div class="flex gap-4">
+              <button class="px-5 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition">
+                Project Requests
+              </button>
+
+              <button class="px-5 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition">
+                Invite Requests
+              </button>
+            </div>
+
+            @endif
         </div>
 
-        
+
 
         <!-- Footer -->
         <div class="bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-between items-center">
@@ -227,39 +242,39 @@
 
           <!-- delete handling -->
 
-              <div id="popup"  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 " style="display: none;">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirm Project Deletion</h2>
-            
-            <p class="mb-4 text-sm text-gray-600">
+          <div id="popup" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 " style="display: none;">
+            <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+              <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirm Project Deletion</h2>
+
+              <p class="mb-4 text-sm text-gray-600">
                 This action cannot be undone. Please enter your password to confirm deletion.
-            </p>
-            
-            <form method="POST" action="/projects">
+              </p>
+
+              <form method="POST" action="/projects">
                 @csrf
                 @method('DELETE')
-                
+
                 <input type="password" name="password" id="delpassword"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-red-200"
-                       placeholder="Enter your password">
-                <input type="hidden" id="projectId" value="{{$project->id}}">       
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-red-200"
+                  placeholder="Enter your password">
+                <input type="hidden" id="projectId" value="{{$project->id}}">
 
                 <div class="mt-6 flex justify-end gap-2">
-                    <button id="cancelbtn" type="button"
-                            class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded">
-                        Cancel
-                    </button>
-                    <button type="submit" id="confrimDelete"
-                            class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">
-                        Confirm Delete
-                    </button>
+                  <button id="cancelbtn" type="button"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded">
+                    Cancel
+                  </button>
+                  <button type="submit" id="confrimDelete"
+                    class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">
+                    Confirm Delete
+                  </button>
                 </div>
-            </form>
-        </div>
-    </div>
+              </form>
+            </div>
+          </div>
 
           <!-- delete handling -->
-           @if($project->owner_id === Auth::user()->id)
+          @if($project->owner_id === Auth::user()->id)
           <button id="deleteProject" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition duration-200">
             Delete Project
           </button>
@@ -426,44 +441,45 @@
 
   <script>
     let deletebtn = document.querySelector('#deleteProject'),
-        delpop = document.querySelector('#popup'),
-        cancel = document.querySelector('#cancelbtn');
+      delpop = document.querySelector('#popup'),
+      cancel = document.querySelector('#cancelbtn');
 
-[deletebtn, cancel].forEach(btn => 
-  btn.addEventListener('click', e => {
-    e.preventDefault();
-    delpop.style.display = delpop.style.display === 'none' ? 'flex' : 'none';
-  })
-);
+    [deletebtn, cancel].forEach(btn =>
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        delpop.style.display = delpop.style.display === 'none' ? 'flex' : 'none';
+      })
+    );
 
-let confrinDelete = document.querySelector('#confrimDelete'),
-    delpass = document.querySelector('#delpassword'),
-    projectId = document.querySelector('#projectId');
-   
+    let confrinDelete = document.querySelector('#confrimDelete'),
+      delpass = document.querySelector('#delpassword'),
+      projectId = document.querySelector('#projectId');
 
-confrinDelete.addEventListener('click', (e) => {
-    e.preventDefault();
 
-    if (delpass.value.trim().length === 0) {
+    confrinDelete.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      if (delpass.value.trim().length === 0) {
         return alert('Please enter your password to delete your project');
-    }
+      }
 
-    fetch("{{ route('deleteProject') }}", {
-        method: 'POST',
-        headers: {
+      fetch("{{ route('deleteProject') }}", {
+          method: 'POST',
+          headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: JSON.stringify({ password: delpass.value.trim(),id : parseInt(projectId.value) })
-    })
-    .then(res => res.json())
-    .then(data => {
-        window.history.go(-1);
-    })
-    .catch(err => console.log(err));
-});
-
-
+          },
+          body: JSON.stringify({
+            password: delpass.value.trim(),
+            id: parseInt(projectId.value)
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          window.location.href = "{{url('/navMyProject')}}";
+        })
+        .catch(err => console.log(err));
+    });
   </script>
 </body>
 

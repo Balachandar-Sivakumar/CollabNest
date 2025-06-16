@@ -217,6 +217,12 @@
             @endif
           </div>
 
+              @if($skills->user_id !== Auth::user()->id)
+              <a href="#" class="px-5 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition">
+                Send Invite
+              </a>
+              @endif
+
           <!-- Button -->
           @if($skills->user_id === Auth::user()->id)
           <div class="pt-2">

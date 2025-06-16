@@ -13,7 +13,8 @@ use App\Models\Skill;
 use App\Models\UserTag;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
-
+use Illuminate\Support\Facades\Hash;
+use PhpParser\Node\Stmt\Return_;
 
 class UsersController extends Controller
 {
@@ -143,5 +144,17 @@ class UsersController extends Controller
     public function navUsers(){
         $users = User::all();
         return view('publicUsers',compact('users'));
+    }
+
+    public function resetPassword(Request $request){
+        
+        if(!Hash::check($request->current_password,Auth::user()->password)){
+          
+            return back()->with('error','Incorrect password');
+        }
+
+        User::where('id',Auth::user()->id)->update(['password'=>Hash::make($request->new_password)]);
+      
+        return back()->with('success','Password changed successfully');
     }
 }
