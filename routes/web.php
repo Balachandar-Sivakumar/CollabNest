@@ -154,8 +154,9 @@ Route::post('/projects/{project}/invite', [ProjectRequestController::class, 'sen
 
 Route::post('/project/{id}/request-join', [ProjectRequestController::class, 'sendRequest'])->name('project.request.join');
 
+// Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
 
-
+// Route::get('/teams/create', [TeamController::class, 'createTeamForm'])->name('team.create');
 
 
 
