@@ -37,8 +37,8 @@ Route::controller(WelcomepageController::class)->group(function () {
 
 // Settings
 Route::controller(SettingsController::class)->group(function () {
-    Route::get('/settings', 'index')->name('settings');
-    Route::put('/settings', 'update')->name('settings.update');
+    Route::get('/settings/changePassword','index')->name('changepass');
+    Route::get('/settings/help','help')->name('help');
 });
 
 // Team

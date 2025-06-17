@@ -17,35 +17,9 @@
     }
   </style>
 </head>
-<body class="bg-white text-gray-900 flex flex-col">
-  <!-- Navbar -->
-  <nav class="flex items-center justify-between px-6 py-4 border-b border-gray-200 shadow-sm" data-aos="fade-down" data-aos-duration="1000">
-    <div class="flex items-center space-x-3">
-      <div class="w-10 h-10 rounded overflow-hidden" data-aos="zoom-in" data-aos-delay="200" data-aos-duration="800">
-        <img
-          src="https://sdmntprnorthcentralus.oaiusercontent.com/files/00000000-e454-622f-8e2d-e85930ca57ca/raw?se=2025-05-23T23%3A07%3A44Z&sp=r&sv=2024-08-04&sr=b&scid=0347ee2b-e592-56de-8757-bb7ae920edac&skoid=add8ee7d-5fc7-451e-b06e-a82b2276cf62&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-05-23T13%3A08%3A22Z&ske=2025-05-24T13%3A08%3A22Z&sks=b&skv=2024-08-04&sig=ZNSHIzBDzN2Lx2KqIjOpe73Xih6u5VMqAhbofCEpL/I%3D"
-          alt="CollabNest Logo"
-          class="w-full h-full object-contain"
-        />
-      </div>
-      <h1 class="text-2xl font-bold" data-aos="fade-right" data-aos-delay="400" data-aos-duration="1000">
-        <span class="text-blue-600">Collab</span><span class="text-blue-600">Nest</span>
-      </h1>
-    </div>
-    <div class="space-x-6 text-sm font-semibold" data-aos="fade-left" data-aos-delay="600" data-aos-duration="1000">
-      <a href="{{ route('home') }}" class="hover:text-blue-600 transition cursor-pointer">Home</a>
-      <a href="{{ route('how-it-works') }}" class="hover:text-blue-600 transition cursor-pointer">How it works</a>
-      <a href="{{ route('explore-projects') }}" class="hover:text-blue-600 transition cursor-pointer">Explore Projects</a>
-      <a href="{{ route('find-talent') }}" class="hover:text-blue-600 transition cursor-pointer">Find Talent</a>
-      <a href="{{ route('help') }}" class="text-blue-600 transition cursor-pointer">Help</a>
-    </div>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex">
 
-    <div class="space-x-4" data-aos="fade-left" data-aos-delay="800" data-aos-duration="1000">
-      <a href="/navlogin" class="text-blue-600 font-semibold hover:underline">Log In</a>
-      <a href="/register" class="bg-blue-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-blue-700 transition">Sign Up</a>
-    </div>
-  </nav>
-
+    @include('layout.aside')
   <!-- Main Content: iframe + contact form -->
   <main class="flex-grow max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-10 p-6">
     <!-- Left: Iframe with DCKAP Palli location -->

@@ -78,7 +78,10 @@
     </div>
 
     @php
-    $image = json_decode($skills->profile_settings,true)['image'] ?? '';
+    $profile = json_decode($skills->profile_settings,true)??[];
+    $image = $profile ['image'] ?? '';
+    $address = $profile['address'] ?? '';
+    $address = json_decode($address,true);
     @endphp
 
     <!-- Form -->
@@ -125,20 +128,20 @@
         <!-- Basic Info -->
         <div class="md:col-span-2 space-y-5">
           <!-- First Name -->
-  <div>
-    <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-    <input type="text" id="first_name" name="first_name"
-           value="{{ json_decode($skills->profile_settings,true)['first_name'] ?? '' }}"
-           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-  </div>
+          <div>
+            <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+            <input type="text" id="first_name" name="first_name"
+              value="{{ json_decode($skills->profile_settings,true)['first_name'] ?? '' }}"
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+          </div>
 
-  <!-- Last Name -->
-  <div>
-    <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-    <input type="text" id="last_name" name="last_name"
-           value="{{ json_decode($skills->profile_settings,true)['last_name'] ?? '' }}"
-           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-  </div>
+          <!-- Last Name -->
+          <div>
+            <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+            <input type="text" id="last_name" name="last_name"
+              value="{{ json_decode($skills->profile_settings,true)['last_name'] ?? '' }}"
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+          </div>
 
           <!-- Mobile Number -->
           <div>
@@ -165,11 +168,39 @@
             </div>
           </div>
 
-          <!-- Address -->
+          <!-- Address Line 1 -->
           <div>
-            <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-            <textarea id="address" name="address" rows="2" placeholder="Enter your full address"
-              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">{{ json_decode($skills->profile_settings,true)['address'] ?? '' }}</textarea>
+            <label for="address_line_1" class="block text-sm font-medium text-gray-700 mb-1">Address Line 1</label>
+            <input type="text" id="address_line_1" name="address_line_1" value="{{ $address['address_1'] ?? '' }}" placeholder="Street address, P.O. box"
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+          </div>
+
+          <!-- Address Line 2 -->
+          <div>
+            <label for="address_line_2" class="block text-sm font-medium text-gray-700 mb-1">Address Line 2 (Optional)</label>
+            <input type="text" id="address_line_2" name="address_line_2" value="{{ $address['address_2'] ?? '' }}" placeholder="Apartment, suite, unit, building, floor, etc."
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+          </div>
+
+          <!-- Postcode -->
+          <div>
+            <label for="postcode" class="block text-sm font-medium text-gray-700 mb-1">Postal/Zip Code</label>
+            <input type="text" id="postcode" name="postcode" value="{{ $address['zip_code'] ?? '' }}" placeholder="Postal or zip code"
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+          </div>
+
+          <!-- State/Province -->
+          <div>
+            <label for="state" class="block text-sm font-medium text-gray-700 mb-1">State/Province</label>
+            <input type="text" id="state" name="state" value="{{ $address['state'] ?? '' }}" placeholder="State or province"
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+          </div>
+
+          <!-- Region/Country -->
+          <div>
+            <label for="region" class="block text-sm font-medium text-gray-700 mb-1">Region/Country</label>
+            <input type="text" id="region" name="region" value="{{ $address['region'] ?? '' }}" placeholder="Region or country"
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
           </div>
 
           <!-- Profession Tags -->
@@ -536,6 +567,11 @@
     $(document).ready(function() {
       // Form validation
       $('form').on('submit', function(e) {
+
+        if (!validateAddressFields()) {
+          e.preventDefault(); // Stop form submission if validation fails
+        }
+
         let isValid = true;
         const errors = [];
 
@@ -678,7 +714,78 @@
       $('input, textarea, select').on('input change', function() {
         $(this).removeClass('border-red-500');
       });
+
     });
+
+
+
+    // Validate address fields on form submission
+
+
+    function validateAddressFields() {
+      // Reset previous errors
+      $('.address-field').removeClass('border-red-500').addClass('border-gray-300');
+      $('.error-message').remove();
+
+      let isValid = true;
+
+      // Validate Address Line 1 (required)
+      const addressLine1 = $('#address_line_1');
+      if (!addressLine1.val().trim()) {
+        showError(addressLine1, 'Primary address is required');
+        isValid = false;
+      } else if (addressLine1.val().trim().length > 255) {
+        showError(addressLine1, 'Address too long (max 255 characters)');
+        isValid = false;
+      }
+
+      // Validate Address Line 2 (optional)
+      const addressLine2 = $('#address_line_2');
+      if (addressLine2.val().trim() && addressLine2.val().trim().length > 255) {
+        showError(addressLine2, 'Address line 2 too long (max 255 characters)');
+        isValid = false;
+      }
+
+      // Validate Postcode (required)
+      const postcode = $('#postcode');
+      if (!postcode.val().trim()) {
+        showError(postcode, 'Postal/Zip code is required');
+        isValid = false;
+      } else if (!/^[a-zA-Z0-9\s\-]+$/.test(postcode.val())) {
+        showError(postcode, 'Invalid postal/zip code format');
+        isValid = false;
+      } else if (postcode.val().trim().length > 20) {
+        showError(postcode, 'Postal code too long (max 20 characters)');
+        isValid = false;
+      }
+
+      // Validate State (required)
+      const state = $('#state');
+      if (!state.val().trim()) {
+        showError(state, 'State/Province is required');
+        isValid = false;
+      } else if (state.val().trim().length > 100) {
+        showError(state, 'State name too long (max 100 characters)');
+        isValid = false;
+      }
+
+      // Validate Region (required)
+      const region = $('#region');
+      if (!region.val().trim()) {
+        showError(region, 'Region/Country is required');
+        isValid = false;
+      } else if (region.val().trim().length > 100) {
+        showError(region, 'Region name too long (max 100 characters)');
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+    function showError(field, message) {
+      field.removeClass('border-gray-300').addClass('border-red-500');
+      field.after('<div class="error-message text-red-500 text-xs mt-1">' + message + '</div>');
+    }
   </script>
 </body>
 

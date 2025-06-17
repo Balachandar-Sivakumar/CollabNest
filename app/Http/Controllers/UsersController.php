@@ -104,7 +104,7 @@ class UsersController extends Controller
             $data->linkedin             = trim($request->linkedin ?? $data->linkedin ?? null);
             $data->github               = trim($request->github ?? $data->github ?? null);
             $data->leetcode             = trim($request->leetcode ?? $data->leetcode ?? null );
-            $data->address              = trim($request->address ?? $data->address ?? null);
+            $data->address              = json_encode(['address_1'=>$request->address_line_1,'address_2'=>$request->address_line_2,'zip_code'=>$request->postcode,'state'=>$request->state,'region'=>$request->region]) ?? $data->address ?? null;
             $data->mobile               = $request->mobile ?? $data->mobile ?? null;
             $data->dob                  = $request->dob ?? $data->dob ?? null;
             $data->first_name            = $request->first_name ?? $data->first_name ?? null;
