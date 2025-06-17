@@ -177,266 +177,230 @@
 
           @if($project->owner_id === Auth::user()->id)
 
-            <div class="flex gap-4">
-              <button class="px-5 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition">
-                Project Requests
-              </button>
-
-              <button class="px-5 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition">
-                Invite Requests
-              </button>
-            </div>
-
-            @endif
-        </div>
-
-
-
-        <!-- Footer -->
-        <div class="bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-between items-center">
-          <span class="text-sm text-gray-500">
-            Created on {{ $project->created_at->format('M d, Y') }}
-          </span>
-          <div class="flex gap-3">
-            <button class="flex items-center px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-100">
-              <i class="fas fa-share-alt mr-2"></i> Share
+          <div x-data="{ showRequestsModal: false }" class="flex gap-4">
+            <!-- Trigger Button -->
+            <button
+              @click="showRequestsModal = true"
+              class="px-5 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition">
+              Project Requests
             </button>
-            @if($project->owner_id !== Auth::user()->id)
-            <form action="{{ route('request', ['project' => $project->id]) }}" method="POST">
-              @csrf
-              <button type="submit" class="flex items-center px-3 py-1.5 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
-                <i class="fas fa-user-plus mr-2"></i> Request
-              </button>
-            </form>
-            @else
-            <div x-data="{ showInviteModal: false }">
-              <a href="#" @click.prevent="showInviteModal = true" class="flex items-center px-3 py-1.5 text-sm text-white bg-green-600 rounded-md hover:bg-green-700">
-                <i class="fas fa-paper-plane mr-2"></i> Invite
-              </a>
 
-              <!-- Modal -->
-              <div x-show="showInviteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-transition>
-                <!-- Modal Panel -->
-                <div @click.away="showInviteModal = false" class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md" x-transition>
-                  <h2 class="text-lg font-semibold mb-4 text-gray-800">Invite a Member</h2>
-
-                  <form method="POST" action="{{ route('sendInvite', $project->id) }}">
-                    @csrf
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email address</label>
-                    <input type="email" name="email" id="email" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-green-200 mb-4" />
-
-                    <div class="flex justify-end gap-2">
-                      <button type="button" @click="showInviteModal = false" class="px-4 py-2 text-sm bg-gray-200 rounded-md hover:bg-gray-300">
-                        Cancel
-                      </button>
-                      <button type="submit" class="px-4 py-2 text-sm text-white bg-green-600 rounded-md hover:bg-green-700">
-                        Send Invite
-                      </button>
-                    </div>
-                  </form>
+            <!-- Modal Background -->
+            <div
+              x-show="showRequestsModal"
+              class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+              x-transition>
+              <!-- Modal Content -->
+              <div
+                @click.away="showRequestsModal = false"
+                class="bg-white rounded-lg shadow-xl p-6 w-full max-w-xl max-h-[80vh] overflow-y-auto"
+                x-transition>
+                <div class="flex justify-between items-center mb-4">
+                  <h2 class="text-xl font-semibold text-gray-800">Project Request Profiles</h2>
+                  <button @click="showRequestsModal = false" class="text-gray-500 hover:text-gray-700">&times;</button>
                 </div>
+
+                @forelse($projectRequests as $request)
+                <div class="border-b py-3">
+                  <p class="font-medium text-gray-700">👤 {{ $request->user->name }}</p>
+                  <p class="text-sm text-gray-500">📧 {{ $request->user->email }}</p>
+                  <p class="text-sm text-gray-500">📅 Requested on: {{ $request->created_at->format('d M Y') }}</p>
+                  <p class="text-sm text-gray-500">Status: <span class="font-medium">{{ ucfirst($request->status) }}</span></p>
+                  <a href="/profile/{{ $request->user->id}}"
+                    class="mt-2 inline-block px-4 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                    View Profile
+                  </a>
+
+
+                </div>
+                @empty
+                <p class="text-gray-500">No project requests found.</p>
+                @endforelse
               </div>
-            </div>
-            @endif
-          </div>
-
-          <!-- delete handling -->
-
-          <div id="popup" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 " style="display: none;">
-            <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-              <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirm Project Deletion</h2>
-
-              <p class="mb-4 text-sm text-gray-600">
-                This action cannot be undone. Please enter your password to confirm deletion.
-              </p>
-
-              <form method="POST" action="/projects">
-                @csrf
-                @method('DELETE')
-
-                <input type="password" name="password" id="delpassword"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-red-200"
-                  placeholder="Enter your password">
-                <input type="hidden" id="projectId" value="{{$project->id}}">
-
-                <div class="mt-6 flex justify-end gap-2">
-                  <button id="cancelbtn" type="button"
-                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded">
-                    Cancel
-                  </button>
-                  <button type="submit" id="confrimDelete"
-                    class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">
-                    Confirm Delete
-                  </button>
-                </div>
-              </form>
             </div>
           </div>
 
-          <!-- delete handling -->
-          @if($project->owner_id === Auth::user()->id)
-          <button id="deleteProject" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition duration-200">
-            Delete Project
-          </button>
-          @endif
+          <div x-data="{ showInviteRequests: false }" class="flex gap-4">
+            <!-- Button -->
+            <button @click="showInviteRequests = true"
+              class="px-5 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition">
+              Invite Requests
+            </button>
 
-        </div>
-      </div>
-    </div>
-
-    <!-- Tasks Section -->
-    <div class="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200">
-      <div class="px-6 py-4 border-b border-gray-200">
-        <h2 class="text-xl font-semibold flex items-center">
-          <i class="fas fa-tasks mr-2 text-indigo-500"></i> Project Tasks
-        </h2>
-      </div>
-
-      <div class="container mx-auto px-4 py-8">
-        <div class="flex justify-center">
-          <div class="w-full">
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-              <div class="bg-gray-800 text-white px-6 py-4">
-                <h2 class="text-xl font-semibold">Tasks</h2>
-              </div>
-
-              <div class="p-6">
-                @if (session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4" role="alert">
-                  {{ session('success') }}
+            <!-- Modal -->
+            <div x-show="showInviteRequests" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-transition>
+              <div @click.away="showInviteRequests = false" class="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg overflow-y-auto max-h-[80vh]" x-transition>
+                <div class="flex justify-between items-center mb-4">
+                  <h2 class="text-lg font-semibold text-gray-800">Project Invitations</h2>
+                  <button @click="showInviteRequests = false" class="text-gray-500 text-xl">&times;</button>
                 </div>
-                @endif
 
-                <div class="mb-6">
-                  <a href="{{ route('tasks.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Create New Task
+                @forelse($inviteRequests as $invite)
+                <div class="border-b py-3">
+                  <p class="text-gray-800 font-medium">📁 Project: {{ $invite->project->title }}</p>
+                  <p class="text-sm text-gray-600">👤 Invited by: {{ $invite->owner->name }}</p>
+                  <p class="text-sm text-gray-500">📅 Sent on: {{ $invite->created_at->format('d M Y') }}</p>
+
+                  <!-- View Profile Button -->
+                  <a href="/profile/{{$invite->owner->id}}"
+                    class="mt-2 inline-block px-4 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                    View Profile
                   </a>
                 </div>
-
-                <h4 class="text-lg font-semibold mb-4">Tasks Assigned by Me</h4>
-                @if($assignedTasks->isEmpty())
-                <p class="text-gray-600">No tasks assigned by you.</p>
-                @else
-                <div class="overflow-x-auto">
-                  <table class="min-w-full bg-white">
-                    <thead>
-                      <tr class="bg-gray-100">
-                        <th class="py-2 px-4 border-b border-gray-200 text-left">Title</th>
-                        <th class="py-2 px-4 border-b border-gray-200 text-left">Assigned To</th>
-                        <th class="py-2 px-4 border-b border-gray-200 text-left">Due Date</th>
-                        <th class="py-2 px-4 border-b border-gray-200 text-left">Status</th>
-                        <th class="py-2 px-4 border-b border-gray-200 text-left">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @foreach($assignedTasks as $task)
-                      <tr class="hover:bg-gray-50">
-                        <td class="py-2 px-4 border-b border-gray-200">{{ $task->title }}</td>
-                        <td class="py-2 px-4 border-b border-gray-200">{{ $task->assignee->name }}</td>
-                        <td class="py-2 px-4 border-b border-gray-200">{{ $task->due_date ? $task->due_date->format('Y-m-d') : 'N/A' }}</td>
-                        <td class="py-2 px-4 border-b border-gray-200">
-                          <div class="relative" x-data="{ open: false }">
-                            <span
-                              @click="open = !open"
-                              class="px-2 py-1 rounded text-xs font-semibold cursor-pointer {{ $statusClasses[$task->status] ?? '' }}">
-                              {{ ucfirst(str_replace('_', ' ', $task->status)) }}
-                            </span>
-                            <div
-                              x-show="open"
-                              @click.away="open = false"
-                              class="absolute left-0 mt-1 w-32 bg-white border rounded shadow-lg z-10"
-                              x-transition>
-                              <form method="POST" action="{{ route('tasks.update', $task) }}">
-                                @csrf
-                                @method('PUT')
-                                <input type="hidden" name="title" value="{{ $task->title }}">
-                                <input type="hidden" name="description" value="{{ $task->description }}">
-                                <input type="hidden" name="assigned_to" value="{{ $task->assigned_to }}">
-                                <input type="hidden" name="due_date" value="{{ $task->due_date }}">
-                                <button type="submit" name="status" value="pending" class="block w-full text-left px-4 py-2 text-yellow-700 hover:bg-yellow-100 {{ $task->status == 'pending' ? 'font-bold' : '' }}">Pending</button>
-                                <button type="submit" name="status" value="in_progress" class="block w-full text-left px-4 py-2 text-blue-700 hover:bg-blue-100 {{ $task->status == 'in_progress' ? 'font-bold' : '' }}">In Progress</button>
-                                <button type="submit" name="status" value="completed" class="block w-full text-left px-4 py-2 text-green-700 hover:bg-green-100 {{ $task->status == 'completed' ? 'font-bold' : '' }}">Completed</button>
-                              </form>
-                            </div>
-                          </div>
-                        </td>
-                        <td class="py-2 px-4 border-b border-gray-200 space-x-2">
-                          <a href="{{ route('tasks.show', $task) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm">View</a>
-                          <a href="{{ route('tasks.edit', $task) }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded text-sm">Edit</a>
-                          <form action="{{ route('tasks.destroy', $task) }}" method="POST" class="inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm" onclick="return confirm('Are you sure?')">Delete</button>
-                          </form>
-                        </td>
-                      </tr>
-                      @endforeach
-                    </tbody>
-                  </table>
-                </div>
-                @endif
-
-                <h4 class="text-lg font-semibold mt-8 mb-4">Tasks Assigned to Me</h4>
-                @if($receivedTasks->isEmpty())
-                <p class="text-gray-600">No tasks assigned to you.</p>
-                @else
-                <div class="overflow-x-auto">
-                  <table class="min-w-full bg-white">
-                    <thead>
-                      <tr class="bg-gray-100">
-                        <th class="py-2 px-4 border-b border-gray-200 text-left">Title</th>
-                        <th class="py-2 px-4 border-b border-gray-200 text-left">Assigned By</th>
-                        <th class="py-2 px-4 border-b border-gray-200 text-left">Due Date</th>
-                        <th class="py-2 px-4 border-b border-gray-200 text-left">Status</th>
-                        <th class="py-2 px-4 border-b border-gray-200 text-left">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @foreach($receivedTasks as $task)
-                      <tr class="hover:bg-gray-50">
-                        <td class="py-2 px-4 border-b border-gray-200">{{ $task->title }}</td>
-                        <td class="py-2 px-4 border-b border-gray-200">{{ $task->assigner->name }}</td>
-                        <td class="py-2 px-4 border-b border-gray-200">{{ $task->due_date ? $task->due_date->format('Y-m-d') : 'N/A' }}</td>
-                        <td class="py-2 px-4 border-b border-gray-200">
-                          <div class="relative" x-data="{ open: false }">
-                            <span
-                              @click="open = !open"
-                              class="px-2 py-1 rounded text-xs font-semibold cursor-pointer {{ $statusClasses[$task->status] ?? '' }}">
-                              {{ ucfirst(str_replace('_', ' ', $task->status)) }}
-                            </span>
-                            <div
-                              x-show="open"
-                              @click.away="open = false"
-                              class="absolute left-0 mt-1 w-32 bg-white border rounded shadow-lg z-10"
-                              x-transition>
-                              <form method="POST" action="{{ route('tasks.update', $task) }}">
-                                @csrf
-                                @method('PUT')
-                                <input type="hidden" name="title" value="{{ $task->title }}">
-                                <input type="hidden" name="description" value="{{ $task->description }}">
-                                <input type="hidden" name="assigned_to" value="{{ $task->assigned_to }}">
-                                <input type="hidden" name="due_date" value="{{ $task->due_date }}">
-                                <button type="submit" name="status" value="pending" class="block w-full text-left px-4 py-2 text-yellow-700 hover:bg-yellow-100 {{ $task->status == 'pending' ? 'font-bold' : '' }}">Pending</button>
-                                <button type="submit" name="status" value="in_progress" class="block w-full text-left px-4 py-2 text-blue-700 hover:bg-blue-100 {{ $task->status == 'in_progress' ? 'font-bold' : '' }}">In Progress</button>
-                                <button type="submit" name="status" value="completed" class="block w-full text-left px-4 py-2 text-green-700 hover:bg-green-100 {{ $task->status == 'completed' ? 'font-bold' : '' }}">Completed</button>
-                              </form>
-                            </div>
-                          </div>
-                        </td>
-                        <td class="py-2 px-4 border-b border-gray-200">
-                          <a href="{{ route('tasks.show', $task) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm">View</a>
-                        </td>
-                      </tr>
-                      @endforeach
-                    </tbody>
-                  </table>
-                </div>
-                @endif
+                @empty
+                <p class="text-gray-500">No invite requests found.</p>
+                @endforelse
               </div>
             </div>
           </div>
+
         </div>
+
+        @endif
       </div>
+
+
+
+      <!-- Footer -->
+      <div class="bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-between items-center">
+        <span class="text-sm text-gray-500">
+          Created on {{ $project->created_at->format('M d, Y') }}
+        </span>
+        <div class="flex gap-3">
+          <button class="flex items-center px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-100">
+            <i class="fas fa-share-alt mr-2"></i> Share
+          </button>
+          @if($project->owner_id !== Auth::user()->id)
+          <div x-data="{ showRequestModal: false }">
+            <button @click="showRequestModal = true" type="button" class="flex items-center px-3 py-1.5 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
+              <i class="fas fa-user-plus mr-2"></i> Request
+            </button>
+
+            <!-- Modal -->
+            <div x-show="showRequestModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-transition>
+              <div @click.away="showRequestModal = false" class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md" x-transition>
+                <h2 class="text-lg font-semibold mb-4 text-gray-800">Request to Join Project</h2>
+                <form method="POST" action="{{ route('project.request.join', ['id' => $project->id]) }}">
+
+                  @csrf
+
+                  <!-- To -->
+                  <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-800 mb-1">To:</label>
+                    <input type="text" value="{{ $project->owner->name }}" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100" readonly />
+                    <input type="email" value="{{ $project->owner->email }}" class="w-full px-3 py-2 mt-2 border border-gray-300 rounded-md bg-gray-100" readonly />
+                  </div>
+
+                  <!-- From -->
+                  <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-800 mb-1">From:</label>
+                    <input type="text" name="name" value="{{ Auth::user()->name }}" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100" readonly />
+                    <input type="email" name="email" value="{{ Auth::user()->email }}" class="w-full px-3 py-2 mt-2 border border-gray-300 rounded-md bg-gray-100" readonly />
+                  </div>
+
+                  <!-- Title -->
+                  <div class="mb-4">
+                    <label for="title" class="block text-sm font-semibold text-gray-800 mb-1">Title:</label>
+                    <input type="text" id="title" name="title" value="Project Request to Join '{{ $project->title }}'" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" readonly />
+                  </div>
+
+                  <!-- Body -->
+                  <div class="mb-4">
+                    <label for="body" class="block text-sm font-semibold text-gray-800 mb-1">Body:</label>
+                    <textarea id="body" name="body" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white resize-none" placeholder="Write your message to the project owner here..."></textarea>
+                  </div>
+
+                  <!-- Buttons -->
+                  <div class="flex justify-end gap-3">
+                    <button type="button" @click="showRequestModal = false" class="px-4 py-2 text-sm bg-gray-200 rounded-md hover:bg-gray-300">
+                      Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
+                      Send Request
+                    </button>
+                  </div>
+                </form>
+
+
+              </div>
+            </div>
+          </div>
+          @else
+          <div x-data="{ showInviteModal: false }">
+            <a href="#" @click.prevent="showInviteModal = true" class="flex items-center px-3 py-1.5 text-sm text-white bg-green-600 rounded-md hover:bg-green-700">
+              <i class="fas fa-paper-plane mr-2"></i> Invite
+            </a>
+
+            <!-- Modal -->
+            <div x-show="showInviteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-transition>
+              <!-- Modal Panel -->
+              <div @click.away="showInviteModal = false" class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md" x-transition>
+                <h2 class="text-lg font-semibold mb-4 text-gray-800">Invite Members</h2>
+
+                <form method="POST" action="{{ route('sendInvite', $project->id) }}" onsubmit="return validateEmails()">
+                  @csrf
+                  <label for="emails" class="block text-sm font-medium text-gray-700 mb-1">Email addresses</label>
+                  <input type="text" name="emails" id="emails" placeholder="e.g. anu@gmail.com, dharshu@gmail.com" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-green-200 mb-4" />
+
+                  <div class="flex justify-end gap-2">
+                    <button type="button" @click="showInviteModal = false" class="px-4 py-2 text-sm bg-gray-200 rounded-md hover:bg-gray-300">
+                      Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 text-sm text-white bg-green-600 rounded-md hover:bg-green-700">
+                      Send Invite
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          @endif
+        </div>
+
+        <!-- delete handling -->
+
+        <div id="popup" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 " style="display: none;">
+          <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirm Project Deletion</h2>
+
+            <p class="mb-4 text-sm text-gray-600">
+              This action cannot be undone. Please enter your password to confirm deletion.
+            </p>
+
+            <form method="POST" action="/projects">
+              @csrf
+              @method('DELETE')
+
+              <input type="password" name="password" id="delpassword"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-red-200"
+                placeholder="Enter your password">
+              <input type="hidden" id="projectId" value="{{$project->id}}">
+
+              <div class="mt-6 flex justify-end gap-2">
+                <button id="cancelbtn" type="button"
+                  class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded">
+                  Cancel
+                </button>
+                <button type="submit" id="confrimDelete"
+                  class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">
+                  Confirm Delete
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- delete handling -->
+        @if($project->owner_id === Auth::user()->id)
+        <button id="deleteProject" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition duration-200">
+          Delete Project
+        </button>
+        @endif
+
+      </div>
+    </div>
+    </div>
+    @include('team')
   </main>
 
   <script>
@@ -476,11 +440,31 @@
         })
         .then(res => res.json())
         .then(data => {
+          window.history.go(-1);
           window.location.href = "{{url('/navMyProject')}}";
         })
         .catch(err => console.log(err));
     });
+
+
+
+    function validateEmails() {
+      const input = document.getElementById('emails').value;
+      const emailArray = input.split(',').map(email => email.trim());
+      console.log(emailArray);
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      for (let email of emailArray) {
+        if (!emailRegex.test(email)) {
+          alert(`Invalid email: ${email}`);
+          return false; // stop form submission
+        }
+      }
+
+      return true; // allow submission
+    }
   </script>
+
 </body>
 
 </html>

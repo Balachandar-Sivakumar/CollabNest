@@ -8,11 +8,14 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Skill;
-use App\Mail\ProjectRequestMail;
+use App\Models\ProjectRequest;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Task;
 use Illuminate\Support\Facades\Hash;
-use PHPUnit\Framework\MockObject\ReturnValueNotConfiguredException;
+use App\Models\ProjectTeamMember;
+use App\Models\ProjectTeam;
+use App\Models\ProjectInvite;
+
 
 class ProjectController extends Controller
 {
@@ -91,21 +94,45 @@ class ProjectController extends Controller
         return redirect()->route('navMyProject')->with('success', 'Project created succesfully!');
     }
 
-        public function viewProject(Project $project)
-    {
-    $user = \Illuminate\Support\Facades\Auth::user(); 
-    $userId = $user->id;
+public function viewProject(Project $project)
+{
+    // $project = Project::findOrFail($id);
+   
+    $team = ProjectTeam::where('project_id', $project->id)->first(); 
 
-        $assignedTasks = Task::where('project_id', $project->id)
-                             ->where('assigned_by', $userId)
-                             ->get();
-
-        $receivedTasks = Task::where('project_id', $project->id)
-                             ->where('assigned_to', $userId)
-                             ->get();
-
-        return view('viewProject', compact('project', 'assignedTasks', 'receivedTasks'));
+    if (!Auth::check()) {
+    return redirect()->route('login')->with('error', 'You must be logged in to view this project.');
     }
+
+    $userId = Auth::user()->id;
+
+
+    $assignedTasks = Task::where('project_id', $project->id)
+                         ->where('assigned_by', $userId)
+                         ->get();
+
+    $receivedTasks = Task::where('project_id', $project->id)
+                         ->where('assigned_to', $userId)
+                         ->get();
+
+   $teamMembers = ProjectTeamMember::with('user') 
+                        ->where('project_id', $project->id)
+                         ->get();
+
+    $projectRequests = ProjectRequest::with('user')
+        ->where('project_id', $project->id)
+        ->where('status', 'pending')
+        ->get();
+
+    $inviteRequests = ProjectInvite::with(['project', 'owner'])
+        ->where('email', Auth::user()->email)
+        ->get();
+
+
+
+    return view('viewProject', compact('project', 'assignedTasks', 'receivedTasks', 'teamMembers','projectRequests', 'inviteRequests'));
+       
+}
 
 
     public function navUpdateProject($id)

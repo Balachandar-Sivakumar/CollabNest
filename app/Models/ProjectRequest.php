@@ -9,10 +9,18 @@ use Mtvs\EloquentHashids\HashidRouting;
 
 class ProjectRequest extends Model
 {
-        use HasHashid, HashidRouting;
-        use HasFactory;
-        protected $fillable = [
-        'project_id',
-        'user_id',
-    ];
+    protected $fillable = ['title', 'body', 'project_id', 'request_type', 'user_id', 'target_id', 'status'];
+
+    public function project() {
+        return $this->belongsTo(Project::class);
+    }
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
+
+    public function target() {
+        return $this->belongsTo(User::class, 'target_id');
+    }
 }
+
