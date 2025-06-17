@@ -14,6 +14,7 @@ use App\Models\Task;
 use Illuminate\Support\Facades\Hash;
 use App\Models\ProjectTeamMember;
 use App\Models\ProjectTeam;
+use App\Models\ProjectInvite;
 
 
 class ProjectController extends Controller
@@ -95,11 +96,14 @@ class ProjectController extends Controller
 
 public function viewProject(Project $project)
 {
-    // $user = \
+    // $project = Project::findOrFail($id);
+   
     $team = ProjectTeam::where('project_id', $project->id)->first(); 
+
     if (!Auth::check()) {
     return redirect()->route('login')->with('error', 'You must be logged in to view this project.');
     }
+
     $userId = Auth::user()->id;
 
 
@@ -111,14 +115,23 @@ public function viewProject(Project $project)
                          ->where('assigned_to', $userId)
                          ->get();
 
-   $teamMembers = ProjectTeamMember::with('user') // eager load user
-    ->where('project_id', $project->id)
-    ->where('team_id', $team->id)
-    ->get();
+   $teamMembers = ProjectTeamMember::with('user') 
+                        ->where('project_id', $project->id)
+                         ->get();
+
+    $projectRequests = ProjectRequest::with('user')
+        ->where('project_id', $project->id)
+        ->where('status', 'pending')
+        ->get();
+
+    $inviteRequests = ProjectInvite::with(['project', 'owner'])
+        ->where('email', Auth::user()->email)
+        ->get();
 
 
 
-    return view('viewProject', compact('project', 'assignedTasks', 'receivedTasks', 'teamMembers'));
+    return view('viewProject', compact('project', 'assignedTasks', 'receivedTasks', 'teamMembers','projectRequests', 'inviteRequests'));
+       
 }
 
 

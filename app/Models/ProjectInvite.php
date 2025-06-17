@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Invite extends Model
+class ProjectInvite extends Model
 {
     protected $fillable = ['owner_id', 'project_id', 'email', 'target_user_id', 'status'];
 
