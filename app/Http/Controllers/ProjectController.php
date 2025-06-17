@@ -97,6 +97,8 @@ public function viewProject(Project $project)
 {
     // $user = \
     $team = ProjectTeam::where('project_id', $project->id)->first(); 
+
+
     if (!Auth::check()) {
     return redirect()->route('login')->with('error', 'You must be logged in to view this project.');
     }
@@ -113,7 +115,6 @@ public function viewProject(Project $project)
 
    $teamMembers = ProjectTeamMember::with('user') // eager load user
     ->where('project_id', $project->id)
-    ->where('team_id', $team->id)
     ->get();
 
 
