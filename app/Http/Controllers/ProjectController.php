@@ -15,21 +15,22 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\ProjectTeamMember;
 use App\Models\ProjectTeam;
 use App\Models\ProjectInvite;
-
+use Illuminate\Cache\Events\RetrievingKey;
 
 class ProjectController extends Controller
 {
     public function index()
     {
         $projects = Project::all();
-        return view('AllProjects',compact('projects'));
+        return view('AllProjects', compact('projects'));
     }
 
-    public function navMyProject(){
+    public function navMyProject()
+    {
 
-        $projects = Project::where('owner_id',Auth::user()->id)->get();
+        $projects = Project::where('owner_id', Auth::user()->id)->get();
 
-        return view('MyProject',compact('projects'));
+        return view('MyProject', compact('projects'));
     }
 
     public function navcreateproject()
@@ -40,7 +41,7 @@ class ProjectController extends Controller
     public function CreateProject(Request $request)
     {
 
-       
+
         $validated = $request->validate([
             'title' => 'required',
             'description' => 'required',
@@ -54,18 +55,17 @@ class ProjectController extends Controller
         $validated['owner_id'] = Auth::user()->id;
 
         // Handle file uploads
-        $document_path=[];
-        if($request->file('requirement_documents')){
-            foreach($request->file('requirement_documents') as $ind=>$file){
-               if(isset($file) && isset($request->doc_names[$ind])){
+        $document_path = [];
+        if ($request->file('requirement_documents')) {
+            foreach ($request->file('requirement_documents') as $ind => $file) {
+                if (isset($file) && isset($request->doc_names[$ind])) {
                     $name = $request->doc_names[$ind];
-                    $document_path[$name] = $file->store('projectDocuments','public');
-               }
-  
+                    $document_path[$name] = $file->store('projectDocuments', 'public');
+                }
             }
         }
 
-    
+
         $logo_path = '';
         if ($request->hasFile('logo')) {
             $logo_path = $request->file('logo')->store('files', 'public');
@@ -87,52 +87,51 @@ class ProjectController extends Controller
             'trello' => $validated['trello'] ?? ''
         ]);
         $validated['skills_required'] = json_encode($skills);
-        $validated['status']=0;
+        $validated['status'] = 0;
 
         Project::create($validated);
 
         return redirect()->route('navMyProject')->with('success', 'Project created succesfully!');
     }
 
-public function viewProject(Project $project)
-{
-    // $project = Project::findOrFail($id);
-   
-    $team = ProjectTeam::where('project_id', $project->id)->first(); 
+    public function viewProject(Project $project)
+    {
+        // $project = Project::findOrFail($id);
 
-    if (!Auth::check()) {
-    return redirect()->route('login')->with('error', 'You must be logged in to view this project.');
+        $team = ProjectTeam::where('project_id', $project->id)->first();
+
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'You must be logged in to view this project.');
+        }
+
+        $userId = Auth::user()->id;
+
+
+        $assignedTasks = Task::where('project_id', $project->id)
+            ->where('assigned_by', $userId)
+            ->get();
+
+        $receivedTasks = Task::where('project_id', $project->id)
+            ->where('assigned_to', $userId)
+            ->get();
+
+        $teamMembers = ProjectTeamMember::with('user')
+            ->where('project_id', $project->id)
+            ->get();
+
+        $projectRequests = ProjectRequest::with('user')
+            ->where('project_id', $project->id)
+            ->where('status', 'pending')
+            ->get();
+
+        $inviteRequests = ProjectInvite::with(['project', 'owner'])
+            ->where('email', Auth::user()->email)
+            ->get();
+
+
+
+        return view('viewProject', compact('project', 'assignedTasks', 'receivedTasks', 'teamMembers', 'projectRequests', 'inviteRequests'));
     }
-
-    $userId = Auth::user()->id;
-
-
-    $assignedTasks = Task::where('project_id', $project->id)
-                         ->where('assigned_by', $userId)
-                         ->get();
-
-    $receivedTasks = Task::where('project_id', $project->id)
-                         ->where('assigned_to', $userId)
-                         ->get();
-
-   $teamMembers = ProjectTeamMember::with('user') 
-                        ->where('project_id', $project->id)
-                         ->get();
-
-    $projectRequests = ProjectRequest::with('user')
-        ->where('project_id', $project->id)
-        ->where('status', 'pending')
-        ->get();
-
-    $inviteRequests = ProjectInvite::with(['project', 'owner'])
-        ->where('email', Auth::user()->email)
-        ->get();
-
-
-
-    return view('viewProject', compact('project', 'assignedTasks', 'receivedTasks', 'teamMembers','projectRequests', 'inviteRequests'));
-       
-}
 
 
     public function navUpdateProject($id)
@@ -144,8 +143,8 @@ public function viewProject(Project $project)
     public function UpdateProject(Request $request, $id)
     {
 
-  
-   
+
+
         $request->validate([
             'title' => 'required',
             'description' => 'required',
@@ -171,10 +170,10 @@ public function viewProject(Project $project)
         $document_path = json_decode($project->requirement_documents, true) ?? [];
         $removed_docs = json_decode($request->removed_documents, true) ?? [];
 
-        foreach($removed_docs as $remove){
-            if(isset($document_path[$remove])){
+        foreach ($removed_docs as $remove) {
+            if (isset($document_path[$remove])) {
                 $file_path = $document_path[$remove];
-                if(Storage::disk('public')->exists($file_path)){
+                if (Storage::disk('public')->exists($file_path)) {
                     Storage::disk('public')->delete($file_path);
                 }
             }
@@ -184,18 +183,17 @@ public function viewProject(Project $project)
             return !in_array($key, $removed_docs);
         }, ARRAY_FILTER_USE_KEY);
 
-        
+
 
         if ($request->hasFile('requirement_documents')) {
-            foreach ($request->file('requirement_documents') as $ind=>$file) {
-                if(isset($file) && isset($request->doc_names[$ind])){
+            foreach ($request->file('requirement_documents') as $ind => $file) {
+                if (isset($file) && isset($request->doc_names[$ind])) {
                     $name = $request->doc_names[$ind];
                     $document_path[$name] = $file->store('projectDocuments', 'public');
                 }
-                
             }
         }
-      
+
         // Convert skills string to IDs
         $skills = [];
         $skillList = array_filter(array_map('trim', explode(',', $request->technical_skills)));
@@ -217,25 +215,29 @@ public function viewProject(Project $project)
                 'trello' => $request->trello
             ]),
             'is_private' => $request->is_private,
-            'status'=>$request->status == 'open' ? 0 :($request->status == 'active' ? 1 : ($request->status == 'closed' ? 2 : $project->status)),
+            'status' => $request->status == 'open' ? 0 : ($request->status == 'active' ? 1 : ($request->status == 'closed' ? 2 : $project->status)),
         ];
 
-        
 
-        Project::where('id',$id)->update($update);
 
-        return redirect()->route('navMyProject')->with('success','Project updated successfully');
+        Project::where('id', $id)->update($update);
+
+        return redirect()->route('navMyProject')->with('success', 'Project updated successfully');
     }
 
-    public function deleteProject(Request $request){
-    
-        if(Hash::check($request->password,Auth::user()->password)){
-            Project::where('id',$request->id)->delete();
-            return ['success'=>'Project deleted success fully'];
-        }else{
-            return ['error','Incorrect password'];
+    public function deleteProject(Request $request)
+    {
+
+        if (Hash::check($request->password, Auth::user()->password)) {
+            Project::where('id', $request->id)->delete();
+            return ['success' => 'Project deleted success fully'];
+        } else {
+            return ['error', 'Incorrect password'];
         }
-       
     }
 
+    public function projectInvites(){
+        $invites = ProjectInvite::where('target_user_id', Auth::user()->id)->get();
+        return view('projectInvites',compact('invites'));
+    }
 }

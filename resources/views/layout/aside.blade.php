@@ -44,7 +44,7 @@
           <i class="fas fa-user-tie"></i><span>Profile</span>
         </p>
 
-        <div class="profile_branch {{request()->is($profileurl) ? 'block' : 'hidden'}}">
+        <div class="profile_branch {{request()->is($profileurl) || request()->routeIs('projectInvites')  ? 'block' : 'hidden'}}">
 
           <a href="/profile/{{Auth::user()->id}}"
             class="flex items-center space-x-2 py-2 px-3 rounded-md 
@@ -52,7 +52,7 @@
             <i></i><i></i><span>MY Profile</span>
           </a>
 
-          <a href="#"
+          <a href="{{route('projectInvites')}}"
             class="flex items-center space-x-2 py-2 px-3 rounded-md 
             {{ request()->routeIs('projectInvites') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
             <i></i><i></i><span>Invites</span>

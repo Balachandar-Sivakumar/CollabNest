@@ -81,6 +81,7 @@ Route::controller(ProjectController::class)->group(function () {
     Route::get('/navMyProject', 'navMyProject')->name('navMyProject');
     Route::get('/navUpdateProject/{id}', 'navUpdateProject')->name('editProject');
     Route::post('/UpdateProject/{id}', 'UpdateProject');
+    Route::get('/projectInvites','projectInvites')->name('projectInvites');
 });
 
 // Project Requests
