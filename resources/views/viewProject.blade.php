@@ -436,8 +436,6 @@
         .catch(err => console.log(err));
     });
 
-
-
     function validateEmails() {
       const input = document.getElementById('emails').value;
       const emailArray = input.split(',').map(email => email.trim());
@@ -451,7 +449,7 @@
         }
       }
 
-      return true; // allow submission
+      return true;
     }
   </script>
 

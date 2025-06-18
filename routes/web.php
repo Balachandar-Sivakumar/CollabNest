@@ -41,8 +41,8 @@ Route::post('/login', [Authentication::class, 'loginUser'])->name('login');
 Route::get('/login', [Authentication::class, 'loginUser'])->name('login');
 // Settings
 Route::controller(SettingsController::class)->group(function () {
-    Route::get('/settings', 'index')->name('settings');
-    Route::put('/settings', 'update')->name('settings.update');
+    Route::get('/settings/changePassword','index')->name('changepass');
+    Route::get('/settings/help','help')->name('help');
 });
 
 // Team
@@ -81,6 +81,7 @@ Route::controller(ProjectController::class)->group(function () {
     Route::get('/navMyProject', 'navMyProject')->name('navMyProject');
     Route::get('/navUpdateProject/{id}', 'navUpdateProject')->name('editProject');
     Route::post('/UpdateProject/{id}', 'UpdateProject');
+    Route::get('/projectInvites','projectInvites')->name('projectInvites');
 });
 
 // Project Requests

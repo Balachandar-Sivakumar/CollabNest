@@ -79,7 +79,7 @@
         <div class="flex-1 space-y-6">
           <!-- Name & Professions -->
           <div>
-            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">{{ isset($userProfile['first_name']) ? $userProfile['first_name'].' '.$userProfile['last_name'] : \App\Models\User::where('id',$id)->value('name') }}</h1>
+            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">{{ isset($settings['first_name']) ? $settings['first_name'].' '.$settings['last_name'] : \App\Models\User::where('id',$id)->value('name') }}</h1>
             <div class="mt-3 flex flex-wrap gap-2">
               @php
               $professions_id = \App\Models\UserTag::where('user_id',$id)->where('tag_model','profession')->pluck('tag_id');
@@ -171,7 +171,33 @@
             <!-- Added Address Field -->
             <div class="bg-gray-50 p-3 rounded-lg">
               <p class="text-gray-500 text-xs font-medium mb-1">Address</p>
-              <p class="font-semibold text-gray-700">{{ $settings['address'] ?? 'Not specified' }}</p>
+              @php
+              $address = isset($settings['address']) ? json_decode($settings['address'], true) : null;
+              @endphp
+
+              @if(is_array($address) && !empty($address))
+              <div class="font-semibold text-gray-700 space-y-1">
+                @if(!empty($address['address_1']))
+                <p>{{ $address['address_1'] }}</p>
+                @endif
+                @if(!empty($address['address_2']))
+                <p>{{ $address['address_2'] }}</p>
+                @endif
+                <p>
+                  @if(!empty($address['state']))
+                  {{ $address['state'] }},
+                  @endif
+                  @if(!empty($address['postcode']))
+                  {{ $address['postcode'] }}
+                  @endif
+                </p>
+                @if(!empty($address['region']))
+                <p>{{ $address['region'] }}</p>
+                @endif
+              </div>
+              @else
+              <p class="font-semibold text-gray-700">Not specified</p>
+              @endif
             </div>
           </div>
           @endif
@@ -276,6 +302,11 @@
             @endif
           </div>
 
+          @if($skills->user_id !== Auth::user()->id)
+          <a href="#" class="px-5 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition">
+            Send Invite
+          </a>
+          @endif
 
           <!-- Button -->
           @if($skills->user_id === Auth::user()->id)
