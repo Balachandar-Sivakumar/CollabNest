@@ -93,7 +93,7 @@ class ProjectRequestController extends Controller
             'project' => $project,
             'owner' => $project->owner,
             'requester' => $projectRequest->user,
-            'teamMembers' => $teamMembers,
+            'teamMembers' => $teamMembers, 
         ])->with('success', 'Request accepted and team updated!');
     }
 

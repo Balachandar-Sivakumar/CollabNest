@@ -120,17 +120,20 @@ public function viewProject(Project $project)
                          ->get();
 
     $projectRequests = ProjectRequest::with('user')
-        ->where('project_id', $project->id)
-        ->where('status', 'pending')
-        ->get();
+                        ->where('project_id', $project->id)
+                        ->where('status', 'pending')
+                        ->get();
 
     $inviteRequests = ProjectInvite::with(['project', 'owner'])
-        ->where('email', Auth::user()->email)
-        ->get();
+                        ->where('email', Auth::user()->email)
+                        ->where('status', 'pending')
+                        ->get();
 
+    $allProjects = Project::all();
+    $projectMembers = User::all(); // Or filter as needed
+    $teams = ProjectTeam::with(['project', 'members'])->get();
 
-
-    return view('viewProject', compact('project', 'assignedTasks', 'receivedTasks', 'teamMembers','projectRequests', 'inviteRequests'));
+    return view('viewProject', compact('project', 'assignedTasks', 'receivedTasks', 'teamMembers','projectRequests', 'inviteRequests','allProjects', 'projectMembers', 'teams'));
        
 }
 

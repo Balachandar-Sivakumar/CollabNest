@@ -195,28 +195,26 @@
                 @click.away="showRequestsModal = false"
                 class="bg-white rounded-lg shadow-xl p-6 w-full max-w-xl max-h-[80vh] overflow-y-auto"
                 x-transition>
+
                 <div class="flex justify-between items-center mb-4">
                   <h2 class="text-xl font-semibold text-gray-800">Project Request Profiles</h2>
                   <button @click="showRequestsModal = false" class="text-gray-500 hover:text-gray-700">&times;</button>
                 </div>
 
-                @forelse($projectRequests as $request)
+                @forelse($inviteRequests as $invite)
+                @if($invite->project)
                 <div class="border-b py-3">
-                  <p class="font-medium text-gray-700">👤 {{ $request->user->name }}</p>
-                  <p class="text-sm text-gray-500">📧 {{ $request->user->email }}</p>
-                  <p class="text-sm text-gray-500">📅 Requested on: {{ $request->created_at->format('d M Y') }}</p>
-                  <p class="text-sm text-gray-500">Status: <span class="font-medium">{{ ucfirst($request->status) }}</span></p>
-                  <a href="/profile/{{ $request->user->id}}"
-                    class="mt-2 inline-block px-4 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-                    View Profile
-                  </a>
-
-
+                  <p class="text-gray-800 font-medium">📁 Project: {{ $invite->project->title }}</p>
+                  <p class="text-sm text-gray-600">👤 Invited by: {{ $invite->owner->name }}</p>
+                  <p class="text-sm text-gray-500">📅 Sent on: {{ $invite->created_at->format('M d, Y') }}</p>
                 </div>
+                @endif
                 @empty
-                <p class="text-gray-500">No project requests found.</p>
+                <p class="text-gray-500">No project invites found.</p>
                 @endforelse
+
               </div>
+
             </div>
           </div>
 
@@ -284,20 +282,6 @@
 
                   @csrf
 
-                  <!-- To -->
-                  <div class="mb-4">
-                    <label class="block text-sm font-semibold text-gray-800 mb-1">To:</label>
-                    <input type="text" value="{{ $project->owner->name }}" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100" readonly />
-                    <input type="email" value="{{ $project->owner->email }}" class="w-full px-3 py-2 mt-2 border border-gray-300 rounded-md bg-gray-100" readonly />
-                  </div>
-
-                  <!-- From -->
-                  <div class="mb-4">
-                    <label class="block text-sm font-semibold text-gray-800 mb-1">From:</label>
-                    <input type="text" name="name" value="{{ Auth::user()->name }}" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100" readonly />
-                    <input type="email" name="email" value="{{ Auth::user()->email }}" class="w-full px-3 py-2 mt-2 border border-gray-300 rounded-md bg-gray-100" readonly />
-                  </div>
-
                   <!-- Title -->
                   <div class="mb-4">
                     <label for="title" class="block text-sm font-semibold text-gray-800 mb-1">Title:</label>
@@ -308,6 +292,12 @@
                   <div class="mb-4">
                     <label for="body" class="block text-sm font-semibold text-gray-800 mb-1">Body:</label>
                     <textarea id="body" name="body" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white resize-none" placeholder="Write your message to the project owner here..."></textarea>
+                  </div>
+
+                  <!-- Document Upload -->
+                  <div class="mb-4">
+                    <label for="document" class="block text-sm font-semibold text-gray-800 mb-1">Upload Document:</label>
+                    <input type="file" name="document" id="document" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white" />
                   </div>
 
                   <!-- Buttons -->

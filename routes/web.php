@@ -154,9 +154,16 @@ Route::post('/projects/{project}/invite', [ProjectRequestController::class, 'sen
 
 Route::post('/project/{id}/request-join', [ProjectRequestController::class, 'sendRequest'])->name('project.request.join');
 
-// Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
+Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
 
-// Route::get('/teams/create', [TeamController::class, 'createTeamForm'])->name('team.create');
+Route::get('/teams/create', [TeamController::class, 'createTeamForm'])->name('team.create');
 
+Route::get('/teams/{team}/edit', [TeamController::class, 'edit'])->name('team.edit');
 
+Route::put('/teams/{team}', [TeamController::class, 'update'])->name('team.update');
 
+Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('team.destroy');
+
+Route::get('/teams', [TeamController::class, 'index'])->name('teams');
+
+Route::post('/project/invite/{id}', [ProjectRequestController::class, 'sendInvite'])->name('project.invite');
