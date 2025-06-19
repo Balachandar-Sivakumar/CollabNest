@@ -146,25 +146,21 @@ Route::post('/UpdateProject/{id}',[ProjectController::class,'UpdateProject']);
 
 Route::get('/project/request/{request}/accept', [ProjectRequestController::class, 'acceptRequest'])->name('project.request.accept');
 
-Route::get('/project/request/{request}/accept', [ProjectRequestController::class, 'acceptRequest'])->name('project.request.accept');
-
 Route::get('/project/request/{request}/reject', [ProjectRequestController::class, 'rejectRequest'])->name('project.reject');
 
-
-Route::post('/projects/{project}/invite', [ProjectRequestController::class, 'sendInvite'])->name('sendInvite');
+Route::get('/project/invite/{id}', [ProjectRequestController::class, 'sendInvite'])->name('project.invite');
 
 Route::post('/project/{id}/request-join', [ProjectRequestController::class, 'sendRequest'])->name('project.request.join');
 
+Route::get('/teams', [TeamController::class, 'index'])->name('teams.index');
 Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
+Route::get('/teams/{team}/edit', [TeamController::class, 'edit'])->name('teams.edit');
+Route::put('/teams/{team}', [TeamController::class, 'update'])->name('teams.update');
+Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('teams.delete');
 
-Route::get('/teams/create', [TeamController::class, 'createTeamForm'])->name('team.create');
-
-Route::get('/teams/{team}/edit', [TeamController::class, 'edit'])->name('team.edit');
-
-Route::put('/teams/{team}', [TeamController::class, 'update'])->name('team.update');
-
-Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('team.destroy');
-
-Route::get('/teams', [TeamController::class, 'index'])->name('teams');
+Route::middleware('auth')->group(function () {
+    Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
+    Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+});
 
 Route::post('/project/invite/{id}', [ProjectRequestController::class, 'sendInvite'])->name('project.invite');

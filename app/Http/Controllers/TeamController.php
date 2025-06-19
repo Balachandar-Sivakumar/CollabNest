@@ -7,34 +7,49 @@ use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\ProjectTeamMember;
 
 
 class TeamController extends Controller
 {
+ 
     public function store(Request $request)
     {
         $request->validate([
-            'team_name' => 'required',
-            'project_id' => 'required',
-            'description' => 'nullable',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
         ]);
 
-        ProjectTeam::create([
-            'name' => $request->team_name,
-            'project_id' => $request->project_id,
+        $project = Project::create([
+            'title' => $request->title,
             'description' => $request->description,
-            'team_lead_id' => optional(Auth::user())->id, // Default to authenticated user if no team lead is specified
+            'owner_id' => Auth::id(),
         ]);
 
-        return redirect()->back()->with('success', 'Team created successfully!');
+        
+        $team = ProjectTeam::create([
+            'name' => $project->title . ' - Team',
+            'description' => 'Default team for project: ' . $project->title,
+            'project_id' => $project->id,
+            'team_lead_id' => $project->owner_id,
+        ]);
+
+        // ✅ Add project owner as the first team member
+        ProjectTeamMember::create([
+            'user_id' => Auth::id(),
+            'project_id' => $project->id,
+            'team_id' => $team->id,
+        ]);
+
+        return redirect()->route('projects.index')->with('success', 'Project and default team created successfully!');
     }
 
-    public function createTeamForm()
+    public function create()
     {
-        $allProjects = Project::all(); 
-       
-        return view('viewProject', compact('allProjects'));
+        $allProjects = Project::all();
+        $projectMembers = User::all();
 
+        return view('team.create', compact('allProjects', 'projectMembers'));
     }
   
     public function edit(ProjectTeam $team)
@@ -67,6 +82,13 @@ class TeamController extends Controller
         $team->delete();
         return redirect()->route('teams')->with('success', 'Team deleted successfully!');
     }
-    
+    public function index()
+    {
+        $teams = ProjectTeam::with(['project', 'members.user'])->get();
+        $allProjects = Project::all();
+        $projectMembers = User::all();
+
+        return view('team', compact('teams', 'allProjects', 'projectMembers'));
+    }
 
 }

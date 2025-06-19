@@ -20,6 +20,7 @@ class ProjectRequestController extends Controller
     {
 
         $project = Project::findOrFail($id);
+        
 
         if ($project->owner_id === Auth::id()) {
             return redirect()->back()->with('error', 'You cannot request your own project.');
@@ -56,7 +57,6 @@ class ProjectRequestController extends Controller
     }
 
 
-
     public function acceptRequest($requesterId)
     {
         $projectRequest = ProjectRequest::where('user_id', $requesterId)->firstOrFail();
@@ -66,22 +66,24 @@ class ProjectRequestController extends Controller
             return redirect()->back()->with('error', 'You cannot accept your own request.');
         }
 
-        ProjectTeam::create([
-            'name' => $projectRequest->title,
-            'description' => $projectRequest->body,
-            'project_id' => $project->id,
-            'team_lead_id' => $project->owner_id,
+        // ✅ Check if team exists
+        $team = ProjectTeam::where('project_id', $project->id)->first();
 
-        ]);
+        if (!$team) {
+            $team = ProjectTeam::create([
+                'name' => $project->title . ' - Team',
+                'description' => 'Default team for project: ' . $project->title,
+                'project_id' => $project->id,
+                'team_lead_id' => $project->owner_id,
+            ]);
+        }
 
+        // ✅ Add user to team
         ProjectTeamMember::create([
             'user_id' => $requesterId,
             'project_id' => $project->id,
-            'team_id' => ProjectTeam::where('project_id', $project->id)->first()->id,
-
+            'team_id' => $team->id,
         ]);
-
-
 
         $projectRequest->update(['status' => 'accepted']);
 
@@ -89,13 +91,22 @@ class ProjectRequestController extends Controller
             ->where('project_id', $project->id)
             ->get();
 
+     
+        $teams = ProjectTeam::with(['project', 'members.user'])->get();
+        $allProjects = Project::all();
+        $projectMembers = User::all();
+
         return view('viewProject', [
             'project' => $project,
             'owner' => $project->owner,
             'requester' => $projectRequest->user,
-            'teamMembers' => $teamMembers, 
-        ])->with('success', 'Request accepted and team updated!');
+            'teamMembers' => $teamMembers,
+            'teams' => $teams,
+            'allProjects' => $allProjects,
+            'projectMembers' => $projectMembers,
+        ])->with('success', 'Request accepted and member added to the team!');
     }
+
 
     public function rejectRequest(Request $request, $projectId)
     {
@@ -118,7 +129,6 @@ class ProjectRequestController extends Controller
         return redirect()->route('dashboard')->with('info', 'You rejected the request for project: ' . $project->title);
     }
 
-
     public function sendInvite(Request $request, $id)
     {
         $request->validate([
@@ -126,9 +136,11 @@ class ProjectRequestController extends Controller
         ]);
 
         $project = Project::findOrFail($id);
+        $requester = Auth::user(); // ✅ This is the logged-in user
 
         $email_ids = explode(',', $request->emails);
         $validatedEmails = [];
+
         foreach ($email_ids as $email) {
             $email = trim($email);
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -136,14 +148,13 @@ class ProjectRequestController extends Controller
             }
             $validatedEmails[] = $email;
         }
+
         foreach ($validatedEmails as $email) {
-            // Check if the email already exists in the invites
             $existingInvite = ProjectInvite::where('project_id', $project->id)
                 ->where('email', $email)
                 ->first();
 
             if (!$existingInvite) {
-                // Save invite to DB
                 ProjectInvite::create([
                     'owner_id' => Auth::id(),
                     'project_id' => $project->id,
@@ -151,15 +162,14 @@ class ProjectRequestController extends Controller
                     'status' => 'pending'
                 ]);
 
-                Mail::to($email)->send(new ProjectInviteMail($project));
+                Mail::to($email)->send(new ProjectInviteMail($project, $requester));
             }
         }
 
-
-
         return redirect()->back()->with('success', 'Invitation email sent!');
     }
-    public function acceptInvite($id)
+
+   public function acceptInvite($id)
     {
         $invite = ProjectInvite::findOrFail($id);
         $invite->status = 'accepted';
@@ -171,24 +181,43 @@ class ProjectRequestController extends Controller
             return back()->with('error', 'User not found. Please make sure they have registered.');
         }
 
-        $existing = ProjectRequest::where('project_id', $invite->project_id)
-            ->where('user_id', $user->id)
-            ->where('status', 'accepted')
-            ->first();
+        // ✅ Add user to a team
+        $team = ProjectTeam::where('project_id', $invite->project_id)->first();
 
-        if (!$existing) {
-
-            ProjectRequest::create([
-                'user_id' => $user->id,
+        if (!$team) {
+            $team = ProjectTeam::create([
+                'name' => 'Default Team',
+                'description' => 'Auto-generated team',
                 'project_id' => $invite->project_id,
-                'status' => 'accepted',
-                'request_type' => 'user_request',
-                'target_id' => $invite->project_id,
+                'team_lead_id' => $invite->owner_id,
             ]);
         }
 
+        $alreadyExists = ProjectTeamMember::where('user_id', $user->id)
+                            ->where('team_id', $team->id)
+                            ->exists();
+
+        if (!$alreadyExists) {
+            ProjectTeamMember::create([
+                'user_id' => $user->id,
+                'project_id' => $invite->project_id,
+                'team_id' => $team->id,
+            ]);
+        }
+
+        // ✅ Create ProjectRequest with status = accepted (record keeping)
+        ProjectRequest::updateOrCreate([
+            'user_id' => $user->id,
+            'project_id' => $invite->project_id,
+        ], [
+            'status' => 'accepted',
+            'request_type' => 'user_request',
+            'target_id' => $invite->project_id,
+        ]);
+
         return back()->with('success', 'Invite accepted and user added to the team!');
     }
+
 
     public function show($projectId)
     {
@@ -198,62 +227,5 @@ class ProjectRequestController extends Controller
 
         return view('viewProject', compact('project', 'projectRequests'));
     }
-
-
-
-    // public function rejectInvite($id)
-    // {
-    //     $invite = ProjectInvite::findOrFail($id);
-    //     $invite->status = 'rejected';
-    //     $invite->save();
-
-    //     return back()->with('info', 'Invite rejected.');
-    // }
-    // public function viewInvites()
-    // {
-    //     $invites = ProjectInvite::where('email', Auth::user()->email)
-    //                      ->where('status', 'pending')
-    //                      ->get();
-
-    //     return view('invites', compact('invites'));
-    // }
-    // public function viewSentInvites()
-    // {
-    //     $sentInvites = ProjectInvite::where('owner_id', Auth::id())
-    //                          ->where('status', 'pending')
-    //                          ->get();
-
-    //     return view('sent_invites', compact('sentInvites'));
-    // }
-    // public function viewProjectRequests()
-    // {
-    //     $requests = ProjectRequest::where('target_id', Auth::id())
-    //                               ->where('status', 'pending')
-    //                               ->get();
-
-    //     return view('project_requests', compact('requests'));
-    // }
-    // public function viewSentProjectRequests()
-    // {
-    //     $sentRequests = ProjectRequest::where('user_id', Auth::id())
-    //                                   ->where('status', 'pending')
-    //                                   ->get();
-
-    //     return view('sent_project_requests', compact('sentRequests'));
-    // }
-    // public function viewTeamMembers($projectId)
-    // {
-    //     $project = Project::findOrFail($projectId);
-    //     $teamMembers = ProjectTeam::with('user')
-    //                               ->where('project_id', $projectId)
-    //                               ->get();
-
-    //     return view('team_members', compact('project', 'teamMembers'));
-    // }
-
-
-
-
-
 
 }

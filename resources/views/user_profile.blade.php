@@ -40,7 +40,7 @@
       <div class="flex flex-col md:flex-row gap-10 items-start">
         <!-- Left: Profile Image & Resume -->
         <div class="flex flex-col items-center gap-6 w-full md:w-1/3">
-
+          
           @php
           $settings = json_decode($skills->profile_settings, true);
           $imagePath = $settings['image'] ?? null;
@@ -242,62 +242,6 @@
                 <i class="fab fa-linkedin-in mr-2"></i>
                 LinkedIn
               </a>
-            </div>
-            @endif
-          </div>
-
-          <!-- Invite Button & Modal Wrapper -->
-          <div x-data="{ showModal: false }" class="inline-block">
-            @if($skills->user_id !== Auth::user()->id)
-            <!-- Button -->
-            <button @click="showModal = true"
-              class="px-5 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition">
-              Send Invite
-            </button>
-
-            <!-- Modal -->
-            <div x-show="showModal" x-transition
-              class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-              <div @click.away="showModal = false"
-                class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
-
-                <h2 class="text-lg font-semibold mb-4 text-gray-800">Send Project Invite</h2>
-
-                <form action="{{ route('project.invite', $skills->user_id) }}" method="POST">
-                  @csrf
-
-                  <!-- Select Project -->
-                  <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Select Project</label>
-                    <select name="project_id" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                      @foreach($allProjects->where('owner_id', Auth::id()) as $project)
-                      <option value="{{ $project->id }}">{{ $project->title }}</option>
-                      @endforeach
-                    </select>
-                  </div>
-
-                  <!-- Description -->
-                  <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Message / Description</label>
-                    <textarea name="description" rows="3"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      placeholder="Add your message here..."></textarea>
-                  </div>
-
-                  <!-- Buttons -->
-                  <div class="flex justify-end gap-2">
-                    <button type="button" @click="showModal = false"
-                      class="px-4 py-2 text-sm bg-gray-200 rounded hover:bg-gray-300">
-                      Cancel
-                    </button>
-                    <button type="submit"
-                      class="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700">
-                      Send
-                    </button>
-                  </div>
-                </form>
-
-              </div>
             </div>
             @endif
           </div>

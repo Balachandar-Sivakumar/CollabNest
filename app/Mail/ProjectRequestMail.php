@@ -21,7 +21,7 @@ class ProjectRequestMail extends Mailable
 
     public function build()
     {
-        return $this->subject('New Project Request')
+        return $this->subject('Project Request: Project Title Is '.$this->project->title)
                     ->view('project_request')->with([
                     'requester' => $this->requester,
                     'project' => $this->project,

@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
+
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -25,6 +26,8 @@
       box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
     }
   </style>
+ 
+
 </head>
 @if(session('success'))
 <div id="toast"
@@ -200,17 +203,19 @@
                   <h2 class="text-xl font-semibold text-gray-800">Project Request Profiles</h2>
                   <button @click="showRequestsModal = false" class="text-gray-500 hover:text-gray-700">&times;</button>
                 </div>
-
-                @forelse($inviteRequests as $invite)
-                @if($invite->project)
+                @forelse($projectRequests as $projectRequest)
                 <div class="border-b py-3">
-                  <p class="text-gray-800 font-medium">📁 Project: {{ $invite->project->title }}</p>
-                  <p class="text-sm text-gray-600">👤 Invited by: {{ $invite->owner->name }}</p>
-                  <p class="text-sm text-gray-500">📅 Sent on: {{ $invite->created_at->format('M d, Y') }}</p>
+                  <p class="text-gray-800 font-medium">📁 Project: {{ $projectRequest->title }}</p><br>
+                  @if($projectRequest->request_type == "owner_request")
+                  <p>Requested By {{ $projectRequest->user->name }}</p>
+                  <a href="/profile/{{ $projectRequest->user->id }}"
+                    class="mt-2 inline-block px-4 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                    View Profile
+                  </a>
+                  @endif
                 </div>
-                @endif
                 @empty
-                <p class="text-gray-500">No project invites found.</p>
+                <p class="text-gray-500">No Requests </p>
                 @endforelse
 
               </div>
@@ -270,125 +275,119 @@
           </button>
           @if($project->owner_id !== Auth::user()->id)
           <div x-data="{ showRequestModal: false }">
-            <button @click="showRequestModal = true" type="button" class="flex items-center px-3 py-1.5 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
-              <i class="fas fa-user-plus mr-2"></i> Request
-            </button>
+              <button @click="showRequestModal = true" type="button" class="flex items-center px-3 py-1.5 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
+                <i class="fas fa-user-plus mr-2"></i> Request
+              </button>
 
-            <!-- Modal -->
-            <div x-show="showRequestModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-transition>
-              <div @click.away="showRequestModal = false" class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md" x-transition>
-                <h2 class="text-lg font-semibold mb-4 text-gray-800">Request to Join Project</h2>
-                <form method="POST" action="{{ route('project.request.join', ['id' => $project->id]) }}">
+              <!-- Modal -->
+              <div x-show="showRequestModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-transition>
+                <div @click.away="showRequestModal = false" class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md" x-transition>
+                  <h2 class="text-lg font-semibold mb-4 text-gray-800">Request to Join Project</h2>
+                  <form method="POST" action="{{ route('project.request.join', ['id' =>($project->id)]) }}">
 
-                  @csrf
+                    @csrf
 
-                  <!-- Title -->
-                  <div class="mb-4">
-                    <label for="title" class="block text-sm font-semibold text-gray-800 mb-1">Title:</label>
-                    <input type="text" id="title" name="title" value="Project Request to Join '{{ $project->title }}'" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" readonly />
-                  </div>
+                    <!-- Title -->
+                    <div class="mb-4">
+                      <label for="title" class="block text-sm font-semibold text-gray-800 mb-1">Title:</label>
+                      <input type="text" id="title" name="title" value="Project Request to Join '{{ $project->title }}'" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" readonly />
+                    </div>
 
-                  <!-- Body -->
-                  <div class="mb-4">
-                    <label for="body" class="block text-sm font-semibold text-gray-800 mb-1">Body:</label>
-                    <textarea id="body" name="body" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white resize-none" placeholder="Write your message to the project owner here..."></textarea>
-                  </div>
+                    <!-- Body -->
+                    <div class="mb-4">
+                      <label for="body" class="block text-sm font-semibold text-gray-800 mb-1">Body:</label>
+                      <textarea id="body" name="body" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white resize-none" placeholder="Write your message to the project owner here..."></textarea>
+                    </div>
 
-                  <!-- Document Upload -->
-                  <div class="mb-4">
-                    <label for="document" class="block text-sm font-semibold text-gray-800 mb-1">Upload Document:</label>
-                    <input type="file" name="document" id="document" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white" />
-                  </div>
-
-                  <!-- Buttons -->
-                  <div class="flex justify-end gap-3">
-                    <button type="button" @click="showRequestModal = false" class="px-4 py-2 text-sm bg-gray-200 rounded-md hover:bg-gray-300">
-                      Cancel
-                    </button>
-                    <button type="submit" class="px-4 py-2 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
-                      Send Request
-                    </button>
-                  </div>
-                </form>
+                    <!-- Buttons -->
+                    <div class="flex justify-end gap-3">
+                      <button type="button" @click="showRequestModal = false" class="px-4 py-2 text-sm bg-gray-200 rounded-md hover:bg-gray-300">
+                        Cancel
+                      </button>
+                      <button type="submit" class="px-4 py-2 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
+                        Send Request
+                      </button>
+                    </div>
+                  </form>
 
 
+                </div>
               </div>
             </div>
-          </div>
-          @else
-          <div x-data="{ showInviteModal: false }">
-            <a href="#" @click.prevent="showInviteModal = true" class="flex items-center px-3 py-1.5 text-sm text-white bg-green-600 rounded-md hover:bg-green-700">
-              <i class="fas fa-paper-plane mr-2"></i> Invite
-            </a>
+            @else
+            <div x-data="{ showInviteModal: false }">
+              <a href="#" @click.prevent="showInviteModal = true" class="flex items-center px-3 py-1.5 text-sm text-white bg-green-600 rounded-md hover:bg-green-700">
+                <i class="fas fa-paper-plane mr-2"></i> Invite
+              </a>
 
-            <!-- Modal -->
-            <div x-show="showInviteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-transition>
-              <!-- Modal Panel -->
-              <div @click.away="showInviteModal = false" class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md" x-transition>
-                <h2 class="text-lg font-semibold mb-4 text-gray-800">Invite Members</h2>
+              <!-- Modal -->
+              <div x-show="showInviteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-transition>
+                <!-- Modal Panel -->
+                <div @click.away="showInviteModal = false" class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md" x-transition>
+                  <h2 class="text-lg font-semibold mb-4 text-gray-800">Invite Members</h2>
 
-                <form method="POST" action="{{ route('sendInvite', $project->id) }}" onsubmit="return validateEmails()">
-                  @csrf
-                  <label for="emails" class="block text-sm font-medium text-gray-700 mb-1">Email addresses</label>
-                  <input type="text" name="emails" id="emails" placeholder="e.g. anu@gmail.com, dharshu@gmail.com" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-green-200 mb-4" />
+                  <form method="POST" action="{{ route('sendInvite', $project->id) }}" onsubmit="return validateEmails()">
+                    @csrf
+                    <label for="emails" class="block text-sm font-medium text-gray-700 mb-1">Email addresses</label>
+                    <input type="text" name="emails" id="emails" placeholder="e.g. anu@gmail.com, dharshu@gmail.com" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-green-200 mb-4" />
 
-                  <div class="flex justify-end gap-2">
-                    <button type="button" @click="showInviteModal = false" class="px-4 py-2 text-sm bg-gray-200 rounded-md hover:bg-gray-300">
-                      Cancel
-                    </button>
-                    <button type="submit" class="px-4 py-2 text-sm text-white bg-green-600 rounded-md hover:bg-green-700">
-                      Send Invite
-                    </button>
-                  </div>
-                </form>
+                    <div class="flex justify-end gap-2">
+                      <button type="button" @click="showInviteModal = false" class="px-4 py-2 text-sm bg-gray-200 rounded-md hover:bg-gray-300">
+                        Cancel
+                      </button>
+                      <button type="submit" class="px-4 py-2 text-sm text-white bg-green-600 rounded-md hover:bg-green-700">
+                        Send Invite
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
+            @endif
           </div>
+
+          <!-- delete handling -->
+
+          <div id="popup" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 " style="display: none;">
+            <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+              <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirm Project Deletion</h2>
+
+              <p class="mb-4 text-sm text-gray-600">
+                This action cannot be undone. Please enter your password to confirm deletion.
+              </p>
+
+              <form method="POST" action="/projects">
+                @csrf
+                @method('DELETE')
+
+                <input type="password" name="password" id="delpassword"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-red-200"
+                  placeholder="Enter your password">
+                <input type="hidden" id="projectId" value="{{$project->id}}">
+
+                <div class="mt-6 flex justify-end gap-2">
+                  <button id="cancelbtn" type="button"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded">
+                    Cancel
+                  </button>
+                  <button type="submit" id="confrimDelete"
+                    class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">
+                    Confirm Delete
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- delete handling -->
+          @if($project->owner_id === Auth::user()->id)
+          <button id="deleteProject" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition duration-200">
+            Delete Project
+          </button>
           @endif
+
         </div>
-
-        <!-- delete handling -->
-
-        <div id="popup" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 " style="display: none;">
-          <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirm Project Deletion</h2>
-
-            <p class="mb-4 text-sm text-gray-600">
-              This action cannot be undone. Please enter your password to confirm deletion.
-            </p>
-
-            <form method="POST" action="/projects">
-              @csrf
-              @method('DELETE')
-
-              <input type="password" name="password" id="delpassword"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-red-200"
-                placeholder="Enter your password">
-              <input type="hidden" id="projectId" value="{{$project->id}}">
-
-              <div class="mt-6 flex justify-end gap-2">
-                <button id="cancelbtn" type="button"
-                  class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded">
-                  Cancel
-                </button>
-                <button type="submit" id="confrimDelete"
-                  class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">
-                  Confirm Delete
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-
-        <!-- delete handling -->
-        @if($project->owner_id === Auth::user()->id)
-        <button id="deleteProject" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition duration-200">
-          Delete Project
-        </button>
-        @endif
-
       </div>
-    </div>
     </div>
     @include('team')
   </main>
