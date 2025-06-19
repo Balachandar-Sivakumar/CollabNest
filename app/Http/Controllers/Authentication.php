@@ -13,6 +13,7 @@ use App\Models\Interest;
 use App\Models\Profession;
 use App\Models\Skill;
 use App\Models\UserTag;
+use App\Mail\ForgotPassword;
 
 class Authentication extends Controller
 {
@@ -49,7 +50,7 @@ class Authentication extends Controller
             return redirect('/dashboard');
         }
 
-    
+
 
         $request->validate([
             'name'         => 'required',
@@ -72,30 +73,28 @@ class Authentication extends Controller
             'verified_at' => now(),
         ]);
 
-        
 
-        foreach($request->profession as $prof){
+
+        foreach ($request->profession as $prof) {
             UserTag::create([
-                'tag_id'=>Profession::where('profession',$prof)->value('id'),
-                'user_id'=>$user->id,
-                'tag_model'=>'profession'
+                'tag_id' => Profession::where('profession', $prof)->value('id'),
+                'user_id' => $user->id,
+                'tag_model' => 'profession'
             ]);
         }
-        foreach($request->skills as $skill){
-             UserTag::create([
-                'tag_id'=>Skill::where('skill',$skill)->value('id'),
-                'user_id'=>$user->id,
-                'tag_model'=>'tech_skill'
+        foreach ($request->skills as $skill) {
+            UserTag::create([
+                'tag_id' => Skill::where('skill', $skill)->value('id'),
+                'user_id' => $user->id,
+                'tag_model' => 'tech_skill'
             ]);
-            
         }
-        foreach($request->interests as $interest){
-             UserTag::create([
-                'tag_id'=>Interest::where('interest',$interest)->value('id'),
-                'user_id'=>$user->id,
-                'tag_model'=>'interest'
+        foreach ($request->interests as $interest) {
+            UserTag::create([
+                'tag_id' => Interest::where('interest', $interest)->value('id'),
+                'user_id' => $user->id,
+                'tag_model' => 'interest'
             ]);
-            
         }
 
         // Save profile settings
@@ -107,16 +106,14 @@ class Authentication extends Controller
             'user_id'          => $user->id,
             'profile_settings' => json_encode($settings),
         ]);
-     
-    
-        Mail::to($user->email)->send(new WelcomeMail($token,$user));
-        
-        return view('verification-success')->with('user', $user);
 
-        
+
+        Mail::to($user->email)->send(new WelcomeMail($token, $user));
+
+        return view('verification-success')->with('user', $user);
     }
 
-        public function verify(Request $request)
+    public function verify(Request $request)
     {
         $emailHash = $request->query('email_hash');
         $token = $request->query('token');
@@ -168,4 +165,43 @@ class Authentication extends Controller
         return Auth::check() ? view('dashboard') : redirect('/login');
     }
 
+    public function forgotPassword()
+    {
+        return view('forgotPassword');
+    }
+
+    public function verifyEmail(Request $request)
+    {
+
+        $email = User::where('email', $request->email)->first();
+
+        if (!$email) return response()->json(['error']);
+
+        Mail::to($request->email)->send(new ForgotPassword($request->email));
+
+        $user = $request;
+
+        return view('verification-success', compact('user'));
+    }
+
+    public function navResetForgotPassword($email)
+    {
+
+        return view('resetForgotpassword', compact('email'));
+    }
+
+    public function changeForgotPassword(Request $request)
+    {
+        // Validate input
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|string|min:6|confirmed'
+        ]);
+
+        // Update password
+        User::where('email', $request->email)
+            ->update(['password' => bcrypt($request->password)]);
+
+        return redirect('/navlogin')->with('success','Password change successfully');
+    }
 }

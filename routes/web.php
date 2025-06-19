@@ -24,6 +24,10 @@ Route::controller(Authentication::class)->group(function () {
     Route::get('/dashboard', 'dashboard')->name('dashboard');
     Route::post('/logout', 'logout');
     Route::get('/verify', 'verify');
+    Route::get('/forgotPassword','forgotPassword');
+    Route::post('/verifyEmail','verifyEmail');
+    Route::get('/navResetForgotPassword/{email}','navResetForgotPassword')->name('navResetForgotPassword');
+    Route::post('/changePassword','changeForgotPassword');
 });
 
 // Welcome Pages
@@ -35,10 +39,7 @@ Route::controller(WelcomepageController::class)->group(function () {
     Route::get('/how-it-works', 'howItWorks')->name('how-it-works');
 });
 
-// User login
-Route::post('/login', [Authentication::class, 'loginUser'])->name('login');
 
-Route::get('/login', [Authentication::class, 'loginUser'])->name('login');
 // Settings
 Route::controller(SettingsController::class)->group(function () {
     Route::get('/settings/changePassword','index')->name('changepass');
@@ -68,7 +69,8 @@ Route::controller(UsersController::class)->group(function () {
     Route::get('/navUsers', 'navUsers')->name('navUsers');
     Route::get('/navProfile/edit', 'navedit');
     Route::post('/profile/update', 'profileUpdate');
-    Route::post('/resetPassword','resetPassword');
+    Route::post('/sendOtp','sendOtp');
+    Route::post('/ressetPassword','ressetPassword');
 });
 
 // Project Routes
@@ -82,6 +84,7 @@ Route::controller(ProjectController::class)->group(function () {
     Route::get('/navUpdateProject/{id}', 'navUpdateProject')->name('editProject');
     Route::post('/UpdateProject/{id}', 'UpdateProject');
     Route::get('/projectInvites','projectInvites')->name('projectInvites');
+    Route::post('/decision','inviteDesicion');
 });
 
 // Project Requests

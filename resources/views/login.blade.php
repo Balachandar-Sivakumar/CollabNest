@@ -49,6 +49,17 @@
             {{ session('error') }}
         </div>
     @endif
+
+          @if(session('success'))
+        <div
+            x-data = "{show:true}"
+            x-init = "setTimeout(()=>show=false,3000)"
+            x-show="show"
+            x-transition
+            class="bg-green-100 text-green-800 text-center absolute p-3 w-full rounded">
+            {{ session('success') }}
+        </div>
+    @endif
       <!-- Left side: Login form -->
       <div class="flex-1 p-10 md:p-16 flex flex-col justify-center">
         <h2 class="text-black text-xl font-semibold mb-8 text-center md:text-left">Login</h2>
@@ -68,9 +79,9 @@
                type="password" 
                id="loginPassword"/>
         <i class="toggle-password fas fa-eye" data-target="loginPassword"></i>
-        <button class="absolute right-16 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-semibold" type="button">
+        <a href="/forgotPassword" class="absolute right-16 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-semibold" type="button">
             Forgot password ?
-        </button>
+        </a>
     </div>
     <div class="flex items-center space-x-2">
         <input class="w-4 h-4 rounded border-gray-300 text-[#3b56f5] focus:ring-[#3b56f5]" 

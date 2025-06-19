@@ -236,8 +236,23 @@ class ProjectController extends Controller
         }
     }
 
-    public function projectInvites(){
-        $invites = ProjectInvite::where('target_user_id', Auth::user()->id)->get();
-        return view('projectInvites',compact('invites'));
+    public function projectInvites()
+    {
+        $invites = ProjectInvite::where('target_user_id', Auth::id())->get();
+        $userInvites = ProjectRequest::where('request_type', 'owner_request')
+            ->where('target_id', Auth::id())->get();
+
+      
+        $mergedInvites = $invites->merge($userInvites);
+
+        return view('projectInvites', ['invites' => $mergedInvites]);
+    }
+
+    public function inviteDesicion(Request $request)
+    {
+        ProjectInvite::where('project_id', $request->project_id)
+            ->where('target_user_id', Auth::user()->id)->update(['status' => $request->name . 'ed']);
+
+        return response()->json(['update' => true]);
     }
 }

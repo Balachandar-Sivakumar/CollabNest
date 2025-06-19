@@ -12,15 +12,71 @@
   <style>
     body {
       font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4f1fe 100%);
     }
-
-    .profile-shadow {
-      box-shadow: 0 4px 6px -1px rgba(6, 182, 212, 0.1), 0 2px 4px -1px rgba(6, 182, 212, 0.06);
+    
+    .profile-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+    }
+    
+    .info-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      border-left: 4px solid;
+    }
+    
+    .info-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .gradient-text {
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .social-btn {
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .social-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .profile-image {
+      border: 4px solid white;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .tag {
+      background: linear-gradient(90deg, #e0f2fe, #bae6fd);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .bio-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border-left: 4px solid #3b82f6;
+    }
+    
+    .success-toast {
+      background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+      border: 1px solid #10b981;
     }
   </style>
 </head>
 
-<body class="bg-gray-50 text-gray-800 min-h-screen flex">
+<body class="text-gray-800 min-h-screen flex">
 
   @include('layout.aside')
 
@@ -31,16 +87,16 @@
       x-init="setTimeout(()=>show=false,3000)"
       x-show="show"
       x-transition
-      class="bg-emerald-50 text-emerald-700 text-sm absolute top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg border border-emerald-100 flex items-center gap-2">
-      <i class="fas fa-check-circle"></i>
+      class="success-toast text-emerald-800 text-sm absolute top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg flex items-center gap-2">
+      <i class="fas fa-check-circle text-emerald-600"></i>
       {{ session('success') }}
     </div>
     @endif
-    <div class="max-w-6xl mx-auto bg-white rounded-2xl overflow-hidden p-8 profile-shadow">
+    
+    <div class="max-w-6xl mx-auto profile-card p-8">
       <div class="flex flex-col md:flex-row gap-10 items-start">
         <!-- Left: Profile Image & Resume -->
         <div class="flex flex-col items-center gap-6 w-full md:w-1/3">
-
           @php
           $settings = json_decode($skills->profile_settings, true);
           $imagePath = $settings['image'] ?? null;
@@ -48,29 +104,29 @@
           @endphp
 
           <!-- Profile Image -->
-          <div class="h-24 w-24 rounded-full bg-gray-200 overflow-hidden border-2 border-white shadow">
+          <div class="h-32 w-32 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 p-1 profile-image">
             <img id="profile-preview"
-              src="{{ $imagePath ? asset('storage/' . $imagePath) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&color=7F9CF5&background=EBF4FF' }}"
+              src="{{ $imagePath ? asset('storage/' . $imagePath) : 'https://ui-avatars.com/api/?name=' . urlencode(\App\Models\User::where('id',$id)->value('name')) . '&color=FFFFFF&background=3b82f6' }}"
               alt="Profile Preview"
-              class="h-full w-full object-cover">
+              class="h-full w-full object-cover rounded-full">
           </div>
 
           <!-- Resume PDF Preview -->
           @if($pdf)
           <div class="w-full">
-            <div class="h-[440px] rounded-lg overflow-hidden shadow-sm border border-gray-100 bg-gray-50">
+            <div class="h-[440px] rounded-xl overflow-hidden shadow-md border border-gray-200 bg-white">
               <iframe src="{{ asset('storage/' . $pdf) }}#toolbar=0" class="w-full h-full" frameborder="0"></iframe>
             </div>
 
             @if($skills->user_id !== Auth::user()->id)
             <div class="mt-3 text-center">
-              <a href="{{ asset('storage/' . $pdf) }}" target="_blank" download class="inline-flex items-center text-sm text-cyan-600 hover:text-cyan-800 font-medium transition-colors">
-                <i class="fas fa-file-pdf mr-2"></i>
+              <a href="{{ asset('storage/' . $pdf) }}" target="_blank" download 
+                class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                <i class="fas fa-file-pdf mr-2 text-red-500"></i>
                 Download Resume
               </a>
             </div>
             @endif
-
           </div>
           @endif
         </div>
@@ -79,104 +135,117 @@
         <div class="flex-1 space-y-6">
           <!-- Name & Professions -->
           <div>
-            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">{{ isset($settings['first_name']) ? $settings['first_name'].' '.$settings['last_name'] : \App\Models\User::where('id',$id)->value('name') }}</h1>
+            <h1 class="text-4xl font-bold gradient-text tracking-tight">
+              {{ isset($settings['first_name']) ? $settings['first_name'].' '.$settings['last_name'] : \App\Models\User::where('id',$id)->value('name') }}
+            </h1>
             <div class="mt-3 flex flex-wrap gap-2">
               @php
               $professions_id = \App\Models\UserTag::where('user_id',$id)->where('tag_model','profession')->pluck('tag_id');
               @endphp
 
               @foreach($professions_id ?? [] as $n)
-              <span class="bg-cyan-50 text-cyan-700 text-xs font-medium px-3 py-1.5 rounded-full border border-cyan-100">{{ App\Models\Profession::where('id',$n)->value('profession')}}</span>
+              <span class="tag text-blue-800 text-xs font-medium px-3 py-1.5 rounded-full">
+                {{ App\Models\Profession::where('id',$n)->value('profession')}}
+              </span>
               @endforeach
             </div>
           </div>
 
           <!-- Key Info Grid -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-            <div class="bg-gray-50 p-3 rounded-lg">
+            <!-- User ID Card -->
+            <div class="info-card border-blue-400 p-4">
+              <p class="text-blue-500 text-xs font-medium mb-1">User ID</p>
               @php
               use Vinkla\Hashids\Facades\Hashids;
               @endphp
-
-              <p class="text-gray-500 text-xs font-medium mb-1">User ID</p>
               <p class="font-semibold text-gray-700">{{ Hashids::encode($id) }}</p>
-
             </div>
-            <div class="bg-gray-50 p-3 rounded-lg">
+
+            <!-- Technical Skills Card -->
+            <div class="info-card border-purple-400 p-4">
+              <p class="text-purple-500 text-xs font-medium mb-1">Technical Skills</p>
               @php
               $tech_skill = [];
               $tech_skill_id = \App\Models\UserTag::where('user_id',$id)->where('tag_model','tech_skill')->pluck('tag_id');
 
               foreach ($tech_skill_id ?? [] as $skill_id) {
-              $tech_skill[] = \App\Models\Skill::where('id', $skill_id)->value('skill');
+                $tech_skill[] = \App\Models\Skill::where('id', $skill_id)->value('skill');
               }
               @endphp
-
-              <p class="text-gray-500 text-xs font-medium mb-1">Technical Skills</p>
-              <p class="font-semibold text-cyan-600">
+              <p class="font-semibold text-purple-600">
                 {{ implode(', ', $tech_skill) ?: 'Not specified' }}
               </p>
             </div>
 
-            @php
-            $soft_skills_id = \App\Models\UserTag::where('user_id',$id)->where('tag_model','tech_skill')->pluck('tag_id');
-            $soft_skills=[];
-            foreach($soft_skills_id ?? [] as $soft_skill){
-            $soft_skills[]=\App\Models\SoftSkill::where('id',$soft_skill)->value('soft_skills');
-            }
-            @endphp
-            <div class="bg-gray-50 p-3 rounded-lg">
-              <p class="text-gray-500 text-xs font-medium mb-1">Soft Skills</p>
-              <p class="font-semibold text-gray-700">{{ implode(', ', $soft_skills) ??  'Not specified' }}</p>
-            </div>
-            <div class="bg-gray-50 p-3 rounded-lg">
-              <p class="text-gray-500 text-xs font-medium mb-1">Skill Level</p>
-              <p class="font-semibold text-gray-700">{{ $settings['skill_level'] ?? 'Not specified' }}</p>
-            </div>
-            @php
-            $interests =[];
-            $interests_id = \App\Models\UserTag::where('user_id',$id)->where('tag_model','interest')->pluck('tag_id');
-
-            foreach($interests_id as $int){
-            $interests[]=\App\Models\Interest::where('id',$int)->value('interest');
-            }
-
-            @endphp
-            <div class="bg-gray-50 p-3 rounded-lg">
-              <p class="text-gray-500 text-xs font-medium mb-1">Interests</p>
-              <p class="font-semibold text-gray-700">{{ implode(', ', $interests) ?: 'Not specified' }}</p>
-            </div>
-            <div class="bg-gray-50 p-3 rounded-lg">
-              <p class="text-gray-500 text-xs font-medium mb-1">Availability</p>
-              <p class="font-semibold text-gray-700">{{ $settings['availability'] ?? 'Not specified' }}</p>
-            </div>
-            <div class="bg-gray-50 p-3 rounded-lg">
-              <p class="text-gray-500 text-xs font-medium mb-1">Experience</p>
-              <p class="font-semibold text-gray-700">{{ $settings['years_of_experience'] ?? 'Not specified' }} years</p>
+            <!-- Soft Skills Card -->
+            <div class="info-card border-pink-400 p-4">
+              <p class="text-pink-500 text-xs font-medium mb-1">Soft Skills</p>
+              @php
+              $soft_skills_id = \App\Models\UserTag::where('user_id',$id)->where('tag_model','tech_skill')->pluck('tag_id');
+              $soft_skills=[];
+              foreach($soft_skills_id ?? [] as $soft_skill){
+                $soft_skills[]=\App\Models\SoftSkill::where('id',$soft_skill)->value('soft_skills');
+              }
+              @endphp
+              <p class="font-semibold text-pink-600">{{ implode(', ', $soft_skills) ??  'Not specified' }}</p>
             </div>
 
-            <!-- Added Date of Birth Field -->
-            <div class="bg-gray-50 p-3 rounded-lg">
-              <p class="text-gray-500 text-xs font-medium mb-1">Date of Birth</p>
-              <p class="font-semibold text-gray-700">{{ $settings['dob'] ?? 'Not specified' }}</p>
+            <!-- Skill Level Card -->
+            <div class="info-card border-cyan-400 p-4">
+              <p class="text-cyan-500 text-xs font-medium mb-1">Skill Level</p>
+              <p class="font-semibold text-cyan-600">{{ $settings['skill_level'] ?? 'Not specified' }}</p>
             </div>
 
-            <!-- Added Mobile Number Field -->
+            <!-- Interests Card -->
+            <div class="info-card border-green-400 p-4">
+              <p class="text-green-500 text-xs font-medium mb-1">Interests</p>
+              @php
+              $interests =[];
+              $interests_id = \App\Models\UserTag::where('user_id',$id)->where('tag_model','interest')->pluck('tag_id');
+
+              foreach($interests_id as $int){
+                $interests[]=\App\Models\Interest::where('id',$int)->value('interest');
+              }
+              @endphp
+              <p class="font-semibold text-green-600">{{ implode(', ', $interests) ?: 'Not specified' }}</p>
+            </div>
+
+            <!-- Availability Card -->
+            <div class="info-card border-yellow-400 p-4">
+              <p class="text-yellow-500 text-xs font-medium mb-1">Availability</p>
+              <p class="font-semibold text-yellow-600">{{ $settings['availability'] ?? 'Not specified' }}</p>
+            </div>
+
+            <!-- Experience Card -->
+            <div class="info-card border-orange-400 p-4">
+              <p class="text-orange-500 text-xs font-medium mb-1">Experience</p>
+              <p class="font-semibold text-orange-600">{{ $settings['years_of_experience'] ?? 'Not specified' }} years</p>
+            </div>
+
             @if($skills->user_id === Auth::user()->id)
-            <div class="bg-gray-50 p-3 rounded-lg">
-              <p class="text-gray-500 text-xs font-medium mb-1">Mobile Number</p>
-              <p class="font-semibold text-gray-700">{{ $settings['mobile'] ?? 'Not specified' }}</p>
+            <!-- Date of Birth Card -->
+            <div class="info-card border-red-400 p-4">
+              <p class="text-red-500 text-xs font-medium mb-1">Date of Birth</p>
+              <p class="font-semibold text-red-600">{{ $settings['dob'] ?? 'Not specified' }}</p>
             </div>
 
-            <!-- Added Address Field -->
-            <div class="bg-gray-50 p-3 rounded-lg">
-              <p class="text-gray-500 text-xs font-medium mb-1">Address</p>
+            
+            <!-- Mobile Number Card -->
+            <div class="info-card border-indigo-400 p-4">
+              <p class="text-indigo-500 text-xs font-medium mb-1">Mobile Number</p>
+              <p class="font-semibold text-indigo-600">{{ $settings['mobile'] ?? 'Not specified' }}</p>
+            </div>
+
+            <!-- Address Card -->
+            <div class="info-card border-teal-400 p-4">
+              <p class="text-teal-500 text-xs font-medium mb-1">Address</p>
               @php
               $address = isset($settings['address']) ? json_decode($settings['address'], true) : null;
               @endphp
 
               @if(is_array($address) && !empty($address))
-              <div class="font-semibold text-gray-700 space-y-1">
+              <div class="font-semibold text-teal-600 space-y-1">
                 @if(!empty($address['address_1']))
                 <p>{{ $address['address_1'] }}</p>
                 @endif
@@ -196,19 +265,19 @@
                 @endif
               </div>
               @else
-              <p class="font-semibold text-gray-700">Not specified</p>
+              <p class="font-semibold text-teal-600">Not specified</p>
               @endif
             </div>
+            @endif
           </div>
-          @endif
-          <!-- Bio -->
-          <div class="bg-gray-50 p-4 rounded-lg">
-            <p class="text-gray-500 text-xs font-medium mb-2">About Me</p>
+
+          <!-- Bio Card -->
+          <div class="bio-card p-5 rounded-xl">
+            <p class="text-blue-500 text-xs font-medium mb-2">About Me</p>
             <p class="text-gray-700 text-sm leading-relaxed">
               {{ $settings['bio'] ?? 'No bio information available. Update your profile to add a bio.' }}
             </p>
           </div>
-
 
           <!-- Social Links -->
           <div class="flex flex-wrap gap-4 items-center">
@@ -216,7 +285,7 @@
             @if(isset($settings['github']))
             <div>
               <a href="{{$settings['github'] ?? 'https://github.com'}}" target="_blank"
-                class="inline-flex items-center px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium rounded-md transition-colors duration-200">
+                class="social-btn inline-flex items-center px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg">
                 <i class="fab fa-github mr-2"></i>
                 GitHub
               </a>
@@ -227,7 +296,7 @@
             @if(isset($settings['leetcode']))
             <div>
               <a href="{{$settings['leetcode'] ?? 'https://leetcode.com'}}" target="_blank"
-                class="inline-flex items-center px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black text-sm font-medium rounded-md transition-colors duration-200">
+                class="social-btn inline-flex items-center px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-medium rounded-lg">
                 <i class="fas fa-code mr-2"></i>
                 LeetCode
               </a>
@@ -238,7 +307,7 @@
             @if(isset($settings['linkedin']))
             <div>
               <a href="{{$settings['linkedin'] ?? 'https://linkedin.com'}}" target="_blank"
-                class="inline-flex items-center px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-medium rounded-md transition-colors duration-200">
+                class="social-btn inline-flex items-center px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-medium rounded-lg">
                 <i class="fab fa-linkedin-in mr-2"></i>
                 LinkedIn
               </a>
@@ -247,15 +316,16 @@
           </div>
 
           @if($skills->user_id !== Auth::user()->id)
-          <a href="#" class="px-5 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition">
+          <a href="#" class="px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all">
+            <i class="fas fa-paper-plane mr-2"></i>
             Send Invite
           </a>
           @endif
 
-          <!-- Button -->
+          <!-- Update Profile Button -->
           @if($skills->user_id === Auth::user()->id)
           <div class="pt-2">
-            <a href="/navProfile/edit" class="inline-flex items-center bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-medium px-6 py-3 rounded-lg shadow-sm transition-all text-sm">
+            <a href="/navProfile/edit" class="inline-flex items-center bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-medium px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all">
               <i class="fas fa-user-edit mr-2"></i>
               Update Profile
             </a>

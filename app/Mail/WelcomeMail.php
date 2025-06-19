@@ -24,6 +24,7 @@ class WelcomeMail extends Mailable
         $this->hash = hash('sha256', $user->email); 
         
     }
+
     public function build()
     {
 
