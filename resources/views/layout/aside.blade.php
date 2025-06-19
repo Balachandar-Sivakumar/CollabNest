@@ -18,8 +18,8 @@
       <a href="/profile/{{Auth::user()->id}}">
         <div class="flex items-center space-x-4 bg-white rounded-xl p-3 shadow-sm border border-indigo-50 hover:border-indigo-100 transition-all">
           @php
-          $profile = App\Models\UserProfile::where('user_id',Auth::user()->id)->first();
-          $userProfile = json_decode($profile->profile_settings,true);
+          $profile = App\Models\UserProfile::where('user_id', Auth::user()->id)->first();
+          $userProfile = json_decode($profile->profile_settings, true);
           $image = $userProfile['image'] ?? [];
           @endphp
           <div class="relative">

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>Project Invitation</title>
@@ -17,11 +18,11 @@
             background-color: #ffffff;
             padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .header {
-            background-color: #4CAF50;
+            background-color: rgb(5, 76, 230);
             color: white;
             padding: 15px 20px;
             border-top-left-radius: 8px;
@@ -38,8 +39,8 @@
             display: inline-block;
             margin-top: 20px;
             padding: 12px 25px;
-            background-color: #4CAF50;
-            color: white;
+            background-color: rgb(5, 76, 230);
+            color: #ffffff;
             text-decoration: none;
             border-radius: 5px;
             font-weight: bold;
@@ -53,34 +54,37 @@
         }
 
         .footer a {
-            color: #4CAF50;
+            color: rgb(5, 76, 230);
             text-decoration: none;
         }
     </style>
 </head>
+
 <body>
 
-<div class="email-container">
-    <div class="header">
-        <h2>Project Invitation</h2>
-    </div>
+    <div class="email-container">
+        <div class="header">
+            <h2>Project Invitation</h2>
+        </div>
 
-    <div class="content">
-        <p>Hi there,</p>
+        <div class="content">
+            <p>Hi {{ $user->name ?? $user['name'] ?? 'there' }} 👋,</p>
 
-        <p>You have been invited to collaborate on a project titled:</p>
+            <p>You have been invited to collaborate on a project titled:</p>
 
-        <p style="font-size: 18px; font-weight: bold; color: #2e7d32;">
-            {{ $project->title }}
-        </p>
+            <p style="font-size: 18px; font-weight: bold; color:rgb(246, 249, 250);">
+                {{ $project->title }}
+            </p>
 
-        <p>The project team is excited to have you onboard and contribute your skills!</p>
+            <p>The project team is excited to have you onboard and contribute your skills!</p>
 
-        <a href="{{ url('/') }}" class="btn">View Project</a>
+            <a class="btn text-blue-600 hover:text-blue-800" href="{{ route('project.invite', ['id' => $invite->hash_id]) }}">
+                View Project
+            </a>
 
-        <p>If you believe this was a mistake, feel free to ignore this email.</p>
-    </div>
-</div>
+            <p>If you believe this was a mistake, feel free to ignore this email.</p>
+        </div>
 
 </body>
+
 </html>

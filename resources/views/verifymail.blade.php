@@ -20,11 +20,6 @@
                     ✅ Verify My Email
                 </a>
             </div>
-
-            <p style="font-size: 14px; color: #555;">
-                Or paste this link in your browser:<br>
-                <a href="{{ url('/verify') . '?token=' . $token . '&email_hash=' . $hash }}" style="color: #2563EB;">{{ url('/verify') . '?token=' . $token . '&email_hash=' . $hash }}</a>
-            </p>
         <div class="bg-gray-100 text-center text-xs text-gray-500 py-3">
             &copy; {{ date('Y') }} Collabnest. All rights reserved.
         </div>

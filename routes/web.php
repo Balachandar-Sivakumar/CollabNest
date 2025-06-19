@@ -12,6 +12,7 @@ use App\Http\Controllers\WelcomepageController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\SkillsController;
 use App\Http\Controllers\ProjectRequestController;
+use App\Http\Controllers\TaskCommentController;
 
 // Authentication & Welcome
 Route::controller(Authentication::class)->group(function () {
@@ -95,53 +96,44 @@ Route::controller(ProjectRequestController::class)->group(function () {
     Route::post('/projects/{project}/invite', 'sendInvite')->name('sendInvite');
 });
 
-// Task Routes (with middleware and permissions)
+/// ======================
+//  TASK ROUTES (Protected by auth)
+// ======================
 Route::middleware(['auth'])->group(function () {
-    Route::controller(TaskController::class)->group(function () {
-        Route::get('tasks', 'index')->name('tasks.index');
-        Route::get('tasks/create', 'create')->name('tasks.create');
-        Route::post('tasks', 'store')->name('tasks.store');
-        Route::get('tasks/{task}', 'show')->name('tasks.show')->middleware('can:view,task');
-        Route::get('tasks/{task}/edit', 'edit')->name('tasks.edit')->middleware('can:update,task');
-        Route::put('tasks/{task}', 'update')->name('tasks.update');
-        Route::patch('tasks/{task}', 'update');
-        Route::delete('tasks/{task}', 'destroy')->name('tasks.destroy')->middleware('can:delete,task');
-    });
-});
-
-
-    Route::middleware(['auth'])->group(function () {
-    // List tasks
-    Route::get('tasks', [TaskController::class, 'index'])->name('tasks.index');
+    // Task Resource Routes
+    Route::resource('tasks', TaskController::class)->except(['show']);
     
-    // Create task
-    Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
-    Route::post('tasks', [TaskController::class, 'store'])->name('tasks.store');
-    
-    // View single task
+    // Custom show route to include authorization
     Route::get('tasks/{task}', [TaskController::class, 'show'])
         ->name('tasks.show')
         ->middleware('can:view,task');
+
+ Route::get('/tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
+
+    // Additional Task Routes
+    Route::post('tasks/{task}/change-status', [TaskController::class, 'changeStatus'])
+        ->name('tasks.change-status');
+    Route::post('tasks/{task}/assign-team', [TaskController::class, 'assignTeam'])
+        ->name('tasks.assign-team');
+    Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
+
     
-    // Edit task
-    Route::get('tasks/{task}/edit', [TaskController::class, 'edit'])
-        ->name('tasks.edit')
-        ->middleware('can:update,task');
-    Route::put('tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
-    Route::patch('tasks/{task}', [TaskController::class, 'update']);
-    
-    // Delete task
-    Route::delete('tasks/{task}', [TaskController::class, 'destroy'])
-        ->name('tasks.destroy')
-        ->middleware('can:delete,task');
+    // Comment Routes
+    Route::post('comments', [TaskCommentController::class, 'store'])
+        ->name('comments.store');
+    Route::delete('comments/{comment}', [TaskCommentController::class, 'destroy'])
+        ->name('comments.destroy');
+
+    Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
+
+Route::put('/comments/{comment}', [TaskCommentController::class, 'update'])->name('comments.update');
 });
+// // Make sure you have routes defined like this:
+// Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
 
-// Make sure you have routes defined like this:
-Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
+// Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
 
-Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
-
-Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
+// Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
 
 Route::get('/navUpdateProject/{id}',[ProjectController::class,'navUpdateProject'])->name('editProject');
 
@@ -149,18 +141,21 @@ Route::post('/UpdateProject/{id}',[ProjectController::class,'UpdateProject']);
 
 Route::get('/project/request/{request}/accept', [ProjectRequestController::class, 'acceptRequest'])->name('project.request.accept');
 
-Route::get('/project/request/{request}/accept', [ProjectRequestController::class, 'acceptRequest'])->name('project.request.accept');
-
 Route::get('/project/request/{request}/reject', [ProjectRequestController::class, 'rejectRequest'])->name('project.reject');
 
-
-Route::post('/projects/{project}/invite', [ProjectRequestController::class, 'sendInvite'])->name('sendInvite');
+Route::get('/project/invite/{id}', [ProjectRequestController::class, 'sendInvite'])->name('project.invite');
 
 Route::post('/project/{id}/request-join', [ProjectRequestController::class, 'sendRequest'])->name('project.request.join');
 
-// Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
+Route::get('/teams', [TeamController::class, 'index'])->name('teams.index');
+Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
+Route::get('/teams/{team}/edit', [TeamController::class, 'edit'])->name('teams.edit');
+Route::put('/teams/{team}', [TeamController::class, 'update'])->name('teams.update');
+Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('teams.delete');
 
-// Route::get('/teams/create', [TeamController::class, 'createTeamForm'])->name('team.create');
+Route::middleware('auth')->group(function () {
+    Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
+    Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+});
 
-
-
+Route::post('/project/invite/{id}', [ProjectRequestController::class, 'sendInvite'])->name('project.invite');

@@ -119,18 +119,20 @@ class ProjectController extends Controller
             ->where('project_id', $project->id)
             ->get();
 
-        $projectRequests = ProjectRequest::with('user')
+        $projectRequests = ProjectRequest::with(['user','target'])
             ->where('project_id', $project->id)
-            ->where('status', 'pending')
+            // ->where('status', 'pending')
             ->get();
 
         $inviteRequests = ProjectInvite::with(['project', 'owner'])
             ->where('email', Auth::user()->email)
             ->get();
 
-
-
-        return view('viewProject', compact('project', 'assignedTasks', 'receivedTasks', 'teamMembers', 'projectRequests', 'inviteRequests'));
+    // 👈 get all projects
+        $projectMembers = User::all(); // 👈 if needed for members
+        $teams = ProjectTeam::with(['project', 'members.user'])->get();
+        // dd($projectRequests);
+        return view('viewProject', compact('project', 'assignedTasks', 'receivedTasks', 'teamMembers', 'projectRequests', 'inviteRequests', 'projectMembers','teams'));
     }
 
 

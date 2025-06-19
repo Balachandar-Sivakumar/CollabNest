@@ -119,13 +119,16 @@
           <ul class="divide-y divide-gray-100">
             @foreach($invites as $invite)
             @if($invite->status === 'pending')
+            
             @php
-            $owner = \App\Models\User::find($invite->owner_id);
+            
+            $owner = \App\Models\User::find($invite->user_id);
             $project = \App\Models\Project::find($invite->project_id);
             @endphp
             <li class="p-6 hover:bg-gray-50/50 transition-all duration-300 invite-card">
               <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="flex items-center space-x-4">
+                
                   <div class="flex-shrink-0 relative">
                     <img class="h-14 w-14 rounded-xl object-cover border-2 border-white shadow" 
                          src="{{ $owner->avatar_url ?? 'https://ui-avatars.com/api/?name='.urlencode($owner->name).'&background=random' }}" 

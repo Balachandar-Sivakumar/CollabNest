@@ -7,31 +7,27 @@ use App\Models\User;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
 {
     public function index()
     {
-        // Get all tasks for admin view if needed
-        $tasks = Task::latest()->get();
+        $tasks = Task::with(['project', 'assignee', 'assigner'])
+                    ->latest()
+                    ->paginate(10);
         
-        // Tasks assigned by me
-        $assignedTasks = Task::where('assigned_by', Auth::id())->get();
+        $assignedTasks = Task::where('assigned_by', Auth::user()->id)->get();
+        $receivedTasks = Task::where('assigned_to', Auth::user()->id)->get();
         
-        // Tasks assigned to me
-        $receivedTasks = Task::where('assigned_to', Auth::id())->get();
-
-        // Fetch a project (example: the first project)
-        $project = Project::first();
-
-        return view('viewProject', compact('tasks', 'assignedTasks', 'receivedTasks', 'project'));
+        return view('tasks.index', compact('tasks', 'assignedTasks', 'receivedTasks'));
     }
 
     public function create()
     {
-        $users = User::where('id', '!=', Auth::id())->get();
-        $projects = Project::all(); // Fetch all projects
-        return view('tasks.create', compact('users', 'projects'));
+        $projects = Project::all();
+        $users = User::where('id', '!=', Auth::user()->id)->get();
+        return view('tasks.create', compact('projects', 'users'));
     }
 
     public function store(Request $request)
@@ -41,30 +37,53 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'project_id' => 'required|exists:projects,id',
             'assigned_to' => 'required|exists:users,id',
-            'due_date' => 'nullable|date',
-            'status' => 'nullable|in:pending,in_progress,completed',
+            'due_date' => 'nullable|date|after:today',
+            'status' => 'nullable|in:todo,in_progress,testing,completed,on_hold,cancelled',
+            'requirement_document' => 'nullable|file|max:10240|mimes:pdf,doc,docx',
+            'images' => 'nullable|array|max:5',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'team' => 'nullable|array',
+            'team.*' => 'exists:users,id'
         ]);
 
-        $validated['assigned_by'] = Auth::id();
+        $validated['assigned_by'] = Auth::user()->id;
 
-        Task::create($validated);
+        if ($request->hasFile('requirement_document')) {
+            $validated['requirement_document'] = $request->file('requirement_document')->store('task_documents', 'public');
+        }
 
-        return redirect()->route('tasks.index')->with('success', 'Task created successfully.');
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $imagePaths[] = $image->store('task_images', 'public');
+            }
+            $validated['images'] = $imagePaths;
+        }
+
+        $task = Task::create($validated);
+
+        if ($request->filled('team')) {
+            $task->teamMembers()->sync($request->team);
+        }
+
+        return redirect()->route('tasks.show', $task)->with('success', 'Task created successfully.');
     }
 
     public function show(Task $task)
     {
         $this->authorize('view', $task);
+        $task->load(['project', 'assigner', 'assignee', 'teamMembers', 'comments.user']);
         return view('tasks.show', compact('task'));
     }
 
     public function edit(Task $task)
     {
         $this->authorize('update', $task);
-        $users = User::where('id', '!=', Auth::id())->get();
-        $projects = Project::all(); // Add this if you need project selection in edit
+        $projects = Project::all();
+        $users = User::where('id', '!=', Auth::user()->id)->get();
+        $teamMembers = $task->teamMembers->pluck('id')->toArray();
         
-        return view('tasks.edit', compact('task', 'users', 'projects'));
+        return view('tasks.edit', compact('task', 'projects', 'users', 'teamMembers'));
     }
 
     public function update(Request $request, Task $task)
@@ -75,20 +94,76 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'assigned_to' => 'required|exists:users,id',
-            'due_date' => 'nullable|date',
-            'status' => 'nullable|in:pending,in_progress,completed'
+            'due_date' => 'nullable|date|after:today',
+            'status' => 'required|in:todo,in_progress,testing,completed,on_hold,cancelled',
+            'requirement_document' => 'nullable|file|max:10240|mimes:pdf,doc,docx',
+            'images' => 'nullable|array|max:5',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'team' => 'nullable|array',
+            'team.*' => 'exists:users,id'
         ]);
 
-        $task->update($validated);
+        if ($request->hasFile('requirement_document')) {
+            if ($task->requirement_document) {
+                Storage::disk('public')->delete($task->requirement_document);
+            }
+            $validated['requirement_document'] = $request->file('requirement_document')->store('task_documents', 'public');
+        }
 
-        // Redirect to the index page with a success message
-        return redirect()->back()->with('success', 'Task status updated!');
+        if ($request->hasFile('images')) {
+            if ($task->images) {
+                foreach ($task->images as $image) {
+                    Storage::disk('public')->delete($image);
+                }
+            }
+            
+            $imagePaths = [];
+            foreach ($request->file('images') as $image) {
+                $imagePaths[] = $image->store('task_images', 'public');
+            }
+            $validated['images'] = $imagePaths;
+        }
+
+        $task->update($validated);
+        $task->teamMembers()->sync($request->team ?? []);
+
+        return redirect()->route('tasks.show', $task)->with('success', 'Task updated successfully!');
     }
 
     public function destroy(Task $task)
     {
         $this->authorize('delete', $task);
+        
+        if ($task->requirement_document) {
+            Storage::disk('public')->delete($task->requirement_document);
+        }
+        
+        if ($task->images) {
+            foreach ($task->images as $image) {
+                Storage::disk('public')->delete($image);
+            }
+        }
+        
         $task->delete();
-        return redirect()->route('tasks.index')->with('success', 'Task deleted successfully.');
+        
+        return redirect()->route('tasks.index')->with('success', 'Task deleted successfully!');
     }
+   public function updateStatus(Request $request, Task $task)
+{
+    // Allow only the assigned user to update the status
+    if (Auth::id() !== $task->assigned_to) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    // Include all valid enum options including 'todo'
+    $validated = $request->validate([
+        'status' => 'required|in:todo,in_progress,completed,testing,on_hold,cancelled',
+    ]);
+
+    $task->status = $validated['status'];
+    $task->save();
+
+    return back()->with('success', 'Task status updated successfully.');
+}
+
 }
