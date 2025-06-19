@@ -73,17 +73,19 @@
                             <p class="text-gray-900">{{ $task->due_date ? $task->due_date->format('M d, Y') : 'N/A' }}</p>
                         </div>
                     </div>
+<!-- Status -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
+    <label class="text-gray-700 font-medium md:text-right md:col-span-1 pt-2">Status</label>
 
-                    <!-- Status -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-    <label class="text-gray-700 font-medium md:text-right md:col-span-1">Status</label>
     <div class="md:col-span-3">
         @if(Auth::id() === $task->assigned_to)
-            <!-- Assigned user can update status -->
+            <!-- ✅ Assigned user can update status -->
             <form action="{{ route('tasks.updateStatus', $task->id) }}" method="POST">
                 @csrf
                 @method('PATCH')
-                <select name="status" onchange="this.form.submit()" class="px-3 py-1 rounded-md border-gray-300 text-sm focus:ring focus:ring-blue-300">
+                <select name="status" onchange="this.form.submit()" 
+                        class="px-3 py-2 rounded-md border border-gray-300 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    <option value="todo" {{ $task->status == 'todo' ? 'selected' : '' }}>Todo</option>
                     <option value="in_progress" {{ $task->status == 'in_progress' ? 'selected' : '' }}>In Progress</option>
                     <option value="completed" {{ $task->status == 'completed' ? 'selected' : '' }}>Completed</option>
                     <option value="testing" {{ $task->status == 'testing' ? 'selected' : '' }}>Testing</option>
@@ -92,8 +94,8 @@
                 </select>
             </form>
         @else
-            <!-- Admin (assigned_by) and other users see status visually -->
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
+            <!-- 🔒 Read-only visual badge for others (admin or viewers) -->
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
                 @if($task->status == 'completed') bg-green-100 text-green-800
                 @elseif($task->status == 'in_progress') bg-blue-100 text-blue-800
                 @elseif($task->status == 'testing') bg-purple-100 text-purple-800
@@ -106,6 +108,7 @@
         @endif
     </div>
 </div>
+
 
 
                     <!-- Requirement Document -->

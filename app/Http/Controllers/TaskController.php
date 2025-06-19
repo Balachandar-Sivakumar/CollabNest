@@ -148,14 +148,16 @@ class TaskController extends Controller
         
         return redirect()->route('tasks.index')->with('success', 'Task deleted successfully!');
     }
-    public function updateStatus(Request $request, Task $task)
+   public function updateStatus(Request $request, Task $task)
 {
+    // Allow only the assigned user to update the status
     if (Auth::id() !== $task->assigned_to) {
         abort(403, 'Unauthorized action.');
     }
 
+    // Include all valid enum options including 'todo'
     $validated = $request->validate([
-        'status' => 'required|in:in_progress,completed,testing,on_hold,cancelled',
+        'status' => 'required|in:todo,in_progress,completed,testing,on_hold,cancelled',
     ]);
 
     $task->status = $validated['status'];

@@ -112,6 +112,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('tasks.change-status');
     Route::post('tasks/{task}/assign-team', [TaskController::class, 'assignTeam'])
         ->name('tasks.assign-team');
+    Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
+
     
     // Comment Routes
     Route::post('comments', [TaskCommentController::class, 'store'])
