@@ -12,15 +12,20 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
-
-            $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
+            $table->foreignId('project_id')->constrained()->onDelete('cascade');
             $table->foreignId('assigned_by')->constrained('users')->onDelete('cascade');
             $table->foreignId('assigned_to')->constrained('users')->onDelete('cascade');
-
             $table->date('due_date')->nullable();
-            $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending');
-
-
+            $table->enum('status', [
+                'todo', 
+                'in_progress', 
+                'testing', 
+                'completed', 
+                'on_hold', 
+                'cancelled'
+            ])->default('todo');
+            $table->string('requirement_document')->nullable();
+            $table->json('images')->nullable();
             $table->timestamps();
         });
     }

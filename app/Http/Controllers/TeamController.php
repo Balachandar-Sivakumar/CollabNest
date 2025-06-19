@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\ProjectTeam;
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Models\User;
 use App\Models\ProjectTeamMember;
 
 
@@ -23,7 +23,7 @@ class TeamController extends Controller
         $project = Project::create([
             'title' => $request->title,
             'description' => $request->description,
-            'owner_id' => Auth::id(),
+            'team_lead_id' => Auth::id(),
         ]);
 
         
@@ -44,14 +44,7 @@ class TeamController extends Controller
         return redirect()->route('projects.index')->with('success', 'Project and default team created successfully!');
     }
 
-    public function create()
-    {
-        $allProjects = Project::all();
-        $projectMembers = User::all();
-
-        return view('team.create', compact('allProjects', 'projectMembers'));
-    }
-  
+    // Edit an existing team
     public function edit(ProjectTeam $team)
     {
         $allProjects = Project::all();
@@ -60,11 +53,12 @@ class TeamController extends Controller
         return view('team.edit', compact('team', 'allProjects', 'projectMembers'));
     }
 
+    // Update an existing team
     public function update(Request $request, ProjectTeam $team)
     {
         $request->validate([
             'team_name' => 'required',
-            'project_id' => 'required',
+            'project_id' => 'required|exists:projects,id',
             'description' => 'nullable',
         ]);
 
@@ -74,21 +68,13 @@ class TeamController extends Controller
             'description' => $request->description,
         ]);
 
-        return redirect()->route('teams')->with('success', 'Team updated successfully!');
+        return redirect()->route('teams.index')->with('success', 'Team updated successfully!');
     }
 
+    // Delete a team
     public function destroy(ProjectTeam $team)
     {
         $team->delete();
-        return redirect()->route('teams')->with('success', 'Team deleted successfully!');
+        return redirect()->route('teams.index')->with('success', 'Team deleted successfully!');
     }
-    public function index()
-    {
-        $teams = ProjectTeam::with(['project', 'members.user'])->get();
-        $allProjects = Project::all();
-        $projectMembers = User::all();
-
-        return view('team', compact('teams', 'allProjects', 'projectMembers'));
-    }
-
 }

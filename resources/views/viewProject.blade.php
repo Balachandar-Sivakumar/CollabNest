@@ -390,6 +390,7 @@
       </div>
     </div>
     @include('team')
+    @include('tasks.index')
   </main>
 
   <script>
