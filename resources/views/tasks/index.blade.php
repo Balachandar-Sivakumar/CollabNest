@@ -1,6 +1,4 @@
-@extends('layout.app')
 
-@section('content')
 <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold">Tasks</h1>
@@ -166,7 +164,6 @@
         </div>
     </div>
 </div>
-@endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.2/dist/alpine.min.js" defer></script>

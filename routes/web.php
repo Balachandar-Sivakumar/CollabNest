@@ -1,29 +1,25 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{
-    Authentication,
-    TeamController,
-    ProjectController,
-    TaskController,
-    MessageController,
-    MeetingController,
-    SettingsController,
-    WelcomepageController,
-    UsersController,
-    SkillsController,
-    ProjectRequestController,
-    TaskCommentController
-};
+use App\Http\Controllers\Authentication;
+use App\Http\Controllers\TeamController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\MeetingController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\WelcomepageController;
+use App\Http\Controllers\UsersController;
+use App\Http\Controllers\SkillsController;
+use App\Http\Controllers\ProjectRequestController;
+use App\Http\Controllers\TaskCommentController;
 
-// ======================
-//  AUTHENTICATION ROUTES
-// ======================
+// Authentication & Welcome
 Route::controller(Authentication::class)->group(function () {
     Route::get('/', 'welcome');
     Route::get('/navregister', 'navregister');
     Route::get('/navlogin', 'navLogin');
-    Route::post('/login', 'loginUser')->name('login');
+    Route::post('/login', 'loginUser');
     Route::post('/register', 'register');
     Route::post('/step_two', 'step_two_register');
     Route::get('/dashboard', 'dashboard')->name('dashboard');
@@ -31,9 +27,7 @@ Route::controller(Authentication::class)->group(function () {
     Route::get('/verify', 'verify');
 });
 
-// ======================
-//  WELCOME PAGE ROUTES
-// ======================
+// Welcome Pages
 Route::controller(WelcomepageController::class)->group(function () {
     Route::get('/Home', 'home')->name('home');
     Route::get('/explore-projects', 'exploreProjects')->name('explore-projects');
@@ -42,35 +36,26 @@ Route::controller(WelcomepageController::class)->group(function () {
     Route::get('/how-it-works', 'howItWorks')->name('how-it-works');
 });
 
-// ======================
-//  SETTINGS ROUTES
-// ======================
+// User login
+Route::post('/login', [Authentication::class, 'loginUser'])->name('login');
+
+Route::get('/login', [Authentication::class, 'loginUser'])->name('login');
+// Settings
 Route::controller(SettingsController::class)->group(function () {
-    Route::get('/settings/changePassword', 'index')->name('changepass');
-    Route::get('/settings/help', 'help')->name('help');
+    Route::get('/settings/changePassword','index')->name('changepass');
+    Route::get('/settings/help','help')->name('help');
 });
 
-// ======================
-//  TEAM ROUTES
-// ======================
-Route::prefix('teams')->controller(TeamController::class)->group(function () {
-    Route::get('/', 'index')->name('teams.index');
-    Route::get('/create', 'createTeamForm')->name('teams.create');
-    Route::post('/', 'store')->name('teams.store');
-    Route::get('/{team}/edit', 'edit')->name('teams.edit');
-    Route::put('/{team}', 'update')->name('teams.update');
-    Route::delete('/{team}', 'destroy')->name('teams.destroy');
-});
+// Team
+Route::get('/team', [TeamController::class, 'index'])->name('team');
 
-// ======================
-//  MESSAGE & MEETING ROUTES
-// ======================
+// Messages
 Route::get('/messages', [MessageController::class, 'index'])->name('messages');
+
+// Meetings
 Route::get('/meetings', [MeetingController::class, 'index'])->name('meetings');
 
-// ======================
-//  SKILLS ROUTES
-// ======================
+// Skills
 Route::controller(SkillsController::class)->group(function () {
     Route::get('/profession/search', 'getProfession');
     Route::get('/skills/search', 'getSkills');
@@ -78,20 +63,16 @@ Route::controller(SkillsController::class)->group(function () {
     Route::get('/softSkill/search', 'getSoftskills');
 });
 
-// ======================
-//  USER PROFILE ROUTES
-// ======================
+// Users
 Route::controller(UsersController::class)->group(function () {
     Route::get('/profile/{id}', 'profile');
     Route::get('/navUsers', 'navUsers')->name('navUsers');
     Route::get('/navProfile/edit', 'navedit');
     Route::post('/profile/update', 'profileUpdate');
-    Route::post('/resetPassword', 'resetPassword');
+    Route::post('/resetPassword','resetPassword');
 });
 
-// ======================
-//  PROJECT ROUTES
-// ======================
+// Project Routes
 Route::controller(ProjectController::class)->group(function () {
     Route::get('/projects', 'index')->name('projects');
     Route::get('/navcreateproject', 'navcreateproject')->name('navCreateProject');
@@ -101,12 +82,10 @@ Route::controller(ProjectController::class)->group(function () {
     Route::get('/navMyProject', 'navMyProject')->name('navMyProject');
     Route::get('/navUpdateProject/{id}', 'navUpdateProject')->name('editProject');
     Route::post('/UpdateProject/{id}', 'UpdateProject');
-    Route::get('/projectInvites', 'projectInvites')->name('projectInvites');
+    Route::get('/projectInvites','projectInvites')->name('projectInvites');
 });
 
-// ======================
-//  PROJECT REQUEST ROUTES
-// ======================
+// Project Requests
 Route::controller(ProjectRequestController::class)->group(function () {
     Route::get('/project/request/{requesterId}/accept', 'acceptRequest');
     Route::get('/project/request/{requester}/reject', 'rejectRequest')->name('project.reject');
@@ -114,7 +93,7 @@ Route::controller(ProjectRequestController::class)->group(function () {
     Route::post('/projects/{project}/invite', 'sendInvite')->name('sendInvite');
 });
 
-// ======================
+/// ======================
 //  TASK ROUTES (Protected by auth)
 // ======================
 Route::middleware(['auth'])->group(function () {
@@ -125,7 +104,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('tasks/{task}', [TaskController::class, 'show'])
         ->name('tasks.show')
         ->middleware('can:view,task');
-    
+
+ Route::get('/tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
+
     // Additional Task Routes
     Route::post('tasks/{task}/change-status', [TaskController::class, 'changeStatus'])
         ->name('tasks.change-status');
@@ -137,4 +118,49 @@ Route::middleware(['auth'])->group(function () {
         ->name('comments.store');
     Route::delete('comments/{comment}', [TaskCommentController::class, 'destroy'])
         ->name('comments.destroy');
+
+    Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
+
 });
+// // Make sure you have routes defined like this:
+// Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
+
+// Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+
+// Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
+
+Route::get('/navUpdateProject/{id}',[ProjectController::class,'navUpdateProject'])->name('editProject');
+
+Route::post('/UpdateProject/{id}',[ProjectController::class,'UpdateProject']);
+
+Route::get('/project/request/{request}/accept', [ProjectRequestController::class, 'acceptRequest'])->name('project.request.accept');
+
+
+Route::get('/project/request/{request}/reject', [ProjectRequestController::class, 'rejectRequest'])->name('project.reject');
+
+Route::get('/project/invite/{id}', [ProjectRequestController::class, 'sendInvite'])->name('project.invite');
+
+Route::post('/project/{id}/request-join', [ProjectRequestController::class, 'sendRequest'])->name('project.request.join');
+
+// Route::post('/project/{id}/teams', [TeamController::class, 'store'])->name('teams.store');
+
+// 
+
+// Route::get('/teams/{team}/edit', [TeamController::class, 'edit'])->name('team.edit');
+
+// Route::put('/teams/{team}', [TeamController::class, 'update'])->name('team.update');
+
+// Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('team.destroy');
+
+// Route::get('/teams', [TeamController::class, 'index'])->name('teams.index');
+
+
+Route::get('/teams', [TeamController::class, 'index'])->name('teams.index');
+Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
+Route::get('/teams/{team}/edit', [TeamController::class, 'edit'])->name('teams.edit');
+Route::put('/teams/{team}', [TeamController::class, 'update'])->name('teams.update');
+Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('teams.delete');
+
+
+
+Route::post('/project/invite/{id}', [ProjectRequestController::class, 'sendInvite'])->name('project.invite');

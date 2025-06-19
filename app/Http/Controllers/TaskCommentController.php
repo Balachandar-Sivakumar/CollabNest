@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\TaskComment;
 use Illuminate\Http\Request;
 
@@ -25,7 +26,7 @@ class TaskCommentController extends Controller
 
     public function destroy(TaskComment $comment)
     {
-        $this->authorize('delete', $comment);
+        // $this->authorize('delete', $comment);
         $comment->delete();
         return back()->with('success', 'Comment deleted successfully!');
     }

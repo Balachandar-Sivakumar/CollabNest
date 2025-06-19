@@ -75,21 +75,38 @@
                     </div>
 
                     <!-- Status -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <label class="text-gray-700 font-medium md:text-right md:col-span-1">Status</label>
-                        <div class="md:col-span-3">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
-                                @if($task->status == 'completed') bg-green-100 text-green-800
-                                @elseif($task->status == 'in_progress') bg-blue-100 text-blue-800
-                                @elseif($task->status == 'testing') bg-purple-100 text-purple-800
-                                @elseif($task->status == 'on_hold') bg-yellow-100 text-yellow-800
-                                @elseif($task->status == 'cancelled') bg-red-100 text-red-800
-                                @else bg-gray-100 text-gray-800
-                                @endif">
-                                {{ ucfirst(str_replace('_', ' ', $task->status)) }}
-                            </span>
-                        </div>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <label class="text-gray-700 font-medium md:text-right md:col-span-1">Status</label>
+    <div class="md:col-span-3">
+        @if(Auth::id() === $task->assigned_to)
+            <!-- Assigned user can update status -->
+            <form action="{{ route('tasks.updateStatus', $task->id) }}" method="POST">
+                @csrf
+                @method('PATCH')
+                <select name="status" onchange="this.form.submit()" class="px-3 py-1 rounded-md border-gray-300 text-sm focus:ring focus:ring-blue-300">
+                    <option value="in_progress" {{ $task->status == 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                    <option value="completed" {{ $task->status == 'completed' ? 'selected' : '' }}>Completed</option>
+                    <option value="testing" {{ $task->status == 'testing' ? 'selected' : '' }}>Testing</option>
+                    <option value="on_hold" {{ $task->status == 'on_hold' ? 'selected' : '' }}>On Hold</option>
+                    <option value="cancelled" {{ $task->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                </select>
+            </form>
+        @else
+            <!-- Admin (assigned_by) and other users see status visually -->
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
+                @if($task->status == 'completed') bg-green-100 text-green-800
+                @elseif($task->status == 'in_progress') bg-blue-100 text-blue-800
+                @elseif($task->status == 'testing') bg-purple-100 text-purple-800
+                @elseif($task->status == 'on_hold') bg-yellow-100 text-yellow-800
+                @elseif($task->status == 'cancelled') bg-red-100 text-red-800
+                @else bg-gray-100 text-gray-800
+                @endif">
+                {{ ucfirst(str_replace('_', ' ', $task->status)) }}
+            </span>
+        @endif
+    </div>
+</div>
+
 
                     <!-- Requirement Document -->
                     @if($task->requirement_document)
@@ -176,18 +193,25 @@
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-                        <a href="{{ route('tasks.edit', $task->id) }}" class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
-                            Edit Task
-                        </a>
-                        <form action="{{ route('tasks.destroy', $task->id) }}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" onclick="return confirm('Are you sure you want to delete this task?')">
-                                Delete Task
-                            </button>
-                        </form>
-                    </div>
+                  @php
+    $isAdminUser = Auth::id() === $task->assigned_by;
+@endphp
+
+@if($isAdminUser)
+    <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+        <a href="{{ route('tasks.edit', $task->id) }}" class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+            Edit Task
+        </a>
+        <form action="{{ route('tasks.destroy', $task->id) }}" method="POST">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" onclick="return confirm('Are you sure you want to delete this task?')">
+                Delete Task
+            </button>
+        </form>
+    </div>
+@endif
+
                 </div>
             </div>
         </div>

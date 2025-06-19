@@ -148,4 +148,20 @@ class TaskController extends Controller
         
         return redirect()->route('tasks.index')->with('success', 'Task deleted successfully!');
     }
+    public function updateStatus(Request $request, Task $task)
+{
+    if (Auth::id() !== $task->assigned_to) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    $validated = $request->validate([
+        'status' => 'required|in:in_progress,completed,testing,on_hold,cancelled',
+    ]);
+
+    $task->status = $validated['status'];
+    $task->save();
+
+    return back()->with('success', 'Task status updated successfully.');
+}
+
 }
