@@ -29,4 +29,21 @@ class ProjectTeam extends Model
     {
         return $this->belongsTo(Project::class);
     }
+
+    public function members()
+    {
+        return $this->hasMany(ProjectTeamMember::class, 'team_id');
+    }
+
+    public function users()
+    {
+        return $this->hasManyThrough(
+            User::class,
+            ProjectTeamMember::class,
+            'team_id',    
+            'id',        
+            'id',         
+            'user_id'     
+        );
+    }
 }

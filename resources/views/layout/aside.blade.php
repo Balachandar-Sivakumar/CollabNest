@@ -5,8 +5,7 @@
         <img
           src="assets/logo.png"
           alt="CollabNest Logo"
-          class="w-full h-full object-contain"
-        />
+          class="w-full h-full object-contain" />
       </div>
       <a class="text-indigo-700 font-semibold text-lg" href="#">CollabNest</a>
     </div>
@@ -14,9 +13,9 @@
       <a href="/profile/{{Auth::user()->id}}">
         <div class="flex items-center space-x-4 bg-gray-100 rounded-lg py-3 px-4">
           @php
-            $profile = App\Models\UserProfile::where('user_id',Auth::user()->id)->first();
-            $userProfile = json_decode($profile->profile_settings,true);
-            $image = $userProfile['image'] ?? [];
+          $profile = App\Models\UserProfile::where('user_id',Auth::user()->id)->first();
+          $userProfile = json_decode($profile->profile_settings,true);
+          $image = $userProfile['image'] ?? [];
           @endphp
           <img alt="Profile" class="rounded-full w-10 h-10 object-cover" src="{{ $image ? asset('storage/'. $image) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->name).'&color=7F9CF5&background=EBF4FF'}}" />
           <div>
@@ -28,82 +27,138 @@
     </div>
     <nav class="flex flex-col space-y-2 px-6 text-sm font-semibold">
 
-  <a href="{{ route('dashboard') }}"
-     class="flex items-center space-x-2 py-2 px-3 rounded-md 
-            {{ request()->routeIs('dashboard') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
-    <i class="fas fa-home"></i><span>Dashboard</span>
-  </a>
-
-  <a href="{{ route('navUsers') }}"
-     class="flex items-center space-x-2 py-2 px-3 rounded-md 
-            {{ request()->routeIs('navUsers') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
-    <i class="fas fa-users"></i><span>Users</span>
-  </a>
-
-  <div>
-      <a id="project" 
-     class="flex items-center space-x-2 py-2 px-3 rounded-md 
-        hover:bg-gray-100 text-gray-900  cursor-pointer">
-    <i class="fas fa-box"></i><span >Projects</span>
-  </a>
-
-    <div class="branch  {{ request()->routeIs('projects') || request()->routeIs('navMyProject') || request()->routeIs('viewProject')  || request()->routeIs('editProject') || request()->routeIs('navCreateProject') ?'block' :'hidden'}}">
-        <a href="{{route('projects')}}"
+      <a href="{{ route('dashboard') }}"
         class="flex items-center space-x-2 py-2 px-3 rounded-md 
-              {{ request()->routeIs('projects') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
-        <i></i><i></i><span id="project">All project</span>
+            {{ request()->routeIs('dashboard') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
+        <i class="fas fa-home"></i><span>Dashboard</span>
+      </a>
+
+      @php
+      $profileurl = 'profile/' . Auth::user()->id;
+      @endphp
+
+      <div>
+        <p id="profileShow"
+          class="flex items-center space-x-2 py-2 px-3 rounded-md 
+             hover:bg-gray-100 text-gray-900">
+          <i class="fas fa-user-tie"></i><span>Profile</span>
+        </p>
+
+        <div class="profile_branch {{request()->is($profileurl) || request()->routeIs('projectInvites')  ? 'block' : 'hidden'}}">
+
+          <a href="/profile/{{Auth::user()->id}}"
+            class="flex items-center space-x-2 py-2 px-3 rounded-md 
+            {{ request()->is($profileurl) ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
+            <i></i><i></i><span>MY Profile</span>
+          </a>
+
+          <a href="{{route('projectInvites')}}"
+            class="flex items-center space-x-2 py-2 px-3 rounded-md 
+            {{ request()->routeIs('projectInvites') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
+            <i></i><i></i><span>Invites</span>
+          </a>
+
+        </div>
+      </div>
+
+      <a href="{{ route('navUsers') }}"
+        class="flex items-center space-x-2 py-2 px-3 rounded-md 
+            {{ request()->routeIs('navUsers') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
+        <i class="fas fa-users"></i><span>Users</span>
+      </a>
+
+      <div>
+        <a id="project"
+          class="flex items-center space-x-2 py-2 px-3 rounded-md 
+        hover:bg-gray-100 text-gray-900  cursor-pointer">
+          <i class="fas fa-box"></i><span>Projects</span>
         </a>
 
-      <a href="{{ route('navMyProject') }}"
-        class="flex items-center space-x-2 py-2 px-3 rounded-md 
+        <div class="branch  {{ request()->routeIs('projects') || request()->routeIs('navMyProject') || request()->routeIs('viewProject')  || request()->routeIs('editProject') || request()->routeIs('navCreateProject') ?'block' :'hidden'}}">
+          <a href="{{route('projects')}}"
+            class="flex items-center space-x-2 py-2 px-3 rounded-md 
+              {{ request()->routeIs('projects') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
+            <i></i><i></i><span id="project">All project</span>
+          </a>
+
+          <a href="{{ route('navMyProject') }}"
+            class="flex items-center space-x-2 py-2 px-3 rounded-md 
             {{ request()->routeIs('navMyProject')  ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
-        <i></i><i></i><span id="project">My project</span>
+            <i></i><i></i><span id="project">My project</span>
+          </a>
+        </div>
+      </div>
+
+      <a href="{{ route('messages') }}"
+        class="flex items-center space-x-2 py-2 px-3 rounded-md 
+            {{ request()->routeIs('messages') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
+        <i class="far fa-comment"></i><span>Messages</span>
       </a>
-    </div>
+
+      <a href="{{ route('meetings') }}"
+        class="flex items-center space-x-2 py-2 px-3 rounded-md 
+            {{ request()->routeIs('meetings') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
+        <i class="fas fa-video"></i><span>Meetings</span>
+      </a>
+
+
+      <div>
+        <p id="settings"
+          class="flex items-center space-x-2 py-2 px-3 rounded-md hover:bg-gray-100 text-gray-900">
+          <i class="fas fa-cog"></i><span>Settings</span>
+        </p>
+
+        <div class="setting_branch {{ request()->routeIs('changepass') || request()->routeIs('help') ? 'block' : 'hidden'}}">
+          <a href="{{route('changepass')}}"
+            class="flex items-center space-x-2 py-2 px-3 rounded-md 
+            {{ request()->routeIs('changepass') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
+            <i></i><i></i><span>Change Password</span>
+          </a>
+
+          <a href="{{route('help')}}"
+            class="flex items-center space-x-2 py-2 px-3 rounded-md 
+              {{ request()->routeIs('help') ? 'bg-indigo-100 text-indigo-700':'hover:bg-gray-100 text-gray-900' }}">
+            <i></i><i></i><span>Help</span>
+          </a>
+        </div>
+
+      </div>
+    </nav>
+
+
   </div>
 
-  <a href="{{ route('messages') }}"
-     class="flex items-center space-x-2 py-2 px-3 rounded-md 
-            {{ request()->routeIs('messages') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
-    <i class="far fa-comment"></i><span>Messages</span>
-  </a>
-
-  <a href="{{ route('meetings') }}"
-     class="flex items-center space-x-2 py-2 px-3 rounded-md 
-            {{ request()->routeIs('meetings') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
-    <i class="fas fa-video"></i><span>Meetings</span>
-  </a>
-
+  <div class="px-6 py-4 border-t border-gray-200">
+    <form method="POST" action="/logout">
+      @csrf
+      <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-2 px-4 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </button>
+    </form>
+  </div>
+</aside>
 
 
-  <a href="{{ route('settings') }}"
-     class="flex items-center space-x-2 py-2 px-3 rounded-md 
-            {{ request()->routeIs('settings') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-900' }}">
-    <i class="fas fa-cog"></i><span>Settings</span>
-  </a>
-</nav>
-
-
-    </div>
-
-    <div class="px-6 py-4 border-t border-gray-200">
-      <form method="POST" action="/logout">
-        @csrf
-        <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-2 px-4 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200">
-          <i class="fas fa-sign-out-alt"></i>
-          <span>Logout</span>
-        </button>
-      </form>
-    </div>
-  </aside>
-
-
-  <script>
-let project = document.querySelector('#project'),
+<script>
+  let project = document.querySelector('#project'),
     branches = document.querySelector('.branch');
 
-    project.addEventListener('click', (e) => {
-      branches.style.display = branches.style.display === 'block' ? 'none' : 'block';
-    });
+  project.addEventListener('click', (e) => {
+    branches.style.display = branches.style.display === 'block' ? 'none' : 'block';
+  });
 
-  </script>
+  let settings = document.querySelector('#settings'),
+    settingBranch = document.querySelector('.setting_branch');
+
+  settings.addEventListener('click', () => {
+    settingBranch.style.display = settingBranch.style.display === 'block' ? 'none' : 'block';
+  })
+
+  let profileShow = document.querySelector('#profileShow');
+  profileBranch = document.querySelector('.profile_branch');
+
+  profileShow.addEventListener('click', () => {
+    profileBranch.style.display = profileBranch.style.display === 'block' ? 'none' : 'block';
+  })
+</script>
