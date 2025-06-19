@@ -145,52 +145,77 @@
                     </div>
                     @endif
 
-                    <!-- Comments Section -->
-                    <div class="border-t border-gray-200 pt-6">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">Comments</h3>
-                        
-                        @if($task->comments->count() > 0)
-                            <div class="space-y-4">
-                                @foreach($task->comments as $comment)
-                                <div class="bg-gray-50 p-4 rounded-lg">
-                                    <div class="flex justify-between items-start">
-                                        <div class="flex items-center space-x-2">
-                                            <span class="font-medium text-gray-900">{{ $comment->user->name }}</span>
-                                            <span class="text-gray-500 text-sm">{{ $comment->created_at->diffForHumans() }}</span>
-                                        </div>
-                                        @if(auth()->id() == $comment->user_id)
-                                        <form action="{{ route('comments.destroy', $comment->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-500 hover:text-red-700">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                </svg>
-                                            </button>
-                                        </form>
-                                        @endif
-                                    </div>
-                                    <p class="mt-2 text-gray-700 whitespace-pre-line">{{ $comment->comment }}</p>
-                                </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <p class="text-gray-500">No comments yet.</p>
-                        @endif
+               <!-- Comments Section -->
+<div class="border-t border-gray-200 pt-6">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Comments</h3>
+    
+    @if($task->comments->count() > 0)
+        <div class="space-y-4">
+            @foreach($task->comments as $comment)
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center space-x-2">
+                            <span class="font-medium text-gray-900">{{ $comment->user->name }}</span>
+                            <span class="text-gray-500 text-sm">{{ $comment->created_at->diffForHumans() }}</span>
+                        </div>
 
-                        <!-- Add Comment Form -->
-                        <form action="{{ route('comments.store') }}" method="POST" class="mt-6">
-                            @csrf
-                            <input type="hidden" name="task_id" value="{{ $task->id }}">
-                            <div class="mb-4">
-                                <label for="comment" class="block text-sm font-medium text-gray-700 mb-1">Add Comment</label>
-                                <textarea name="comment" id="comment" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required></textarea>
+                        @if(auth()->id() == $comment->user_id)
+                            <div class="flex space-x-2">
+                                <!-- Edit Button -->
+                                <button type="button" onclick="document.getElementById('edit-form-{{ $comment->id }}').classList.toggle('hidden')" class="text-blue-500 hover:text-blue-700">
+                                    ✏️
+                                </button>
+
+                                <!-- Delete Form -->
+                                <form action="{{ route('comments.destroy', $comment->id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-500 hover:text-red-700">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
-                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                Post Comment
+                        @endif
+                    </div>
+
+                    <!-- Comment Text -->
+                    <p class="mt-2 text-gray-700 whitespace-pre-line">{{ $comment->comment }}</p>
+
+                    <!-- Hidden Edit Form -->
+                    @if(auth()->id() == $comment->user_id)
+                        <form action="{{ route('comments.update', $comment->id) }}" method="POST" class="mt-3 hidden" id="edit-form-{{ $comment->id }}">
+                            @csrf
+                            @method('PUT')
+                            <textarea name="comment" class="w-full p-2 border rounded" rows="2" required>{{ $comment->comment }}</textarea>
+                            <button type="submit" class="mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                                Update
                             </button>
                         </form>
-                    </div>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+    @else
+        <p class="text-gray-500">No comments yet.</p>
+    @endif
+
+    <!-- Add Comment Form -->
+    <form action="{{ route('comments.store') }}" method="POST" class="mt-6">
+        @csrf
+        <input type="hidden" name="task_id" value="{{ $task->id }}">
+        <div class="mb-4">
+            <label for="comment" class="block text-sm font-medium text-gray-700 mb-1">Add Comment</label>
+            <textarea name="comment" id="comment" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required></textarea>
+        </div>
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Post Comment
+        </button>
+    </form>
+</div>
+
 
                     <!-- Action Buttons -->
                   @php

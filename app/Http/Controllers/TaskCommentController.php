@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 
 use App\Models\TaskComment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+
+
 
 class TaskCommentController extends Controller
 {
@@ -30,4 +34,21 @@ class TaskCommentController extends Controller
         $comment->delete();
         return back()->with('success', 'Comment deleted successfully!');
     }
+
+// Update existing comment
+public function update(Request $request, TaskComment $comment)
+{
+    if (Auth::id() !== $comment->user_id) {
+        abort(403, 'Unauthorized');
+    }
+
+    $request->validate([
+        'comment' => 'required|string|max:1000',
+    ]);
+
+    $comment->comment = $request->comment;
+    $comment->save();
+
+    return back()->with('success', 'Comment updated!');
+}
 }

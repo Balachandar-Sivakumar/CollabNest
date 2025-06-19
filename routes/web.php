@@ -121,6 +121,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
 
+Route::put('/comments/{comment}', [TaskCommentController::class, 'update'])->name('comments.update');
 });
 // // Make sure you have routes defined like this:
 // Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
